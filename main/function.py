@@ -80,3 +80,13 @@ def populate_the_timesheet(weekday: str):
         lst.append(dict(name=lesson_name, start=start_time, end=end_time))
         last_end_time = end_time  # 更新上一节课的结束时间
     return lst
+
+
+# 比较两个时间是不是一样的
+def compareTime():
+    try:
+        data = json.loads(read_file("../data/daily_config.json"))
+        if data["date_time"] == datetime.datetime.now().strftime("%Y_%m_%d"):
+            return True  # 文件中的日期等于当前日期，返回
+    except:
+        return False  # 文件损坏或者不相等
