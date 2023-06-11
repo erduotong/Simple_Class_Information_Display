@@ -1,7 +1,9 @@
 import json
 import time
 import shutil
+import datetime
 import os
+from collections import OrderedDict
 
 
 # 备份 分别为:路径,目标路径,备份槽位,
@@ -24,4 +26,28 @@ def backup(path: str, destination_path: str, backup_slot: int) -> None:
         os.remove(backups[0])
 
 
+# 读取文件函数
+def read_file(path: str):
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
 
+
+# 写入文件函数
+def write_file(path: str, text: str) -> None:
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(text)
+
+
+# todo 补全课表函数 先根据l1~l8填充然后填早读,最后把课间填上(从最早到最晚的空隙,如果到了end就跳转到下一个进行计时
+# 输入:星期几,全小写
+def populate_the_timesheet(weekday: str):
+    if weekday == "saturday" or weekday == "sunday":  # 可以自定义
+        # 解析为python对象,调用方法是[0][None][start]这样的,表示一整天都是空的
+        return json.loads('[{"None": {"start": "00:01", "end": "23:59", }}]')
+    time_dict = json.loads(read_file("../data/Curriculum/time.json"))
+    lessons_dict = json.loads(read_file("../data/Curriculum/lessons.json"))
+    lessons_dict = lessons_dict[weekday]
+
+
+
+populate_the_timesheet("monday")
