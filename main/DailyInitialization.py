@@ -1,4 +1,6 @@
 import datetime
+import json
+
 from function import *
 
 
@@ -9,7 +11,7 @@ def daily_initialization():  # 每日的配置文件生成函数
         with open("../data/daily_config.json", "w"):
             pass
     try:
-        with open("../data/daily_config.json", "w") as f:
+        with open("../data/daily_config.json", "r") as f:
             if json.loads(f.read())["date_time"] == datetime.datetime.now().strftime("%Y_%m_%d"):
                 return
     except:
