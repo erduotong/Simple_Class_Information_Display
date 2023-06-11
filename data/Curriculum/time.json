@@ -31,19 +31,19 @@
     "start": "16:50",
     "end": "17:35"
   },
-  "morning_exercises": {
+  "早操": {
     "start": "07:40",
     "end": "08:10"
   },
-  "morning_reading": {
+  "晨读": {
     "start": "08:15",
     "end": "08:30"
   },
-  "time_extension_service": {
+  "延时服务": {
     "start": "17:45",
     "end": "18:30"
   },
-  "break_at_noon": {
+  "中午休息": {
     "start": "12:00",
     "end": "13:40"
   }

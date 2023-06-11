@@ -8,16 +8,17 @@ def daily_initialization():  # 每日的配置文件生成函数
     if not os.path.exists("../data/daily_config.json"):
         with open("../data/daily_config.json", "w"):
             pass
+    now_datetime = datetime.datetime.now()
     try:
         with open("../data/daily_config.json", "r") as f:
-            if json.loads(f.read())["date_time"] == datetime.datetime.now().strftime("%Y_%m_%d"):
+            if json.loads(f.read())["date_time"] == now_datetime.strftime("%Y_%m_%d"):
                 return
     except:
         pass
     backup("../data/daily_config.json", "../data/backup/daily_config", config["backup_slots"]["daily_config"])
-    # todo 将lessons里面的和时间一一对应并且补全课间&延时服务等
+    week_name = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][now_datetime.weekday()]
     daily_config = {
-        "date_time": datetime.datetime.now().strftime("%Y_%m_%d")
+        "date_time": datetime.datetime.now().strftime("%Y_%m_%d"),
+        "lessons_list": populate_the_timesheet(week_name)
     }
-    with open("../data/daily_config.json", "w") as f:
-        f.write(json.dumps(daily_config))
+    write_file('../data/daily_config.json', json.dumps(daily_config, ensure_ascii=False, indent=4))
