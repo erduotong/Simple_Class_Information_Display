@@ -10,10 +10,11 @@ def daily_initialization():  # 每日的配置文件生成函数
             pass
     now_datetime = datetime.datetime.now()
     try:
-        with open("../data/daily_config.json", "r") as f:
-            if json.loads(f.read())["date_time"] == now_datetime.strftime("%Y_%m_%d"):
-                return
-    except:
+        data = json.loads(read_file("../data/daily_config.json"))
+        print(data["date_time"] == now_datetime.strftime("%Y_%m_%d"))
+        if data["date_time"] == now_datetime.strftime("%Y_%m_%d"):
+            return  # 文件中的日期等于当前日期，返回
+    except :
         pass
     backup("../data/daily_config.json", "../data/backup/daily_config", config["backup_slots"]["daily_config"])
     week_name = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][now_datetime.weekday()]
