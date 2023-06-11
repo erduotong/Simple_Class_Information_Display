@@ -1,15 +1,15 @@
-from DailyInitialization import *
 import datetime
-import random
 import json
 import sys
+import time
+from DailyInitialization import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5 import uic
+import qdarkstyle
 
-import time
 
-
+# 使用了qdarkstyle
 class ReselectTheClassScheduleWindow(QWidget):
     returnPressed = pyqtSignal(str)
 
@@ -67,6 +67,7 @@ if __name__ == '__main__':
         ReselectTheClassSchduleWindow = ReselectTheClassScheduleWindow(
             json.loads(read_file('../data/Curriculum/lessons.json')))
         ReselectTheClassSchduleWindow.returnPressed.connect(lambda: None)  # 禁用自定义信号
+        app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 使用深色的qss
         ReselectTheClassSchduleWindow.ui.show()
         app.exec()
         week_name = ReselectTheClassSchduleWindow.result
