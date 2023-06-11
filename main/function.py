@@ -88,5 +88,7 @@ def compareTime():
         data = json.loads(read_file("../data/daily_config.json"))
         if data["date_time"] == datetime.datetime.now().strftime("%Y_%m_%d"):
             return True  # 文件中的日期等于当前日期，返回
+        else:
+            return False
     except:
         return False  # 文件损坏或者不相等
