@@ -38,16 +38,45 @@ def write_file(path: str, text: str) -> None:
         f.write(text)
 
 
-# todo 补全课表函数 先根据l1~l8填充然后填早读,最后把课间填上(从最早到最晚的空隙,如果到了end就跳转到下一个进行计时
-# 输入:星期几,全小写
+# 输入:星期几,全小写 周六日会返回一个空的列表
 def populate_the_timesheet(weekday: str):
     if weekday == "saturday" or weekday == "sunday":  # 可以自定义
-        # 解析为python对象,调用方法是[0][None][start]这样的,表示一整天都是空的
-        return json.loads('[{"None": {"start": "00:01", "end": "23:59", }}]')
+        # 返回空~
+        return [{'name': 'None', 'start': '00:01', 'end': '23:59'}]
     time_dict = json.loads(read_file("../data/Curriculum/time.json"))
-    lessons_dict = json.loads(read_file("../data/Curriculum/lessons.json"))
-    lessons_dict = lessons_dict[weekday]
-
-
-
-populate_the_timesheet("monday")
+    lessons_list = json.loads(read_file("../data/Curriculum/lessons.json"))
+    lessons_list = lessons_list[weekday]
+    # 创建一个空列表 start_end_times，用于存储各节课程的开始和结束时间
+    start_end_times = []
+    # 读取每个课程的时间信息并将其添加到 start_end_times 中
+    for i in range(len(lessons_list)):
+        lesson_name = lessons_list[i]  # 获取当前课程名称
+        time_info = time_dict["l" + str(i + 1)]  # 提取当前课程的时间信息
+        start_time = time_info["start"]  # 提取当前课程的开始时间
+        end_time = time_info["end"]  # 提取当前课程的结束时间
+        start_end_times.append(
+            dict(name=lesson_name, start=start_time, end=end_time))  # 将当前课程的时间信息存储到 start_end_times 中
+    # 将特殊课程的时间信息添加到 start_end_times 中
+    for lesson_name in ["早读", "延时服务", "晨读", "中午休息"]:
+        if lesson_name in time_dict:
+            start_time = time_dict[lesson_name]["start"]
+            end_time = time_dict[lesson_name]["end"]
+            start_end_times.append(dict(name=lesson_name, start=start_time, end=end_time))
+    # 对 start_end_times 中的课程按照开始时间进行排序
+    sorted_times = sorted(start_end_times, key=lambda x: x["start"])
+    # 用列表 lst 来记录排序后的课程及其对应的时间信息
+    lst = []
+    last_end_time = None
+    # 处理每节课程的开始和结束时间，并在每节课程之间添加课间时间
+    for time_info in sorted_times:
+        lesson_name = time_info["name"]
+        start_time = time_info["start"]  # 当前课程的开始时间
+        end_time = time_info["end"]  # 当前课程的结束时间
+        if last_end_time is not None and start_time > last_end_time:
+            # 如果上一节课结束时间和当前课程的开始时间之间有空闲时间，就添加上课间时间
+            interval_name = "课间"
+            interval_time = dict(name=interval_name, start=last_end_time, end=start_time)
+            lst.append(interval_time)
+        lst.append(dict(name=lesson_name, start=start_time, end=end_time))
+        last_end_time = end_time  # 更新上一节课的结束时间
+    return lst
