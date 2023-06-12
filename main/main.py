@@ -57,6 +57,16 @@ class ReselectTheClassScheduleWindow(QWidget):
             self.ui.textBrowser.repaint()
 
 
+class MainWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.ui = None
+        self.init_ui()
+
+    def init_ui(self):
+        self.ui = uic.loadUi("./MainWindow.ui")
+
+
 if __name__ == '__main__':
     now = datetime.datetime.now()
     week_name = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][now.weekday()]
@@ -73,4 +83,8 @@ if __name__ == '__main__':
         week_name = ReselectTheClassSchduleWindow.result
     daily_initialization(week_name)  # 初始化daily_config文件
     # 进入主窗口
-
+    app = QApplication(sys.argv)
+    MainWindow = MainWindow()
+    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 使用qdarkstyle qss
+    MainWindow.ui.show()
+    app.exec()
