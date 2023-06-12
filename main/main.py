@@ -60,6 +60,8 @@ class ReselectTheClassScheduleWindow(QWidget):
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
+        self.screen_height = None
+        self.screen_width = None
         self.ui = None
         self.init_ui()
 
@@ -72,6 +74,7 @@ if __name__ == '__main__':
     week_name = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][now.weekday()]
     compare_time = compareTime()
     # 如果是周六日并且文件没有在今天被创建过的话就问一下
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)  # 高DPI自适应
     if (week_name == 'saturday' or week_name == 'sunday') and compare_time is False:
         app = QApplication(sys.argv)
         ReselectTheClassSchduleWindow = ReselectTheClassScheduleWindow(

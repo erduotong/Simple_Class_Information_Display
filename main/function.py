@@ -3,7 +3,7 @@ import time
 import shutil
 import datetime
 import os
-from collections import OrderedDict
+from PyQt5 import QtWidgets
 
 
 # 备份 分别为:路径,目标路径,备份槽位,
@@ -92,3 +92,11 @@ def compareTime():
             return False
     except:
         return False  # 文件损坏或者不相等
+
+
+# 获得去掉任务栏后的大小,也就是壁纸应该的面积
+def get_desktop_size():
+    app = QtWidgets.QApplication([])
+    screen = app.primaryScreen()
+    rect = screen.availableGeometry()
+    return rect.width(), rect.height()
