@@ -73,3 +73,4 @@ if __name__ == '__main__':
         week_name = ReselectTheClassSchduleWindow.result
     daily_initialization(week_name)  # 初始化daily_config文件
     # 进入主窗口
+
