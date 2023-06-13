@@ -16,7 +16,6 @@ def daily_initialization(weekname):  # 每日的配置文件生成函数
     except :
         pass
     backup("../data/daily_config.json", "../data/backup/daily_config", config["backup_slots"]["daily_config"])
-
     daily_config = {
         "date_time": datetime.datetime.now().strftime("%Y_%m_%d"),
         "lessons_list": populate_the_timesheet(weekname)

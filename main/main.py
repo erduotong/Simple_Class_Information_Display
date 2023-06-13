@@ -2,7 +2,7 @@ import datetime
 import json
 import sys
 import time
-from DailyInitialization import *
+from daily_initialization import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5 import uic
@@ -66,7 +66,7 @@ class MainWindow(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        self.ui = uic.loadUi("./MainWindow.ui")
+        self.ui = uic.loadUi("./main_window.ui")
 
 
 if __name__ == '__main__':
