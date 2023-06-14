@@ -84,7 +84,7 @@ if __name__ == '__main__':
         ReselectTheClassSchduleWindow.ui.show()
         app.exec()
         week_name = ReselectTheClassSchduleWindow.result
-    else: # 防止app忘记创建
+    else:  # 防止app忘记创建
         app = QApplication(sys.argv)
     daily_initialization(week_name)  # 初始化daily_config文件
     # 进入主窗口
