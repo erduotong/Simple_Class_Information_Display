@@ -92,4 +92,3 @@ if __name__ == '__main__':
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 使用qdarkstyle qss
     MainWindow.ui.show()
     app.exec()
-    print("test")
