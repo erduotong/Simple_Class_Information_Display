@@ -75,6 +75,8 @@ if __name__ == '__main__':
     compare_time = compareTime()
     # 如果是周六日并且文件没有在今天被创建过的话就问一下
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)  # 高DPI自适应
+    week_name = 'saturday'
+    compare_time = False
     if (week_name == 'saturday' or week_name == 'sunday') and compare_time is False:
         app = QApplication(sys.argv)
         ReselectTheClassSchduleWindow = ReselectTheClassScheduleWindow(
@@ -86,7 +88,6 @@ if __name__ == '__main__':
         week_name = ReselectTheClassSchduleWindow.result
     daily_initialization(week_name)  # 初始化daily_config文件
     # 进入主窗口
-    app = QApplication(sys.argv)
     MainWindow = MainWindow()
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 使用qdarkstyle qss
     MainWindow.ui.show()
