@@ -67,6 +67,10 @@ class MainWindow(QWidget):
 
     def init_ui(self):
         self.ui = uic.loadUi("./main_window.ui")
+        self.ui.setWindowFlags(Qt.FramelessWindowHint)  # 设置无边框窗口
+        rect = QDesktopWidget().availableGeometry()  # 初始化大小
+        self.ui.resize(rect.width(), rect.height())
+
 
 
 if __name__ == '__main__':
@@ -88,7 +92,7 @@ if __name__ == '__main__':
         app = QApplication(sys.argv)
     daily_initialization(week_name)  # 初始化daily_config文件
     # 进入主窗口
-    MainWindow = MainWindow()
+    main_window = MainWindow()
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 使用qdarkstyle qss
-    MainWindow.ui.show()
+    main_window.ui.show()
     app.exec()

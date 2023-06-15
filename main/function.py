@@ -94,9 +94,3 @@ def compareTime():
         return False  # 文件损坏或者不相等
 
 
-# 获得去掉任务栏后的大小,也就是壁纸应该的面积
-def get_desktop_size():
-    app = QtWidgets.QApplication([])
-    screen = app.primaryScreen()
-    rect = screen.availableGeometry()
-    return rect.width(), rect.height()
