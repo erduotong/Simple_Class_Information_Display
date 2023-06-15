@@ -7,6 +7,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5 import uic
 import qdarkstyle
+import win32gui
+import ctypes
 
 
 # 使用了qdarkstyle
@@ -57,20 +59,26 @@ class ReselectTheClassScheduleWindow(QDialog):
             self.ui.textBrowser.repaint()
 
 
-class MainWindow(QWidget):
+class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.screen_height = None
         self.screen_width = None
         self.ui = None
-        self.init_ui()
+        self.run_window()
 
-    def init_ui(self):
+    def run_window(self):
         self.ui = uic.loadUi("./main_window.ui")
+
         self.ui.setWindowFlags(Qt.FramelessWindowHint)  # 设置无边框窗口
         rect = QDesktopWidget().availableGeometry()  # 初始化大小
         self.ui.resize(rect.width(), rect.height())
-
+        # 设置位置
+        h = win32gui.FindWindow("Progman", "Program Manager")  # 获取桌面窗口句柄
+        win_hwnd = int(self.winId())  # 获取MainWindow窗口句柄
+        win32gui.SetParent(win_hwnd, h)  # 将MainWindow窗口设置为桌面窗口的子窗口
+        # todo 实现类似wallpaper engine的方式放置在桌面上(现在能基本实现 但是效果并不好)
+        # todo 根据目前所看的虚拟桌面自动切换
 
 
 if __name__ == '__main__':
@@ -92,6 +100,7 @@ if __name__ == '__main__':
         app = QApplication(sys.argv)
     daily_initialization(week_name)  # 初始化daily_config文件
     # 进入主窗口
+    pretreatmentHandle()  # 清理一下窗口
     main_window = MainWindow()
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 使用qdarkstyle qss
     main_window.ui.show()

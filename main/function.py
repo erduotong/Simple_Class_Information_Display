@@ -4,6 +4,7 @@ import shutil
 import datetime
 import os
 from PyQt5 import QtWidgets
+import win32gui
 
 
 # 备份 分别为:路径,目标路径,备份槽位,
@@ -94,3 +95,21 @@ def compareTime():
         return False  # 文件损坏或者不相等
 
 
+# 清理不需要的WorkerW窗口
+def pretreatmentHandle():
+    hwnd = win32gui.FindWindow("Progman", "Program Manager")
+    win32gui.SendMessageTimeout(hwnd, 0x052C, 0, None, 0, 0x03E8)
+    hwnd_WorkW = None
+    while 1:
+        hwnd_WorkW = win32gui.FindWindowEx(None, hwnd_WorkW, "WorkerW", None)
+        if not hwnd_WorkW:
+            continue
+        hView = win32gui.FindWindowEx(hwnd_WorkW, None, "SHELLDLL_DefView", None)
+        if not hView:
+            continue
+        h = win32gui.FindWindowEx(None, hwnd_WorkW, "WorkerW", None)
+        while h:
+            win32gui.SendMessage(h, 0x0010, 0, 0)  # WM_CLOSE
+            h = win32gui.FindWindowEx(None, hwnd_WorkW, "WorkerW", None)
+        break
+    return hwnd
