@@ -8,11 +8,12 @@ from PyQt5.QtCore import *
 from PyQt5 import uic
 import qdarkstyle
 import win32gui
-import ctypes
+import win32con
 
 
 # 使用了qdarkstyle
 class ReselectTheClassScheduleWindow(QDialog):
+    # todo 不允许用户直接关闭窗口
     returnPressed = pyqtSignal(str)
 
     def __init__(self, week):
