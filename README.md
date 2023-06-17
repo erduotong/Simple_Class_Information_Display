@@ -1,4 +1,4 @@
-
+# Simple_Daily_Desktop
 [![Generic badge](https://img.shields.io/badge/编写于_Python_版本-3.11.3-blue.svg)](https://Python.org)  
 >这是一个可以交互的,一般来说位于壁纸层的应用
 ## 适用场景
@@ -8,6 +8,8 @@
 >程序的基本设置存储与program_config中 每天更新的配置文件存储与daily_config中
 
 你可以在这里阅读:
+* [daily_config.json](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/daily_config_meaning.md)
+* [program_config.json](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/program_config_meaning.md)
 ## 分享协议
 #### https://creativecommons.org/licenses/by-nc-sa/4.0/
 #### 署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0)
