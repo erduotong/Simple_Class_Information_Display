@@ -9,6 +9,8 @@ from PyQt5 import uic
 import qdarkstyle
 import win32gui
 import win32con
+import schedule  # 用于计时
+import threading
 
 
 # 使用了qdarkstyle
@@ -61,16 +63,18 @@ class ReselectTheClassScheduleWindow(QDialog):
 
 
 class MainWindow(QMainWindow):
+    refresh_time_singal = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.screen_height = None
         self.screen_width = None
         self.ui = None
+        self.refresh_time_singal.connect(self.refresh_time)
         self.run_window()
 
     def run_window(self):
         self.ui = uic.loadUi("./main_window.ui")
-
         self.ui.setWindowFlags(Qt.FramelessWindowHint)  # 设置无边框窗口
         rect = QDesktopWidget().availableGeometry()  # 初始化大小
         self.ui.resize(rect.width(), rect.height())
@@ -78,8 +82,15 @@ class MainWindow(QMainWindow):
         h = win32gui.FindWindow("Progman", "Program Manager")  # 获取桌面窗口句柄
         win_hwnd = int(self.winId())  # 获取MainWindow窗口句柄
         win32gui.SetParent(win_hwnd, h)  # 将MainWindow窗口设置为桌面窗口的子窗口
+        # print(self.ui.__dict__)  # 调试用
         # todo 实现类似wallpaper engine的方式放置在桌面上(现在能基本实现 但是效果并不好)
         # todo 根据目前所看的虚拟桌面自动切换
+
+    # 刷新时间
+    def refresh_time(self):
+        self.ui.nowtime.setText(time.strftime("%Y/%m/%d %H:%M:%S ", time.localtime()) +
+                                ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"][time.localtime().tm_wday])
+        self.ui.nowtime.repaint()
 
 
 if __name__ == '__main__':
@@ -88,6 +99,7 @@ if __name__ == '__main__':
     compare_time = compareTime()
     # 如果是周六日并且文件没有在今天被创建过的话就问一下
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)  # 高DPI自适应
+    # 询问课表
     if (week_name == 'saturday' or week_name == 'sunday') and compare_time is False:
         app = QApplication(sys.argv)
         ReselectTheClassSchduleWindow = ReselectTheClassScheduleWindow(
@@ -99,10 +111,16 @@ if __name__ == '__main__':
         week_name = ReselectTheClassSchduleWindow.result
     else:  # 防止app忘记创建
         app = QApplication(sys.argv)
+    config = json.loads(read_file("../data/program_config.json"))  # 把program_config读了
     daily_initialization(week_name)  # 初始化daily_config文件
-    # 进入主窗口
-    pretreatmentHandle()  # 清理一下窗口
+    # 创建主窗口
     main_window = MainWindow()
-    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 使用qdarkstyle qss
+    # 创建进程开始定时执行任务,传入刷新的秒数
+    scheduled_task_thread = threading.Thread(target=run_schedule,
+                                             args=(float(config["run_schedule_time"]), main_window,))
+    scheduled_task_thread.start()
+    pretreatmentHandle()  # 清理一下桌面
+    # 进入主窗口
+    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss
     main_window.ui.show()
     app.exec()

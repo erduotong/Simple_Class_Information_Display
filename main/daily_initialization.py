@@ -1,5 +1,5 @@
 import datetime
-from function import *
+from functions import *
 
 
 def daily_initialization(week_name):  # 每日的配置文件生成函数

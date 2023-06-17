@@ -3,6 +3,8 @@ import time
 import shutil
 import datetime
 import os
+
+import schedule
 from PyQt5 import QtWidgets
 import win32gui
 
@@ -113,3 +115,14 @@ def pretreatmentHandle():
             h = win32gui.FindWindowEx(None, hwnd_WorkW, "WorkerW", None)
         break
     return hwnd
+
+
+# schedule计时任务的运行模块 传入等待时间
+def run_schedule(sec: float, window) -> None:
+    # 对齐整数秒
+    time_to_next_second = 1 - time.time() % 1
+    time.sleep(time_to_next_second)
+    while 1:
+        schedule.run_pending()
+        time.sleep(sec)
+        window.refresh_time_singal.emit()

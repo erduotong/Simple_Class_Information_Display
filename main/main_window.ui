@@ -19,7 +19,7 @@
      <widget class="QWidget" name="widget_2" native="true">
       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,30">
        <item>
-        <widget class="QLabel" name="time">
+        <widget class="QLabel" name="nowtime">
          <property name="font">
           <font>
            <family>黑体</family>
@@ -27,7 +27,7 @@
           </font>
          </property>
          <property name="text">
-          <string>0001/1/01 000:000:00</string>
+          <string>等待刷新......</string>
          </property>
         </widget>
        </item>

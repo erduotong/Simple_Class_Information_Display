@@ -2,5 +2,6 @@
   "version": "0.0.1",
   "backup_slots": {
     "daily_config": 5
-  }
+  },
+  "run_schedule_time": "1"
 }
