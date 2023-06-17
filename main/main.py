@@ -62,6 +62,107 @@ class ReselectTheClassScheduleWindow(QDialog):
             self.ui.textBrowser.repaint()
 
 
+# 参考用,字体自动大小切换
+'''MainWindow(QMainWindow):
+    # 定义两个信号：refresh_time_singal 和 adjust_textedit_size_singal
+    refresh_time_singal = pyqtSignal()
+    adjust_textedit_size_singal = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.screen_height = None
+        self.screen_width = None
+        self.ui = None
+        # 将 refresh_time_singal 信号连接到 refresh_time 槽函数
+        self.refresh_time_singal.connect(self.refresh_time)
+        # 将 adjust_textedit_size_singal 信号连接到 adjust_textedit_size 槽函数
+        self.adjust_textedit_size_singal.connect(self.adjust_textedit_size)
+        self.run_window()
+        # 创建一个 QTimer 对象，并将它的 timeout 信号连接到 adjust_textedit_size 槽函数
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.adjust_textedit_size)
+
+    def run_window(self):
+        self.ui = uic.loadUi("./main_window.ui")
+        self.ui.setWindowFlags(Qt.FramelessWindowHint)  # 设置无边框窗口
+        rect = QDesktopWidget().availableGeometry()  # 初始化大小
+        self.ui.resize(rect.width(), rect.height())
+        # 设置位置
+        h = win32gui.FindWindow("Progman", "Program Manager")  # 获取桌面窗口句柄
+        win_hwnd = int(self.winId())  # 获取MainWindow窗口句柄
+        win32gui.SetParent(win_hwnd, h)  # 将MainWindow窗口设置为桌面窗口的子窗口
+
+    # 刷新时间的槽函数
+    def refresh_time(self):
+        self.ui.nowtime.setText(time.strftime("%Y/%m/%d %H:%M:%S ", time.localtime()) +
+                                ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"][
+                                    time.localtime().tm_wday])
+        self.ui.nowtime.repaint()
+
+    # 调整字体大小和控件比例的槽函数
+    def adjust_textedit_size(self):
+        # 获取两个QTextEdit的文本内容
+        message_text = self.ui.message.toPlainText()
+        homework_text = self.ui.homework.toPlainText()
+        # 计算两个QTextEdit的文本长度
+        message_length = len(message_text)
+        homework_length = len(homework_text)
+        # 计算两个QTextEdit的文本长度比例
+        if message_length + homework_length == 0:
+            ratio = 0.5
+        else:
+            ratio = message_length / (message_length + homework_length)
+        # 根据比例调整两个QTextEdit在msg_hw中的比例
+        self.ui.msg_hw.layout().setStretch(0, ratio)
+        self.ui.msg_hw.layout().setStretch(1, 1 - ratio)
+        # 计算两个QTextEdit中最大的文本高度和宽度
+        max_height = 0
+        max_width = 0
+        for textedit in [self.ui.message, self.ui.homework]:
+            document_size = textedit.document().size().toSize()
+            max_height = max(max_height, document_size.height())
+            max_width = max(max_width, document_size.width())
+        # 根据最大的文本高度和宽度调整字体大小
+        if max_height > 0 and max_width > 0:
+            new_font_size_width = min(max(self.ui.message.width() / max_width * self.ui.message.font().pointSize(), 10),
+                                      20)
+            new_font_size_height = min(
+                max(self.ui.message.height() / max_height * self.ui.message.font().pointSize(), 10), 20)
+            new_font_size = min(new_font_size_width, new_font_size_height)
+            font = self.ui.message.font()
+            font.setPointSize(new_font_size)
+            self.ui.message.setFont(font)
+            self.ui.homework.setFont(font)
+
+    @pyqtSlot()
+    def on_message_textChanged(self):
+        if not self.timer.isActive():
+            self.timer.start(60000)
+        else:
+            self.timer.stop()
+            self.timer.start(60000)
+
+    @pyqtSlot()
+    def on_homework_textChanged(self):
+        if not self.timer.isActive():
+            self.timer.start(60000)
+        else:
+            self.timer.stop()
+            self.timer.start(60000)
+
+    @pyqtSlot()
+    def on_message_textEditFinished(self):
+        if self.timer.isActive():
+            self.timer.stop()
+            self.adjust_textedit_size()
+
+    @pyqtSlot()
+    def on_homework_textEditFinished(self):
+        if self.timer.isActive():
+            self.timer.stop()
+            self.adjust_textedit_size()'''
+
+
 class MainWindow(QMainWindow):
     refresh_time_singal = pyqtSignal()
 
@@ -89,8 +190,12 @@ class MainWindow(QMainWindow):
     # 刷新时间
     def refresh_time(self):
         self.ui.nowtime.setText(time.strftime("%Y/%m/%d %H:%M:%S ", time.localtime()) +
-                                ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"][time.localtime().tm_wday])
+                                ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"][
+                                    time.localtime().tm_wday])
         self.ui.nowtime.repaint()
+    # todo 字体自动大小切换
+    # todo 课表自动大小切换+自适应数量
+    # todo 课表的下节课指示牌
 
 
 if __name__ == '__main__':
