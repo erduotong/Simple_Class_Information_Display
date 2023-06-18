@@ -3,7 +3,7 @@ import time
 import shutil
 import datetime
 import os
-
+from PyQt5.QtGui import QFont
 import schedule
 from PyQt5 import QtWidgets
 import win32gui
@@ -126,3 +126,38 @@ def run_schedule(sec: float, window) -> None:
         schedule.run_pending()
         time.sleep(sec)
         window.refresh_time_singal.emit()
+
+
+# 获得实际的行数 包括自动换行 传入控件
+def get_visible_line_count(text_edit):
+    line_count = 0
+    block = text_edit.document().begin()
+    while block.isValid():
+        line_count += block.layout().lineCount()
+        block = block.next()
+    return line_count
+
+
+# 传入:调整的的text_edits的列表 最小值 最大值
+def adjust_the_text_edit_font_size(text_edits, min_size: int, max_size: int):
+    # 计算合适的字体大小
+    font_size = min_size
+    font = QFont()
+    while font_size < max_size:
+        font.setPointSize(font_size)
+        for text_edit in text_edits:
+            text_edit.setFont(font)
+        if any(text_edit.verticalScrollBar().isVisible() for text_edit in text_edits):
+            font_size -= 1
+            break
+        font_size += 1
+    # 如果出现了滚动条，则将字体大小减小1
+    if font_size <= 0:  # 否则就出bug了
+        font_size = 1
+    font.setPointSize(font_size)
+    for text_edit in text_edits:
+        text_edit.setFont(font)
+
+
+
+

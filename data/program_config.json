@@ -4,5 +4,7 @@
     "daily_config": 5
   },
   "run_schedule_time": "1",
-  "layout_adjustment_accuracy": "100"
+  "layout_adjustment_accuracy": 100,
+  "minimum_font_size": 1,
+  "maximum_font_size": 150
 }

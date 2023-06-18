@@ -63,116 +63,17 @@ class ReselectTheClassScheduleWindow(QDialog):
             self.ui.textBrowser.repaint()
 
 
-# 参考用,字体自动大小切换
-'''MainWindow(QMainWindow):
-    # 定义两个信号：refresh_time_singal 和 adjust_textedit_size_singal
-    refresh_time_singal = pyqtSignal()
-    adjust_textedit_size_singal = pyqtSignal()
-
-    def __init__(self):
-        super().__init__()
-        self.screen_height = None
-        self.screen_width = None
-        self.ui = None
-        # 将 refresh_time_singal 信号连接到 refresh_time 槽函数
-        self.refresh_time_singal.connect(self.refresh_time)
-        # 将 adjust_textedit_size_singal 信号连接到 adjust_textedit_size 槽函数
-        self.adjust_textedit_size_singal.connect(self.adjust_textedit_size)
-        self.run_window()
-        # 创建一个 QTimer 对象，并将它的 timeout 信号连接到 adjust_textedit_size 槽函数
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.adjust_textedit_size)
-
-    def run_window(self):
-        self.ui = uic.loadUi("./main_window.ui")
-        self.ui.setWindowFlags(Qt.FramelessWindowHint)  # 设置无边框窗口
-        rect = QDesktopWidget().availableGeometry()  # 初始化大小
-        self.ui.resize(rect.width(), rect.height())
-        # 设置位置
-        h = win32gui.FindWindow("Progman", "Program Manager")  # 获取桌面窗口句柄
-        win_hwnd = int(self.winId())  # 获取MainWindow窗口句柄
-        win32gui.SetParent(win_hwnd, h)  # 将MainWindow窗口设置为桌面窗口的子窗口
-
-    # 刷新时间的槽函数
-    def refresh_time(self):
-        self.ui.nowtime.setText(time.strftime("%Y/%m/%d %H:%M:%S ", time.localtime()) +
-                                ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"][
-                                    time.localtime().tm_wday])
-        self.ui.nowtime.repaint()
-
-    # 调整字体大小和控件比例的槽函数
-    def adjust_textedit_size(self):
-        # 获取两个QTextEdit的文本内容
-        message_text = self.ui.message.toPlainText()
-        homework_text = self.ui.homework.toPlainText()
-        # 计算两个QTextEdit的文本长度
-        message_length = len(message_text)
-        homework_length = len(homework_text)
-        # 计算两个QTextEdit的文本长度比例
-        if message_length + homework_length == 0:
-            ratio = 0.5
-        else:
-            ratio = message_length / (message_length + homework_length)
-        # 根据比例调整两个QTextEdit在msg_hw中的比例
-        self.ui.msg_hw.layout().setStretch(0, ratio)
-        self.ui.msg_hw.layout().setStretch(1, 1 - ratio)
-        # 计算两个QTextEdit中最大的文本高度和宽度
-        max_height = 0
-        max_width = 0
-        for textedit in [self.ui.message, self.ui.homework]:
-            document_size = textedit.document().size().toSize()
-            max_height = max(max_height, document_size.height())
-            max_width = max(max_width, document_size.width())
-        # 根据最大的文本高度和宽度调整字体大小
-        if max_height > 0 and max_width > 0:
-            new_font_size_width = min(max(self.ui.message.width() / max_width * self.ui.message.font().pointSize(), 10),
-                                      20)
-            new_font_size_height = min(
-                max(self.ui.message.height() / max_height * self.ui.message.font().pointSize(), 10), 20)
-            new_font_size = min(new_font_size_width, new_font_size_height)
-            font = self.ui.message.font()
-            font.setPointSize(new_font_size)
-            self.ui.message.setFont(font)
-            self.ui.homework.setFont(font)
-
-    @pyqtSlot()
-    def on_message_textChanged(self):
-        if not self.timer.isActive():
-            self.timer.start(60000)
-        else:
-            self.timer.stop()
-            self.timer.start(60000)
-
-    @pyqtSlot()
-    def on_homework_textChanged(self):
-        if not self.timer.isActive():
-            self.timer.start(60000)
-        else:
-            self.timer.stop()
-            self.timer.start(60000)
-
-    @pyqtSlot()
-    def on_message_textEditFinished(self):
-        if self.timer.isActive():
-            self.timer.stop()
-            self.adjust_textedit_size()
-
-    @pyqtSlot()
-    def on_homework_textEditFinished(self):
-        if self.timer.isActive():
-            self.timer.stop()
-            self.adjust_textedit_size()'''
-
-
 class MainWindow(QMainWindow):
     refresh_time_singal = pyqtSignal()
 
-    def __init__(self, laa):
+    def __init__(self, config):
         super().__init__()
         self.screen_height = None
         self.screen_width = None
         self.ui = None
-        self.laa = laa
+        self.laa = int(config["layout_adjustment_accuracy"])
+        self.min_font_size = int(config["minimum_font_size"])
+        self.max_font_size = int(config["maximum_font_size"])
         self.refresh_time_singal.connect(self.refresh_time)
         self.run_window()
 
@@ -181,6 +82,8 @@ class MainWindow(QMainWindow):
         self.ui.setWindowFlags(Qt.FramelessWindowHint)  # 设置无边框窗口
         rect = QDesktopWidget().availableGeometry()  # 初始化大小
         self.ui.resize(rect.width(), rect.height())
+        self.refresh_time()  # 先进行初始化
+        self.adjust_msg_hw_size()
         # 设置位置
         h = win32gui.FindWindow("Progman", "Program Manager")  # 获取桌面窗口句柄
         win_hwnd = int(self.winId())  # 获取MainWindow窗口句柄
@@ -204,12 +107,14 @@ class MainWindow(QMainWindow):
         homework_text = self.ui.homework.toPlainText().rstrip()
         message_cursor_pos = self.ui.message.textCursor().position()  # 保存当前光标位置 后面要用
         homework_cursor_pos = self.ui.homework.textCursor().position()
+        homework_scroll_value = self.ui.homework.verticalScrollBar().value()  # 保留滚动条的位置
+        message_scroll_value = self.ui.message.verticalScrollBar().value()
         self.ui.message.setPlainText(message_text)  # 设置删除空格后的文本
         self.ui.homework.setPlainText(homework_text)
 
         # 根据文本行数计算比值
-        message_lines = self.ui.message.document().lineCount()
-        homework_lines = self.ui.homework.document().lineCount()
+        message_lines = get_visible_line_count(self.ui.message)
+        homework_lines = get_visible_line_count(self.ui.homework)
         if message_lines + homework_lines == 0:
             ratio = 0.5
         else:
@@ -217,6 +122,13 @@ class MainWindow(QMainWindow):
         # 根据计算出的比值设置拉伸系数
         self.ui.msg_hw.layout().setStretchFactor(self.ui.message, int(ratio * self.laa))
         self.ui.msg_hw.layout().setStretchFactor(self.ui.homework, int((1 - ratio) * self.laa))
+        # 字体大小设置
+        # 如果行没变动就先不刷新(因为绝对不会出现滚动条或者过少)
+
+        adjust_the_text_edit_font_size([self.ui.message, self.ui.homework], self.min_font_size, self.max_font_size)
+        # 恢复滚动条的位置
+        self.ui.homework.verticalScrollBar().setValue(homework_scroll_value)
+        self.ui.message.verticalScrollBar().setValue(message_scroll_value)
 
         # 恢复光标位置
         message_cursor = self.ui.message.textCursor()  # message的位置
@@ -259,7 +171,7 @@ if __name__ == '__main__':
     config = json.loads(read_file("../data/program_config.json"))  # 把program_config读了
     daily_initialization(week_name)  # 初始化daily_config文件
     # 创建主窗口
-    main_window = MainWindow(int(config['layout_adjustment_accuracy']))
+    main_window = MainWindow(config)
     # 创建进程开始定时执行任务,传入刷新的秒数
     scheduled_task_thread = threading.Thread(target=run_schedule,
                                              args=(float(config["run_schedule_time"]), main_window,))
