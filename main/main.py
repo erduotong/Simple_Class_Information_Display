@@ -11,6 +11,7 @@ import win32gui
 import win32con
 import schedule  # 用于计时
 import threading
+from PyQt5 import QtGui
 
 
 # 使用了qdarkstyle
@@ -166,11 +167,12 @@ class ReselectTheClassScheduleWindow(QDialog):
 class MainWindow(QMainWindow):
     refresh_time_singal = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, laa):
         super().__init__()
         self.screen_height = None
         self.screen_width = None
         self.ui = None
+        self.laa = laa
         self.refresh_time_singal.connect(self.refresh_time)
         self.run_window()
 
@@ -193,6 +195,44 @@ class MainWindow(QMainWindow):
                                 ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"][
                                     time.localtime().tm_wday])
         self.ui.nowtime.repaint()
+        self.adjust_msg_hw_size()
+
+    # 更新msg和hw两个的拉伸和字体大小
+    def adjust_msg_hw_size(self):
+        # 删除 message 和 homework 末尾的空行和空格
+        message_text = self.ui.message.toPlainText().rstrip()
+        homework_text = self.ui.homework.toPlainText().rstrip()
+        message_cursor_pos = self.ui.message.textCursor().position()  # 保存当前光标位置 后面要用
+        homework_cursor_pos = self.ui.homework.textCursor().position()
+        self.ui.message.setPlainText(message_text)  # 设置删除空格后的文本
+        self.ui.homework.setPlainText(homework_text)
+
+        # 根据文本行数计算比值
+        message_lines = self.ui.message.document().lineCount()
+        homework_lines = self.ui.homework.document().lineCount()
+        if message_lines + homework_lines == 0:
+            ratio = 0.5
+        else:
+            ratio = message_lines / (message_lines + homework_lines)
+        # 根据计算出的比值设置拉伸系数
+        self.ui.msg_hw.layout().setStretchFactor(self.ui.message, int(ratio * self.laa))
+        self.ui.msg_hw.layout().setStretchFactor(self.ui.homework, int((1 - ratio) * self.laa))
+
+        # 恢复光标位置
+        message_cursor = self.ui.message.textCursor()  # message的位置
+        if message_cursor_pos > len(message_text):
+            message_cursor.movePosition(QtGui.QTextCursor.End)
+        else:
+            message_cursor.setPosition(message_cursor_pos)
+        self.ui.message.setTextCursor(message_cursor)
+        homework_cursor = self.ui.homework.textCursor()  # homework的位置
+        # 如果光标位置超出文本长度，则将光标移动到文本末尾
+        if homework_cursor_pos > len(homework_text):
+            homework_cursor.movePosition(QtGui.QTextCursor.End)
+        else:
+            homework_cursor.setPosition(homework_cursor_pos)
+        self.ui.homework.setTextCursor(homework_cursor)
+
     # todo 字体自动大小切换
     # todo 课表自动大小切换+自适应数量
     # todo 课表的下节课指示牌
@@ -219,7 +259,7 @@ if __name__ == '__main__':
     config = json.loads(read_file("../data/program_config.json"))  # 把program_config读了
     daily_initialization(week_name)  # 初始化daily_config文件
     # 创建主窗口
-    main_window = MainWindow()
+    main_window = MainWindow(int(config['layout_adjustment_accuracy']))
     # 创建进程开始定时执行任务,传入刷新的秒数
     scheduled_task_thread = threading.Thread(target=run_schedule,
                                              args=(float(config["run_schedule_time"]), main_window,))

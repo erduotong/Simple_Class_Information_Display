@@ -3,5 +3,6 @@
   "backup_slots": {
     "daily_config": 5
   },
-  "run_schedule_time": "1"
+  "run_schedule_time": "1",
+  "layout_adjustment_accuracy": "100"
 }
