@@ -7,3 +7,5 @@
 * layout_adjustment_accuracy：比值精度 用于自适应调节两个东西时候的int比值精度 越大精度越高 推荐使用100就足够了 输入时强制转换int
 * minimum_font_size：自动调节字体大小时的最小值
 * maximum_font_size：自动调节字体大小时的最大值
+* time_font_size：显示时间的Label的字体大小
+* 

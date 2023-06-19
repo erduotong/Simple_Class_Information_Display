@@ -4,8 +4,8 @@ import shutil
 import datetime
 import os
 from PyQt5.QtGui import QFont
+from PyQt5 import QtGui
 import schedule
-from PyQt5 import QtWidgets
 import win32gui
 
 
@@ -139,7 +139,7 @@ def get_visible_line_count(text_edit):
 
 
 # 传入:调整的的text_edits的列表 最小值 最大值
-def adjust_the_text_edit_font_size(text_edits, min_size: int, max_size: int):
+def adjust_the_text_edit_font_size(text_edits, min_size: int, max_size: int) -> None:
     # 计算合适的字体大小
     font_size = min_size
     font = QFont()
@@ -159,5 +159,8 @@ def adjust_the_text_edit_font_size(text_edits, min_size: int, max_size: int):
         text_edit.setFont(font)
 
 
-
-
+# 设置字体大小 传入对象以及要设置的字体大小
+def adjust_font_size(obj, font_size: int) -> None:
+    font = QtGui.QFont()
+    font.setPointSize(font_size)
+    obj.setFont(font)

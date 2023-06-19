@@ -64,17 +64,19 @@ class ReselectTheClassScheduleWindow(QDialog):
 
 
 class MainWindow(QMainWindow):
-    refresh_time_singal = pyqtSignal()
+    refresh_time_singal = pyqtSignal()  # 更新时间
+    update_hwmsgtext_the_scale_and_font_singal = pyqtSignal()  # 自适应homework和message的字体大小和比例
 
-    def __init__(self, config):
+    def __init__(self, program_config):
         super().__init__()
         self.screen_height = None
         self.screen_width = None
         self.ui = None
-        self.laa = int(config["layout_adjustment_accuracy"])
-        self.min_font_size = int(config["minimum_font_size"])
-        self.max_font_size = int(config["maximum_font_size"])
+        self.laa = int(program_config["layout_adjustment_accuracy"])
+        self.min_font_size = int(program_config["minimum_font_size"])
+        self.max_font_size = int(program_config["maximum_font_size"])
         self.refresh_time_singal.connect(self.refresh_time)
+        self.update_hwmsgtext_the_scale_and_font_singal.connect(self.adjust_msg_hw_size)
         self.run_window()
 
     def run_window(self):
@@ -84,13 +86,15 @@ class MainWindow(QMainWindow):
         self.ui.resize(rect.width(), rect.height())
         self.refresh_time()  # 先进行初始化
         self.adjust_msg_hw_size()
+        adjust_font_size(self.ui.nowtime, config["time_font_size"]) # 设置时间显示的字体大小
         # 设置位置
         h = win32gui.FindWindow("Progman", "Program Manager")  # 获取桌面窗口句柄
         win_hwnd = int(self.winId())  # 获取MainWindow窗口句柄
         win32gui.SetParent(win_hwnd, h)  # 将MainWindow窗口设置为桌面窗口的子窗口
         # print(self.ui.__dict__)  # 调试用
-        # todo 实现类似wallpaper engine的方式放置在桌面上(现在能基本实现 但是效果并不好)
-        # todo 根据目前所看的虚拟桌面自动切换
+
+    # todo 实现类似wallpaper engine的方式放置在桌面上(现在能基本实现 但是效果并不好)
+    # todo 根据目前所看的虚拟桌面自动切换
 
     # 刷新时间
     def refresh_time(self):
@@ -98,7 +102,6 @@ class MainWindow(QMainWindow):
                                 ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"][
                                     time.localtime().tm_wday])
         self.ui.nowtime.repaint()
-        self.adjust_msg_hw_size()
 
     # 更新msg和hw两个的拉伸和字体大小
     def adjust_msg_hw_size(self):
@@ -144,8 +147,7 @@ class MainWindow(QMainWindow):
         else:
             homework_cursor.setPosition(homework_cursor_pos)
         self.ui.homework.setTextCursor(homework_cursor)
-
-    # todo 字体自动大小切换
+    # todo 停止输入x秒或按下按钮后刷新
     # todo 课表自动大小切换+自适应数量
     # todo 课表的下节课指示牌
 
