@@ -67,6 +67,7 @@ class ReselectTheClassScheduleWindow(QDialog):
 class MainWindow(QMainWindow):
     refresh_time_singal = pyqtSignal()  # 更新时间
     run_adaptive_text_edit_manually = pyqtSignal()  # 自适应homework和message的字体大小和比例 手动触发
+    # todo 这个信号↑要绑定一个按钮的
 
     def __init__(self, program_config):
         super().__init__()
@@ -105,6 +106,8 @@ class MainWindow(QMainWindow):
 
     # todo 实现类似wallpaper engine的方式放置在桌面上(现在能基本实现 但是效果并不好)
     # todo 根据目前所看的虚拟桌面自动切换
+    # todo 课表自动大小切换+自适应数量
+    # todo 课表的下节课指示牌
 
     # 刷新时间
     def refresh_time(self):
@@ -139,10 +142,6 @@ class MainWindow(QMainWindow):
         # 如果行没变动就先不刷新(因为绝对不会出现滚动条或者过少)
 
         adjust_the_text_edit_font_size([self.ui.message, self.ui.homework], self.min_font_size, self.max_font_size)
-        # 恢复滚动条的位置
-        self.ui.homework.verticalScrollBar().setValue(homework_scroll_value)
-        self.ui.message.verticalScrollBar().setValue(message_scroll_value)
-
         # 恢复光标位置
         message_cursor = self.ui.message.textCursor()  # message的位置
         if message_cursor_pos > len(message_text):
@@ -157,9 +156,10 @@ class MainWindow(QMainWindow):
         else:
             homework_cursor.setPosition(homework_cursor_pos)
         self.ui.homework.setTextCursor(homework_cursor)
+        # 恢复滚动条的位置
+        self.ui.homework.verticalScrollBar().setValue(homework_scroll_value)
+        self.ui.message.verticalScrollBar().setValue(message_scroll_value)
 
-    # todo 课表自动大小切换+自适应数量
-    # todo 课表的下节课指示牌
     # 计时器的函数 如果被改变了那就开始计时
     def on_text_changed(self):
         # 如果定时器正在运行，则停止定时器
