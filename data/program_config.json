@@ -7,5 +7,6 @@
   "layout_adjustment_accuracy": 100,
   "minimum_font_size": 1,
   "maximum_font_size": 100,
-  "time_font_size": 51
+  "time_font_size": 51,
+  "text_edit_refresh_time": 2
 }

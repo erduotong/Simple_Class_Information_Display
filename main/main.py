@@ -12,6 +12,7 @@ import win32con
 import schedule  # 用于计时
 import threading
 from PyQt5 import QtGui
+from PyQt5 import QtCore
 
 
 # 使用了qdarkstyle
@@ -65,19 +66,25 @@ class ReselectTheClassScheduleWindow(QDialog):
 
 class MainWindow(QMainWindow):
     refresh_time_singal = pyqtSignal()  # 更新时间
-    update_hwmsgtext_the_scale_and_font_singal = pyqtSignal()  # 自适应homework和message的字体大小和比例
+    run_adaptive_text_edit_manually = pyqtSignal()  # 自适应homework和message的字体大小和比例 手动触发
 
     def __init__(self, program_config):
         super().__init__()
+        self.refresh_edit_size = QtCore.QTimer()  # 设置一个计时器
+        self.refresh_edit_size.setInterval(program_config["text_edit_refresh_time"] * 1000)  # 设置停止编辑刷新的时间
+        # 绑定信号&槽
+        self.refresh_edit_size.timeout.connect(self.adjust_msg_hw_size)  # 超时后连接到更新字体
+        self.refresh_time_singal.connect(self.refresh_time)
+        self.run_adaptive_text_edit_manually.connect(self.manually_refresh_the_text_edit_font)
+        # 变量初始化
         self.screen_height = None
         self.screen_width = None
         self.ui = None
+        # config需要用的内容初始化
         self.laa = int(program_config["layout_adjustment_accuracy"])
         self.min_font_size = int(program_config["minimum_font_size"])
         self.max_font_size = int(program_config["maximum_font_size"])
-        self.refresh_time_singal.connect(self.refresh_time)
-        self.update_hwmsgtext_the_scale_and_font_singal.connect(self.adjust_msg_hw_size)
-        self.run_window()
+        self.run_window()  # 运行!
 
     def run_window(self):
         self.ui = uic.loadUi("./main_window.ui")
@@ -86,11 +93,14 @@ class MainWindow(QMainWindow):
         self.ui.resize(rect.width(), rect.height())
         self.refresh_time()  # 先进行初始化
         self.adjust_msg_hw_size()
-        adjust_font_size(self.ui.nowtime, config["time_font_size"]) # 设置时间显示的字体大小
+        adjust_font_size(self.ui.nowtime, config["time_font_size"])  # 设置时间显示的字体大小
         # 设置位置
         h = win32gui.FindWindow("Progman", "Program Manager")  # 获取桌面窗口句柄
         win_hwnd = int(self.winId())  # 获取MainWindow窗口句柄
         win32gui.SetParent(win_hwnd, h)  # 将MainWindow窗口设置为桌面窗口的子窗口
+        # 绑定要用到ui的信号和槽
+        self.ui.message.textChanged.connect(self.on_text_changed)  # 两个文本框的超时信号
+        self.ui.homework.textChanged.connect(self.on_text_changed)
         # print(self.ui.__dict__)  # 调试用
 
     # todo 实现类似wallpaper engine的方式放置在桌面上(现在能基本实现 但是效果并不好)
@@ -147,9 +157,21 @@ class MainWindow(QMainWindow):
         else:
             homework_cursor.setPosition(homework_cursor_pos)
         self.ui.homework.setTextCursor(homework_cursor)
-    # todo 停止输入x秒或按下按钮后刷新
+
     # todo 课表自动大小切换+自适应数量
     # todo 课表的下节课指示牌
+    # 计时器的函数 如果被改变了那就开始计时
+    def on_text_changed(self):
+        # 如果定时器正在运行，则停止定时器
+        if self.refresh_edit_size.isActive():
+            self.refresh_edit_size.stop()
+        # 重新启动定时器
+        self.refresh_edit_size.start()
+
+    # 手动触发字体更新
+    def manually_refresh_the_text_edit_font(self):
+        self.refresh_edit_size.stop()  # 先把计时器关了
+        self.adjust_msg_hw_size()  # 然后再更新一下
 
 
 if __name__ == '__main__':
@@ -164,7 +186,6 @@ if __name__ == '__main__':
         ReselectTheClassSchduleWindow = ReselectTheClassScheduleWindow(
             json.loads(read_file('../data/Curriculum/lessons.json')))
         ReselectTheClassSchduleWindow.returnPressed.connect(lambda: None)  # 禁用自定义信号
-        app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 使用深色的qss
         ReselectTheClassSchduleWindow.ui.show()
         app.exec()
         week_name = ReselectTheClassSchduleWindow.result
