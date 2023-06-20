@@ -47,8 +47,9 @@ def populate_the_timesheet(weekday: str):
         # 返回空~
         return [{'name': 'None', 'start': '00:01', 'end': '23:59'}]
     time_dict = json.loads(read_file("../data/Curriculum/time.json"))
-    lessons_list = json.loads(read_file("../data/Curriculum/lessons.json"))
-    lessons_list = lessons_list[weekday]
+    lessons_list_a = json.loads(read_file("../data/Curriculum/lessons.json"))
+    lessons_list = lessons_list_a[weekday]
+
     # 创建一个空列表 start_end_times，用于存储各节课程的开始和结束时间
     start_end_times = []
     # 读取每个课程的时间信息并将其添加到 start_end_times 中
@@ -60,7 +61,7 @@ def populate_the_timesheet(weekday: str):
         start_end_times.append(
             dict(name=lesson_name, start=start_time, end=end_time))  # 将当前课程的时间信息存储到 start_end_times 中
     # 将特殊课程的时间信息添加到 start_end_times 中
-    for lesson_name in ["早读", "延时服务", "晨读", "中午休息"]:
+    for lesson_name in lessons_list_a['special']:
         if lesson_name in time_dict:
             start_time = time_dict[lesson_name]["start"]
             end_time = time_dict[lesson_name]["end"]

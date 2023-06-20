@@ -27,7 +27,7 @@
           </font>
          </property>
          <property name="text">
-          <string>等待刷新......</string>
+          <string/>
          </property>
         </widget>
        </item>

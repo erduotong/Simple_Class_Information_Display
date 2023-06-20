@@ -1,18 +1,12 @@
-import datetime
-import json
 import sys
-import time
-from daily_initialization import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5 import uic
-import qdarkstyle
-import win32gui
-import win32con
-import schedule  # 用于计时
 import threading
-from PyQt5 import QtGui
+import qdarkstyle
 from PyQt5 import QtCore
+from PyQt5 import uic
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+import schedule
+from daily_initialization import *
 
 
 # 使用了qdarkstyle
@@ -67,6 +61,7 @@ class ReselectTheClassScheduleWindow(QDialog):
 class MainWindow(QMainWindow):
     refresh_time_singal = pyqtSignal()  # 更新时间
     run_adaptive_text_edit_manually = pyqtSignal()  # 自适应homework和message的字体大小和比例 手动触发
+
     # todo 这个信号↑要绑定一个按钮的
 
     def __init__(self, program_config):
@@ -81,6 +76,8 @@ class MainWindow(QMainWindow):
         self.screen_height = None
         self.screen_width = None
         self.ui = None
+        self.daily_config = None
+        self.lessons_with_slots = []
         # config需要用的内容初始化
         self.laa = int(program_config["layout_adjustment_accuracy"])
         self.min_font_size = int(program_config["minimum_font_size"])
@@ -104,10 +101,14 @@ class MainWindow(QMainWindow):
         self.ui.homework.textChanged.connect(self.on_text_changed)
         # print(self.ui.__dict__)  # 调试用
 
+    # todo 粘贴自动转换成纯文本
     # todo 实现类似wallpaper engine的方式放置在桌面上(现在能基本实现 但是效果并不好)
     # todo 根据目前所看的虚拟桌面自动切换
     # todo 课表自动大小切换+自适应数量
     # todo 课表的下节课指示牌
+    # todo 可编辑颜色的message
+    # 生成→自适应→显示(可重复)
+    # 计算并且开始计时
 
     # 刷新时间
     def refresh_time(self):
@@ -172,6 +173,21 @@ class MainWindow(QMainWindow):
     def manually_refresh_the_text_edit_font(self):
         self.refresh_edit_size.stop()  # 先把计时器关了
         self.adjust_msg_hw_size()  # 然后再更新一下
+
+    # 为课表添加内容 排除”课间“以及special内的内容 并且添加browser
+    # 随后为这些browser添加对应的内容 并且开始计时器
+    # 然后就丢到移动函数去了
+    def initialize_the_class_schedule(self):
+        # 先把要加入的数量判断出来
+        self.lessons_with_slots = []  # 初始化一下
+        lessons = json.loads(read_file("../data/Curriculum/lessons.json"))  # 读一下lessons后面判断
+        self.daily_config = json.loads(read_file("../data/daily_config.json"))  # 读入daily_config
+        for i in self.daily_config["lessons_list"]:
+            if i["name"] in lessons["special"] or i["name"] == '课间':  # 特殊课程和课间不能入内
+                continue
+            self.lessons_with_slots.append(i["name"])  # 加!
+        # 加一下widget到里面去
+        # 清空 -> 添加len(lessons_with_slots)个 -> +1个 -> 依次设置
 
 
 if __name__ == '__main__':
