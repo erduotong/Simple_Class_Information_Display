@@ -1,11 +1,13 @@
 import sys
 import threading
+
 import qdarkstyle
 from PyQt5 import QtCore
+from PyQt5 import QtWidgets
 from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-import schedule
+
 from daily_initialization import *
 
 
@@ -69,7 +71,7 @@ class MainWindow(QMainWindow):
         self.refresh_edit_size = QtCore.QTimer()  # 设置一个计时器
         self.refresh_edit_size.setInterval(program_config["text_edit_refresh_time"] * 1000)  # 设置停止编辑刷新的时间
         # 绑定信号&槽
-        self.refresh_edit_size.timeout.connect(self.adjust_msg_hw_size)  # 超时后连接到更新字体
+        self.refresh_edit_size.timeout.connect(self.manually_refresh_the_text_edit_font)  # 超时后连接到更新字体
         self.refresh_time_singal.connect(self.refresh_time)
         self.run_adaptive_text_edit_manually.connect(self.manually_refresh_the_text_edit_font)
         # 变量初始化
@@ -92,14 +94,11 @@ class MainWindow(QMainWindow):
         self.refresh_time()  # 先进行初始化
         self.adjust_msg_hw_size()
         adjust_font_size(self.ui.nowtime, config["time_font_size"])  # 设置时间显示的字体大小
-        # 设置位置
-        h = win32gui.FindWindow("Progman", "Program Manager")  # 获取桌面窗口句柄
-        win_hwnd = int(self.winId())  # 获取MainWindow窗口句柄
-        win32gui.SetParent(win_hwnd, h)  # 将MainWindow窗口设置为桌面窗口的子窗口
         # 绑定要用到ui的信号和槽
         self.ui.message.textChanged.connect(self.on_text_changed)  # 两个文本框的超时信号
         self.ui.homework.textChanged.connect(self.on_text_changed)
         # print(self.ui.__dict__)  # 调试用
+        self.initialize_the_class_schedule()  # 测试课表初始化函数
 
     # todo 粘贴自动转换成纯文本
     # todo 实现类似wallpaper engine的方式放置在桌面上(现在能基本实现 但是效果并不好)
@@ -107,8 +106,6 @@ class MainWindow(QMainWindow):
     # todo 课表自动大小切换+自适应数量
     # todo 课表的下节课指示牌
     # todo 可编辑颜色的message
-    # 生成→自适应→显示(可重复)
-    # 计算并且开始计时
 
     # 刷新时间
     def refresh_time(self):
@@ -128,7 +125,6 @@ class MainWindow(QMainWindow):
         message_scroll_value = self.ui.message.verticalScrollBar().value()
         self.ui.message.setPlainText(message_text)  # 设置删除空格后的文本
         self.ui.homework.setPlainText(homework_text)
-
         # 根据文本行数计算比值
         message_lines = get_visible_line_count(self.ui.message)
         homework_lines = get_visible_line_count(self.ui.homework)
@@ -171,12 +167,19 @@ class MainWindow(QMainWindow):
 
     # 手动触发字体更新
     def manually_refresh_the_text_edit_font(self):
+        self.ui.message.textChanged.disconnect(self.on_text_changed)  # 先断开防止重复触发
+        self.ui.homework.textChanged.disconnect(self.on_text_changed)
         self.refresh_edit_size.stop()  # 先把计时器关了
         self.adjust_msg_hw_size()  # 然后再更新一下
+        # 重新连接textChanged信号与槽函数
+        self.ui.message.textChanged.connect(self.on_text_changed)
+        self.ui.homework.textChanged.connect(self.on_text_changed)
 
     # 为课表添加内容 排除”课间“以及special内的内容 并且添加browser
     # 随后为这些browser添加对应的内容 并且开始计时器
     # 然后就丢到移动函数去了
+    # 生成→自适应→显示(可重复)
+    # 计算并且开始计时
     def initialize_the_class_schedule(self):
         # 先把要加入的数量判断出来
         self.lessons_with_slots = []  # 初始化一下
@@ -186,8 +189,23 @@ class MainWindow(QMainWindow):
             if i["name"] in lessons["special"] or i["name"] == '课间':  # 特殊课程和课间不能入内
                 continue
             self.lessons_with_slots.append(i["name"])  # 加!
-        # 加一下widget到里面去
-        # 清空 -> 添加len(lessons_with_slots)个 -> +1个 -> 依次设置
+        # 初始化lessons_list
+        # 操作的是lessons_list这个widget 先清空其中所有的QTextBrowser
+        for i in self.ui.lessons_list.findChildren(QtWidgets.QTextBrowser):
+            i.deleteLater()
+        # 添加第一个用于显示课间等的widget(一定有的) 名称为common_course_slots
+        text_browser = QtWidgets.QTextBrowser(self.ui.lessons_list)
+        text_browser.setObjectName("common_course_slots")
+        text_browser.setText("s")  # todo test!!!!!!
+        self.ui.lessons_list.layout().addWidget(text_browser)
+        # 添加剩余len lessons_with_slots个
+        for i in range(1, len(self.lessons_with_slots) + 1):
+            text_browser = QtWidgets.QTextBrowser(self.ui.lessons_list)
+            text_browser.setObjectName(f"lesson{i}")
+            text_browser.setText(str(i))  # todo test!!!!!
+            self.ui.lessons_list.layout().addWidget(text_browser)
+        # 最后刷新一下
+        self.ui.lessons_list.repaint()
 
 
 if __name__ == '__main__':
@@ -215,7 +233,6 @@ if __name__ == '__main__':
     scheduled_task_thread = threading.Thread(target=run_schedule,
                                              args=(float(config["run_schedule_time"]), main_window,))
     scheduled_task_thread.start()
-    pretreatmentHandle()  # 清理一下桌面
     # 进入主窗口
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss
     main_window.ui.show()
