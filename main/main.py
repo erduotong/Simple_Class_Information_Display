@@ -98,9 +98,8 @@ class MainWindow(QMainWindow):
         self.ui.message.textChanged.connect(self.on_text_changed)  # 两个文本框的超时信号
         self.ui.homework.textChanged.connect(self.on_text_changed)
         # print(self.ui.__dict__)  # 调试用
-        self.initialize_the_class_schedule()  # 测试课表初始化函数
+        # self.initialize_the_class_schedule()  # 测试课表初始化函数
 
-    # todo 粘贴自动转换成纯文本
     # todo 实现类似wallpaper engine的方式放置在桌面上(现在能基本实现 但是效果并不好)
     # todo 根据目前所看的虚拟桌面自动切换
     # todo 课表自动大小切换+自适应数量
