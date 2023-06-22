@@ -1,13 +1,11 @@
 import json
-import time
-import shutil
-import datetime
 import os
-from PyQt5.QtGui import QFont
-from PyQt5 import QtGui
+import shutil
+from datetime import *
+import time
 import schedule
-import win32gui
-from PyQt5 import QtWidgets
+from PyQt5 import QtGui
+from PyQt5.QtGui import QFont
 
 
 # 备份 分别为:路径,目标路径,备份槽位,
@@ -91,7 +89,7 @@ def populate_the_timesheet(weekday: str):
 def compareTime():
     try:
         data = json.loads(read_file("../data/daily_config.json"))
-        if data["date_time"] == datetime.datetime.now().strftime("%Y_%m_%d"):
+        if data["date_time"] == datetime.now().strftime("%Y_%m_%d"):
             return True  # 文件中的日期等于当前日期，返回
         else:
             return False
@@ -148,4 +146,15 @@ def adjust_font_size(obj, font_size: int) -> None:
     obj.setFont(font)
 
 
-
+def time_to_datetime(time_str):
+    """
+    :param time_str: 类似‘11:45’这样的字符串输入
+    :return:一个和datetime.now()一样的格式
+    """
+    # 获取当前时间
+    now = datetime.now()
+    # 解析输入的时间字符串，获取小时和分钟
+    hour, minute = map(int, time_str.split(":"))
+    # 构造一个日期时间对象，将时分秒设置为输入的时间
+    dt = datetime(now.year, now.month, now.day, hour, minute)
+    return dt

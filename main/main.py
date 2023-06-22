@@ -1,14 +1,13 @@
 import sys
 import threading
-
+from datetime import *
 import qdarkstyle
-from PyQt5 import QtCore
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-
 from daily_initialization import *
+import time
 
 
 # 使用了qdarkstyle
@@ -78,13 +77,15 @@ class MainWindow(QMainWindow):
         self.screen_height = None
         self.screen_width = None
         self.ui = None
-        self.daily_config = None
+        self.lessons_status = None
+        self.daily_config = self.daily_config = json.loads(read_file("../data/daily_config.json"))
         self.lessons_with_slots = []
         # config需要用的内容初始化
         self.laa = int(program_config["layout_adjustment_accuracy"])
         self.min_font_size = int(program_config["minimum_font_size"])
         self.max_font_size = int(program_config["maximum_font_size"])
         self.run_window()  # 运行!
+        self.time_to_next_refresh()
 
     def run_window(self):
         self.ui = uic.loadUi("./main_window.ui")
@@ -179,6 +180,7 @@ class MainWindow(QMainWindow):
     # 然后就丢到移动函数去了
     # 生成→自适应→显示(可重复)
     # 计算并且开始计时
+    # todo 解决窗口过大的bug
     def initialize_the_class_schedule(self):
         # 先把要加入的数量判断出来
         self.lessons_with_slots = []  # 初始化一下
@@ -192,23 +194,46 @@ class MainWindow(QMainWindow):
         # 操作的是lessons_list这个widget 先清空其中所有的QTextBrowser
         for i in self.ui.lessons_list.findChildren(QtWidgets.QTextBrowser):
             i.deleteLater()
+        # 防止超出距离
         # 添加第一个用于显示课间等的widget(一定有的) 名称为common_course_slots
         text_browser = QtWidgets.QTextBrowser(self.ui.lessons_list)
         text_browser.setObjectName("common_course_slots")
-        text_browser.setText("s")  # todo test!!!!!!
+        text_browser.setText("s")  # test
         self.ui.lessons_list.layout().addWidget(text_browser)
         # 添加剩余len lessons_with_slots个
         for i in range(1, len(self.lessons_with_slots) + 1):
             text_browser = QtWidgets.QTextBrowser(self.ui.lessons_list)
             text_browser.setObjectName(f"lesson{i}")
-            text_browser.setText(str(i))  # todo test!!!!!
+            text_browser.setText(str(i))  # test
             self.ui.lessons_list.layout().addWidget(text_browser)
         # 最后刷新一下
         self.ui.lessons_list.repaint()
 
+    # 展示到下一个的时间
+    def time_to_next_refresh(self) -> None:
+        # 先判断时间 然后进行处理
+        # 如果没有特殊变化那就不刷新 否则就进行一个刷新
+        #
+        now_time = datetime.now()
+        # 如果还没开始第一节课的情况 为0
+        if now_time < time_to_datetime(self.daily_config["lessons_list"][0]["start"]):
+            if self.lessons_status != 0:
+                # todo 更新课程指示器用的信号
+                self.lessons_status = 0
+            # 更新一下课程表的指示器
+            return
+        # 上完最后一节课的情况 为1
+        elif now_time > time_to_datetime(self.daily_config["lessons_list"][-1]["end"]):
+            if self.lessons_status != 1:
+                # todo 更新课程指示器用的信号
+                self.lessons_status = 1
+
+            return
+        # 正常 正在上课的情况
+
 
 if __name__ == '__main__':
-    now = datetime.datetime.now()
+    now = datetime.now()
     week_name = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][now.weekday()]
     compare_time = compareTime()
     # 如果是周六日并且文件没有在今天被创建过的话就问一下
