@@ -61,7 +61,7 @@ class ReselectTheClassScheduleWindow(QDialog):
 
 class MainWindow(QMainWindow):
     refresh_time_singal = pyqtSignal()  # 更新时间
-    run_adaptive_text_edit_manually = pyqtSignal()  # 自适应homework和message的字体大小和比例 手动触发 todo 绑定一个刷新按钮
+    run_adaptive_text_edit_manually = pyqtSignal()  # 自适应homework和message的字体大小和比例 手动触发
     update_the_course_indicator_singal = pyqtSignal()  # 刷新课程指示器用的信号
 
     def __init__(self, program_config):
@@ -121,7 +121,6 @@ class MainWindow(QMainWindow):
         # print(self.ui.__dict__)  # 调试用
     # todo 实现类似wallpaper engine的方式放置在桌面上(现在能基本实现 但是效果并不好)
     # todo 根据目前所看的虚拟桌面自动切换
-    # todo 课表自动大小切换+自适应数量
     # todo 课表的下节课指示牌
     # todo 可编辑颜色的message
 

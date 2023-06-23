@@ -9,6 +9,7 @@
 你可以在这里阅读:
 * [daily_config.json](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/daily_config_meaning.md)
 * [program_config.json](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/program_config_meaning.md)
+* [快捷键](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/shortcut.md)
 ## 分享协议
 #### https://creativecommons.org/licenses/by-nc-sa/4.0/
 #### 署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0)
