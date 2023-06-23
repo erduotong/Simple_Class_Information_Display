@@ -80,6 +80,8 @@ class MainWindow(QMainWindow):
         self.lessons_status = None
         self.daily_config = self.daily_config = json.loads(read_file("../data/daily_config.json"))
         self.lessons_with_slots = []
+        self.next_lesson = None  # 存储的是lessons_list的下标
+        self.time_to_next_len = None
         # config需要用的内容初始化
         self.laa = int(program_config["layout_adjustment_accuracy"])
         self.min_font_size = int(program_config["minimum_font_size"])
@@ -112,6 +114,7 @@ class MainWindow(QMainWindow):
         self.ui.nowtime.setText(time.strftime("%Y/%m/%d %H:%M:%S ", time.localtime()) +
                                 ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"][
                                     time.localtime().tm_wday])
+        self.time_to_next_refresh()
         self.ui.nowtime.repaint()
 
     # 更新msg和hw两个的拉伸和字体大小
@@ -216,20 +219,45 @@ class MainWindow(QMainWindow):
         #
         now_time = datetime.now()
         # 如果还没开始第一节课的情况 为0
-        if now_time < time_to_datetime(self.daily_config["lessons_list"][0]["start"]):
+        if now_time < time_to_datetime(self.daily_config["lessons_list"][0]["start"], now_time):
             if self.lessons_status != 0:
                 # todo 更新课程指示器用的信号
                 self.lessons_status = 0
             # 更新一下课程表的指示器
-            return
+            self.ui.time_to_next.setPlainText(
+                f"距离第一节课还有{format_timedelta(time_to_datetime(self.daily_config['lessons_list'][0]['start'], now_time) - now_time)}"
+            )
         # 上完最后一节课的情况 为1
-        elif now_time > time_to_datetime(self.daily_config["lessons_list"][-1]["end"]):
+        elif now_time > time_to_datetime(self.daily_config["lessons_list"][-1]["end"], now_time):
             if self.lessons_status != 1:
                 # todo 更新课程指示器用的信号
                 self.lessons_status = 1
-
-            return
+            self.ui.time_to_next.setPlainText(
+                f"已放学{format_timedelta(now_time - time_to_datetime(self.daily_config['lessons_list'][-1]['end'], now_time))}"
+            )
         # 正常 正在上课的情况
+        else:
+            for index, lesson in enumerate(self.daily_config["lessons_list"]):
+                if time_to_datetime(lesson["start"], now_time) <= now_time < time_to_datetime(lesson["end"], now):
+                    if self.next_lesson != index + 1:
+                        self.next_lesson = index + 1
+                        # todo 更新课程指示器的信号
+                    break
+            if self.next_lesson == len(self.daily_config["lessons_list"]):  # 超过列表最大长度了
+                self.ui.time_to_next.setPlainText(
+                    f"距离放学还有{format_timedelta(time_to_datetime(self.daily_config['lessons_list'][self.next_lesson - 1]['end'], now_time) - now_time)}")
+            else:
+                self.ui.time_to_next.setPlainText(
+                    f"距离{self.daily_config['lessons_list'][self.next_lesson]['name']}还有{format_timedelta(time_to_datetime(self.daily_config['lessons_list'][self.next_lesson]['start'], now_time) - now_time)}"
+                )
+
+        # 设置对齐方式
+        self.ui.time_to_next.setAlignment(Qt.AlignCenter)
+        # 自适应大小
+        if len(self.ui.time_to_next.toPlainText()) != self.time_to_next_len or self.ui.time_to_next.verticalScrollBar().isVisible():
+            self.time_to_next_len = len(self.ui.time_to_next.toPlainText())
+            # 自适应字体大小
+            adjust_the_text_edit_font_size([self.ui.time_to_next], self.min_font_size, self.max_font_size)
 
 
 if __name__ == '__main__':

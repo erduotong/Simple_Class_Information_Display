@@ -146,15 +146,36 @@ def adjust_font_size(obj, font_size: int) -> None:
     obj.setFont(font)
 
 
-def time_to_datetime(time_str):
+def time_to_datetime(time_str, now):
     """
     :param time_str: 类似‘11:45’这样的字符串输入
+    :param now: 现在的时间，datetime.now()获得的
     :return:一个和datetime.now()一样的格式
     """
     # 获取当前时间
-    now = datetime.now()
     # 解析输入的时间字符串，获取小时和分钟
     hour, minute = map(int, time_str.split(":"))
     # 构造一个日期时间对象，将时分秒设置为输入的时间
     dt = datetime(now.year, now.month, now.day, hour, minute)
     return dt
+
+
+# 格式化倒计时字符串
+def format_timedelta(delta):
+    """
+    格式化倒计时字符串
+    :param delta:timedelta对象
+    :return:小于60s: xx秒 小于1h:xx:xx 否则xx:xx:xx
+    """
+    total_seconds = delta.total_seconds()
+    if total_seconds < 60:
+        return f"{int(total_seconds)}秒"
+    elif total_seconds < 3600:
+        minutes = int(total_seconds // 60)
+        seconds = int(total_seconds % 60)
+        return f"{minutes:02d}:{seconds:02d}"
+    else:
+        hours = int(total_seconds // 3600)
+        minutes = int((total_seconds - hours * 3600) // 60)
+        seconds = int(total_seconds - hours * 3600 - minutes * 60)
+        return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
