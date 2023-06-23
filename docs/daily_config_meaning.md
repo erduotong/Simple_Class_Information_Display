@@ -6,3 +6,6 @@
   * start: 开始的时间
   * end: 结束的时间
   * >时间和课程都位于Curriculum文件夹内 lessons内的special代表特殊课程(无单独的槽位显示) 以及还会自动填充课间到剩下的时间内(也没有单独的槽)
+* backup: 存储信息的备份
+  * msg: 消息的备份
+  * homework: 作业的备份

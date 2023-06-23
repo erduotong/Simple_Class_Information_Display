@@ -61,9 +61,8 @@ class ReselectTheClassScheduleWindow(QDialog):
 
 class MainWindow(QMainWindow):
     refresh_time_singal = pyqtSignal()  # 更新时间
-    run_adaptive_text_edit_manually = pyqtSignal()  # 自适应homework和message的字体大小和比例 手动触发
-
-    # todo 这个信号↑要绑定一个按钮的
+    run_adaptive_text_edit_manually = pyqtSignal()  # 自适应homework和message的字体大小和比例 手动触发 todo 绑定一个刷新按钮
+    update_the_course_indicator_singal = pyqtSignal()  # 刷新课程指示器用的信号
 
     def __init__(self, program_config):
         super().__init__()
@@ -73,6 +72,7 @@ class MainWindow(QMainWindow):
         self.refresh_edit_size.timeout.connect(self.manually_refresh_the_text_edit_font)  # 超时后连接到更新字体
         self.refresh_time_singal.connect(self.refresh_time)
         self.run_adaptive_text_edit_manually.connect(self.manually_refresh_the_text_edit_font)
+        self.update_the_course_indicator_singal.connect(self.refresh_the_course_indicator)
         # 变量初始化
         self.screen_height = None
         self.screen_width = None
@@ -87,21 +87,23 @@ class MainWindow(QMainWindow):
         self.min_font_size = int(program_config["minimum_font_size"])
         self.max_font_size = int(program_config["maximum_font_size"])
         self.run_window()  # 运行!
-        self.time_to_next_refresh()
+        self.time_to_next_refresh()  # 强制刷新一下到下一节课的时间
 
     def run_window(self):
         self.ui = uic.loadUi("./main_window.ui")
         self.ui.setWindowFlags(Qt.FramelessWindowHint)  # 设置无边框窗口
         rect = QDesktopWidget().availableGeometry()  # 初始化大小
         self.ui.resize(rect.width(), rect.height())
-        self.refresh_time()  # 先进行初始化
-        self.adjust_msg_hw_size()
         adjust_font_size(self.ui.nowtime, config["time_font_size"])  # 设置时间显示的字体大小
         # 绑定要用到ui的信号和槽
+        self.ui.homework.setPlainText(self.daily_config['backup']['homework'])  # 加载之前的文本
+        self.ui.message.setPlainText(self.daily_config['backup']['msg'])
         self.ui.message.textChanged.connect(self.on_text_changed)  # 两个文本框的超时信号
         self.ui.homework.textChanged.connect(self.on_text_changed)
+        self.run_adaptive_text_edit_manually.emit()
+        self.refresh_time()  # 先进行初始化一次时间防止卡着
         # print(self.ui.__dict__)  # 调试用
-        self.initialize_the_class_schedule()  # 测试课表初始化函数
+        # self.initialize_the_class_schedule()  # 测试课表初始化函数
 
     # todo 实现类似wallpaper engine的方式放置在桌面上(现在能基本实现 但是效果并不好)
     # todo 根据目前所看的虚拟桌面自动切换
@@ -139,8 +141,6 @@ class MainWindow(QMainWindow):
         self.ui.msg_hw.layout().setStretchFactor(self.ui.message, int(ratio * self.laa))
         self.ui.msg_hw.layout().setStretchFactor(self.ui.homework, int((1 - ratio) * self.laa))
         # 字体大小设置
-        # 如果行没变动就先不刷新(因为绝对不会出现滚动条或者过少)
-
         adjust_the_text_edit_font_size([self.ui.message, self.ui.homework], self.min_font_size, self.max_font_size)
         # 恢复光标位置
         message_cursor = self.ui.message.textCursor()  # message的位置
@@ -174,15 +174,14 @@ class MainWindow(QMainWindow):
         self.ui.homework.textChanged.disconnect(self.on_text_changed)
         self.refresh_edit_size.stop()  # 先把计时器关了
         self.adjust_msg_hw_size()  # 然后再更新一下
+        # 备份一下其中的内容
+        self.daily_config["backup"]["msg"] = self.ui.message.toPlainText()
+        self.daily_config["backup"]["homework"] = self.ui.homework.toPlainText()
+        write_file("../data/daily_config.json", json.dumps(self.daily_config, ensure_ascii=False, indent=4))
         # 重新连接textChanged信号与槽函数
         self.ui.message.textChanged.connect(self.on_text_changed)
         self.ui.homework.textChanged.connect(self.on_text_changed)
 
-    # 为课表添加内容 排除”课间“以及special内的内容 并且添加browser
-    # 随后为这些browser添加对应的内容 并且开始计时器
-    # 然后就丢到移动函数去了
-    # 生成→自适应→显示(可重复)
-    # 计算并且开始计时
     # todo 解决窗口过大的bug
     def initialize_the_class_schedule(self):
         # 先把要加入的数量判断出来
@@ -221,8 +220,8 @@ class MainWindow(QMainWindow):
         # 如果还没开始第一节课的情况 为0
         if now_time < time_to_datetime(self.daily_config["lessons_list"][0]["start"], now_time):
             if self.lessons_status != 0:
-                # todo 更新课程指示器用的信号
                 self.lessons_status = 0
+                self.update_the_course_indicator_singal.emit()
             # 更新一下课程表的指示器
             self.ui.time_to_next.setPlainText(
                 f"距离第一节课还有{format_timedelta(time_to_datetime(self.daily_config['lessons_list'][0]['start'], now_time) - now_time)}"
@@ -230,8 +229,8 @@ class MainWindow(QMainWindow):
         # 上完最后一节课的情况 为1
         elif now_time > time_to_datetime(self.daily_config["lessons_list"][-1]["end"], now_time):
             if self.lessons_status != 1:
-                # todo 更新课程指示器用的信号
                 self.lessons_status = 1
+                self.update_the_course_indicator_singal.emit()
             self.ui.time_to_next.setPlainText(
                 f"已放学{format_timedelta(now_time - time_to_datetime(self.daily_config['lessons_list'][-1]['end'], now_time))}"
             )
@@ -241,7 +240,7 @@ class MainWindow(QMainWindow):
                 if time_to_datetime(lesson["start"], now_time) <= now_time < time_to_datetime(lesson["end"], now):
                     if self.next_lesson != index + 1:
                         self.next_lesson = index + 1
-                        # todo 更新课程指示器的信号
+                        self.update_the_course_indicator_singal.emit()
                     break
             if self.next_lesson == len(self.daily_config["lessons_list"]):  # 超过列表最大长度了
                 self.ui.time_to_next.setPlainText(
@@ -258,6 +257,10 @@ class MainWindow(QMainWindow):
             self.time_to_next_len = len(self.ui.time_to_next.toPlainText())
             # 自适应字体大小
             adjust_the_text_edit_font_size([self.ui.time_to_next], self.min_font_size, self.max_font_size)
+
+    # 刷新这个课程以及下一个课程的指示器
+    def refresh_the_course_indicator(self) -> None:
+        print("refresh_the_course_indicator")
 
 
 if __name__ == '__main__':

@@ -110,12 +110,13 @@ def run_schedule(sec: float, window) -> None:
 
 # 获得实际的行数 包括自动换行 传入控件
 def get_visible_line_count(text_edit):
+    a_line_count = text_edit.document().lineCount()
     line_count = 0
     block = text_edit.document().begin()
     while block.isValid():
         line_count += block.layout().lineCount()
         block = block.next()
-    return line_count
+    return max(line_count, a_line_count)
 
 
 # 传入:调整的的text_edits的列表 最小值 最大值
@@ -179,3 +180,22 @@ def format_timedelta(delta):
         minutes = int((total_seconds - hours * 3600) // 60)
         seconds = int(total_seconds - hours * 3600 - minutes * 60)
         return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+
+
+# 生成作业
+def generate_homework(lessons) -> str:
+    """
+    生成作业 按照with_homework的顺序
+    :param lessons:传入daily_config中的lessons这个列表
+    :return: 作业 包括换行
+    """
+    lessons_with_homework = json.loads(read_file("../data/Curriculum/lessons.json"))["with_homework"]
+    return_lessons = []
+    return_str = ''
+    for i in lessons:
+        if i['name'] in lessons_with_homework:
+            return_lessons.append(i['name'])
+    for i in lessons_with_homework:
+        if i in return_lessons:
+            return_str += f'*{i}:\n'
+    return return_str
