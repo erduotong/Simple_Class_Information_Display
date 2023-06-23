@@ -25,16 +25,49 @@
      <widget class="QWidget" name="widget_2" native="true">
       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,30">
        <item>
-        <widget class="QLabel" name="nowtime">
-         <property name="font">
-          <font>
-           <family>黑体</family>
-           <pointsize>48</pointsize>
-          </font>
+        <widget class="QWidget" name="widget" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-         <property name="text">
-          <string>时间显示区域</string>
-         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="30,1">
+          <item>
+           <widget class="QLabel" name="nowtime">
+            <property name="font">
+             <font>
+              <family>黑体</family>
+              <pointsize>48</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>时间显示区域</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="refresh_font">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <family>黑体</family>
+              <pointsize>12</pointsize>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>刷新字体</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>

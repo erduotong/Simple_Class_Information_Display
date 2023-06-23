@@ -82,12 +82,25 @@ class MainWindow(QMainWindow):
         self.lessons_with_slots = []
         self.next_lesson = None  # 存储的是lessons_list的下标
         self.time_to_next_len = None
+        self.lessons_slots = []
         # config需要用的内容初始化
         self.laa = int(program_config["layout_adjustment_accuracy"])
         self.min_font_size = int(program_config["minimum_font_size"])
         self.max_font_size = int(program_config["maximum_font_size"])
         self.run_window()  # 运行!
         self.time_to_next_refresh()  # 强制刷新一下到下一节课的时间
+        QtCore.QTimer.singleShot(0, self.after_init)
+
+    # 需要渲染窗口完毕后执行的函数
+    def after_init(self):
+        self.initialize_the_class_schedule()
+        set_font_list = []
+        QtCore.QTimer.singleShot(0, self.after_after_init)
+
+    # 真的是醉了......
+    def after_after_init(self):
+        for i in self.lessons_slots:
+            adjust_the_text_edit_font_size([self.ui.findChild(QTextBrowser, i)], self.min_font_size, self.max_font_size)
 
     def run_window(self):
         self.ui = uic.loadUi("./main_window.ui")
@@ -101,10 +114,11 @@ class MainWindow(QMainWindow):
         self.ui.message.textChanged.connect(self.on_text_changed)  # 两个文本框的超时信号
         self.ui.homework.textChanged.connect(self.on_text_changed)
         self.run_adaptive_text_edit_manually.emit()
+        self.ui.refresh_font.clicked.connect(self.run_adaptive_text_edit_manually)
+        # 设置快捷键
+        self.ui.refresh_font.setShortcut('F5')
         self.refresh_time()  # 先进行初始化一次时间防止卡着
         # print(self.ui.__dict__)  # 调试用
-        # self.initialize_the_class_schedule()  # 测试课表初始化函数
-
     # todo 实现类似wallpaper engine的方式放置在桌面上(现在能基本实现 但是效果并不好)
     # todo 根据目前所看的虚拟桌面自动切换
     # todo 课表自动大小切换+自适应数量
@@ -182,7 +196,7 @@ class MainWindow(QMainWindow):
         self.ui.message.textChanged.connect(self.on_text_changed)
         self.ui.homework.textChanged.connect(self.on_text_changed)
 
-    # todo 解决窗口过大的bug
+    # 添加课表
     def initialize_the_class_schedule(self):
         # 先把要加入的数量判断出来
         self.lessons_with_slots = []  # 初始化一下
@@ -196,22 +210,25 @@ class MainWindow(QMainWindow):
         # 操作的是lessons_list这个widget 先清空其中所有的QTextBrowser
         for i in self.ui.lessons_list.findChildren(QtWidgets.QTextBrowser):
             i.deleteLater()
-        # 防止超出距离
+        self.ui.lessons_list.setMaximumHeight(self.ui.lessons_list.height())  # 防止超出距离
         # 添加第一个用于显示课间等的widget(一定有的) 名称为common_course_slots
+        self.lessons_slots = []
         text_browser = QtWidgets.QTextBrowser(self.ui.lessons_list)
         text_browser.setObjectName("common_course_slots")
-        text_browser.setText("s")  # test
+        self.lessons_slots.append("common_course_slots")
+        text_browser.setText("延时服务")  # test
+        text_browser.setAlignment(Qt.AlignHCenter)
         self.ui.lessons_list.layout().addWidget(text_browser)
         # 添加剩余len lessons_with_slots个
         for i in range(1, len(self.lessons_with_slots) + 1):
             text_browser = QtWidgets.QTextBrowser(self.ui.lessons_list)
             text_browser.setObjectName(f"lesson{i}")
-            text_browser.setText(str(i))  # test
+            text_browser.setText(self.lessons_with_slots[i - 1])
+            text_browser.setAlignment(Qt.AlignHCenter)
+            self.lessons_slots.append(f"lesson{i}")
             self.ui.lessons_list.layout().addWidget(text_browser)
-        # 最后刷新一下
-        self.ui.lessons_list.repaint()
 
-    # 展示到下一个的时间
+    # 展示到下一个的事件
     def time_to_next_refresh(self) -> None:
         # 先判断时间 然后进行处理
         # 如果没有特殊变化那就不刷新 否则就进行一个刷新

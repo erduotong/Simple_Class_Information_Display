@@ -3,7 +3,6 @@ import os
 import shutil
 from datetime import *
 import time
-import schedule
 from PyQt5 import QtGui
 from PyQt5.QtGui import QFont
 
@@ -103,7 +102,6 @@ def run_schedule(sec: float, window) -> None:
     time_to_next_second = 1 - time.time() % 1
     time.sleep(time_to_next_second)
     while 1:
-        schedule.run_pending()
         time.sleep(sec)
         window.refresh_time_singal.emit()
 
@@ -132,7 +130,11 @@ def adjust_the_text_edit_font_size(text_edits, min_size: int, max_size: int) -> 
             font_size -= 1
             break
         font_size += 1
-    # 如果出现了滚动条，则将字体大小减小1
+    while any(text_edit.verticalScrollBar().isVisible() for text_edit in text_edits):
+        font_size -= 1
+        font.setPointSize(font_size)
+        for text_edit in text_edits:
+            text_edit.setFont(font)
     if font_size <= 0:  # 否则就出bug了
         font_size = 1
     font.setPointSize(font_size)
