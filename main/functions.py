@@ -203,3 +203,18 @@ def generate_homework(lessons) -> str:
     return return_str
 
 
+# 传入daily_config和now_lesson，获得now_lesson在daily_config中的第几个同名
+def search_now_lessons(daily_config: dict, next_lesson: dict):
+    """
+    传入daily_config和now_lesson，获得now_lesson在daily_config中的第几个同名
+    :param daily_config: self.daily_config
+    :param next_lesson: 要找的下一节课
+    :return: 位于第几个
+    """
+    tot: int = 0
+    for i in daily_config["lessons_list"]:
+        if i['name'] == next_lesson['name']:
+            tot += 1
+        if i == next_lesson:
+            break
+    return tot

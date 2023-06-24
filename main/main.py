@@ -93,7 +93,6 @@ class MainWindow(QMainWindow):
     # 需要渲染窗口完毕后执行的函数
     def after_init(self):
         self.initialize_the_class_schedule()
-        set_font_list = []
         QtCore.QTimer.singleShot(0, self.after_after_init)
 
     # 真的是醉了......
@@ -321,8 +320,11 @@ class MainWindow(QMainWindow):
                 # TODO 指向common(now)
                 return
             # 下一节课不用槽位的情况 搜索下一节课是哪个
-
+            tot = search_now_lessons(self.daily_config, self.daily_config["lessons_list"][lesson_index + 1])
+            print(tot)
+            # 根据tot判断是第几个 然后用find child来设置
         # 搜索:根据列表一个一个遍历，检索是第几个 比如第2个，然后再从lessons_with_slots里面进行搜索，找到第二个
+        # 然后判断下一节课，如果下一节课是课程那就再搜索一次
 
 
 if __name__ == '__main__':
