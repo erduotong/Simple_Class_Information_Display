@@ -274,6 +274,7 @@ class MainWindow(QMainWindow):
             adjust_the_text_edit_font_size([self.ui.time_to_next], self.min_font_size, self.max_font_size)
 
     # 刷新这个课程以及下一个课程的指示器
+    # 这是一坨
     def refresh_the_course_indicator(self, mode) -> None:
         """
         :param mode:0:第一节课之前 1:放学后 2:正常 位于start和end之间
@@ -281,6 +282,7 @@ class MainWindow(QMainWindow):
         """
         now_time = datetime.now()
         print(f'refresh mode:{mode}')
+        print(self.lessons_with_slots, self.lessons_slots)
         if mode == 0:
             if self.daily_config['lessons_list'][0]['name'] in self.lessons_with_slots:
                 # TODO 指向lesson1(next)
@@ -306,7 +308,6 @@ class MainWindow(QMainWindow):
                 lesson_now = lesson
                 lesson_index = index
                 break
-        print(lesson_now, lesson_index, "\n", self.lessons_with_slots)
         if lesson_now['name'] not in self.lessons_with_slots:  # 要用到common槽位的情况
             text_browser = self.ui.findChild(QTextBrowser, "common_course_slots")
             text_browser.setPlainText(lesson_now['name'])
@@ -321,10 +322,43 @@ class MainWindow(QMainWindow):
                 return
             # 下一节课不用槽位的情况 搜索下一节课是哪个
             tot = search_now_lessons(self.daily_config, self.daily_config["lessons_list"][lesson_index + 1])
-            print(tot)
-            # 根据tot判断是第几个 然后用find child来设置
-        # 搜索:根据列表一个一个遍历，检索是第几个 比如第2个，然后再从lessons_with_slots里面进行搜索，找到第二个
-        # 然后判断下一节课，如果下一节课是课程那就再搜索一次
+            index: int = 0
+            for index, i in enumerate(self.lessons_with_slots):
+                if i == self.self.daily_config["lessons_list"][lesson_index + 1]['name']:
+                    tot -= 1
+                if tot == 0:
+                    break
+            # TODO 指向common(now) self.lessons_slots[index+1](next)
+            return
+        # 现在不用槽位的情况
+        else:
+            # 先搜索现在的在什么地方
+            tot = search_now_lessons(self.daily_config, self.daily_config["lessons_list"][lesson_index])
+            index: int = 0
+            for index, i in enumerate(self.lessons_with_slots):
+                if i == self.self.daily_config["lessons_list"][lesson_index]['name']:
+                    tot -= 1
+                if tot == 0:
+                    break
+            # 下一节课是放学
+            if lesson_index + 1 >= len(self.daily_config['lessons_list']):
+                text_browser = self.ui.findChild(QTextBrowser, "common_course_slots")
+                text_browser.setPlainText('放学')
+                text_browser.setAlignment(Qt.AlignHCenter)
+                adjust_the_text_edit_font_size([text_browser], self.min_font_size, self.max_font_size)
+                # TODO 指向self.lessons_slots[index+1](now) 指向common(next)
+                return
+            # 下一节课是课间/special等
+            elif self.daily_config['lessons_list'][lesson_index + 1]['name'] not in self.lessons_with_slots:
+                text_browser = self.ui.findChild(QTextBrowser, "common_course_slots")
+                text_browser.setPlainText(self.daily_config["lessons_list"][lesson_index + 1]['name'])
+                text_browser.setAlignment(Qt.AlignHCenter)
+                adjust_the_text_edit_font_size([text_browser], self.min_font_size, self.max_font_size)
+                # TODO self.lessons_slots[index+1](now) 指向common(next)
+                return
+            # 下节课也在lessons_with_slots里面 所以那就正好+1和+2了
+            # TODO 指向self.lessons_slots[index+1](now) self.lessons_slots[index+2](next)
+            return
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 import subprocess
 import sys
 
-libraries = ['PyQt5']
+libraries = ['PyQt5','qdarkstyle']
 for library in libraries:
     try:
         # 检查库是否已经安装
