@@ -62,7 +62,7 @@ class ReselectTheClassScheduleWindow(QDialog):
 class MainWindow(QMainWindow):
     refresh_time_singal = pyqtSignal()  # 更新时间
     run_adaptive_text_edit_manually = pyqtSignal()  # 自适应homework和message的字体大小和比例 手动触发
-    update_the_course_indicator_singal = pyqtSignal()  # 刷新课程指示器用的信号
+    update_the_course_indicator_singal = pyqtSignal(int)  # 刷新课程指示器用的信号
 
     def __init__(self, program_config):
         super().__init__()
@@ -88,8 +88,7 @@ class MainWindow(QMainWindow):
         self.min_font_size = int(program_config["minimum_font_size"])
         self.max_font_size = int(program_config["maximum_font_size"])
         self.run_window()  # 运行!
-        self.time_to_next_refresh()  # 强制刷新一下到下一节课的时间
-        QtCore.QTimer.singleShot(0, self.after_init)
+        QtCore.QTimer.singleShot(0, self.after_init)  # 开始套......
 
     # 需要渲染窗口完毕后执行的函数
     def after_init(self):
@@ -101,6 +100,7 @@ class MainWindow(QMainWindow):
     def after_after_init(self):
         for i in self.lessons_slots:
             adjust_the_text_edit_font_size([self.ui.findChild(QTextBrowser, i)], self.min_font_size, self.max_font_size)
+        QtCore.QTimer.singleShot(0, self.refresh_time)  # 强制刷新时间
 
     def run_window(self):
         self.ui = uic.loadUi("./main_window.ui")
@@ -117,8 +117,8 @@ class MainWindow(QMainWindow):
         self.ui.refresh_font.clicked.connect(self.run_adaptive_text_edit_manually)
         # 设置快捷键
         self.ui.refresh_font.setShortcut('F5')
-        self.refresh_time()  # 先进行初始化一次时间防止卡着
         # print(self.ui.__dict__)  # 调试用
+
     # todo 实现类似wallpaper engine的方式放置在桌面上(现在能基本实现 但是效果并不好)
     # todo 根据目前所看的虚拟桌面自动切换
     # todo 课表的下节课指示牌
@@ -237,26 +237,26 @@ class MainWindow(QMainWindow):
         if now_time < time_to_datetime(self.daily_config["lessons_list"][0]["start"], now_time):
             if self.lessons_status != 0:
                 self.lessons_status = 0
-                self.update_the_course_indicator_singal.emit()
+                self.update_the_course_indicator_singal.emit(0)
             # 更新一下课程表的指示器
             self.ui.time_to_next.setPlainText(
-                f"距离第一节课还有{format_timedelta(time_to_datetime(self.daily_config['lessons_list'][0]['start'], now_time) - now_time)}"
+                f"距离{self.daily_config['lessons_list'][0]['name']}还有{format_timedelta(time_to_datetime(self.daily_config['lessons_list'][0]['start'], now_time) - now_time)}"
             )
         # 上完最后一节课的情况 为1
         elif now_time > time_to_datetime(self.daily_config["lessons_list"][-1]["end"], now_time):
             if self.lessons_status != 1:
                 self.lessons_status = 1
-                self.update_the_course_indicator_singal.emit()
+                self.update_the_course_indicator_singal.emit(1)
             self.ui.time_to_next.setPlainText(
                 f"已放学{format_timedelta(now_time - time_to_datetime(self.daily_config['lessons_list'][-1]['end'], now_time))}"
             )
-        # 正常 正在上课的情况
+        # 正常 正在上课的情况 为2
         else:
             for index, lesson in enumerate(self.daily_config["lessons_list"]):
                 if time_to_datetime(lesson["start"], now_time) <= now_time < time_to_datetime(lesson["end"], now):
                     if self.next_lesson != index + 1:
                         self.next_lesson = index + 1
-                        self.update_the_course_indicator_singal.emit()
+                        self.update_the_course_indicator_singal.emit(2)
                     break
             if self.next_lesson == len(self.daily_config["lessons_list"]):  # 超过列表最大长度了
                 self.ui.time_to_next.setPlainText(
@@ -275,8 +275,54 @@ class MainWindow(QMainWindow):
             adjust_the_text_edit_font_size([self.ui.time_to_next], self.min_font_size, self.max_font_size)
 
     # 刷新这个课程以及下一个课程的指示器
-    def refresh_the_course_indicator(self) -> None:
-        print("refresh_the_course_indicator")
+    def refresh_the_course_indicator(self, mode) -> None:
+        """
+        :param mode:0:第一节课之前 1:放学后 2:正常 位于start和end之间
+        :return: None
+        """
+        now_time = datetime.now()
+        print(f'refresh mode:{mode}')
+        if mode == 0:
+            if self.daily_config['lessons_list'][0]['name'] in self.lessons_with_slots:
+                # TODO 指向lesson1(next)
+                pass
+            else:
+                text_browser = self.ui.findChild(QTextBrowser, "common_course_slots")
+                text_browser.setPlainText(self.daily_config['lessons_list'][0]['name'])
+                text_browser.setAlignment(Qt.AlignHCenter)
+                adjust_the_text_edit_font_size([text_browser], self.min_font_size, self.max_font_size)
+                # TODO 指向common_course_slots(next)
+            return
+        elif mode == 1:
+            text_browser = self.ui.findChild(QTextBrowser, "common_course_slots")
+            text_browser.setPlainText("放学")
+            text_browser.setAlignment(Qt.AlignHCenter)
+            adjust_the_text_edit_font_size([text_browser], self.min_font_size, self.max_font_size)
+            # TODO 指向common_course_slots(now)
+            return
+        lesson_index = 0
+        lesson_now: dict = {}
+        for index, lesson in enumerate(self.daily_config["lessons_list"]):
+            if time_to_datetime(lesson["start"], now_time) <= now_time < time_to_datetime(lesson["end"], now):
+                lesson_now = lesson
+                lesson_index = index
+                break
+        print(lesson_now, lesson_index, "\n", self.lessons_with_slots)
+        if lesson_now['name'] not in self.lessons_with_slots:  # 要用到common槽位的情况
+            text_browser = self.ui.findChild(QTextBrowser, "common_course_slots")
+            text_browser.setPlainText(lesson_now['name'])
+            text_browser.setAlignment(Qt.AlignHCenter)
+            adjust_the_text_edit_font_size([text_browser], self.min_font_size, self.max_font_size)
+            # 首先来判断lesson_index+1是否存在
+            # 下一节课是放学或者要用槽 现在又要用到槽位 所以不显示下一节课
+            if lesson_index + 1 >= len(self.daily_config['lessons_list']) or \
+                    self.daily_config['lessons_list'][lesson_index + 1][
+                        'name'] not in self.lessons_with_slots:
+                # TODO 指向common(now)
+                return
+            # 下一节课不用槽位的情况 搜索下一节课是哪个
+
+        # 搜索:根据列表一个一个遍历，检索是第几个 比如第2个，然后再从lessons_with_slots里面进行搜索，找到第二个
 
 
 if __name__ == '__main__':

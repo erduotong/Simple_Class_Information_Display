@@ -201,3 +201,5 @@ def generate_homework(lessons) -> str:
         if i in return_lessons:
             return_str += f'*{i}:\n'
     return return_str
+
+
