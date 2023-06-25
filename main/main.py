@@ -83,12 +83,20 @@ class MainWindow(QMainWindow):
         self.next_lesson = None  # 存储的是lessons_list的下标
         self.time_to_next_len = None
         self.lessons_slots = []
+        self.now_lesson_indicator = None
+        self.next_lesson_indicator = None
         # config需要用的内容初始化
         self.laa = int(program_config["layout_adjustment_accuracy"])
         self.min_font_size = int(program_config["minimum_font_size"])
         self.max_font_size = int(program_config["maximum_font_size"])
-        self.run_window()  # 运行!
-        QtCore.QTimer.singleShot(0, self.after_init)  # 开始套......
+        self.run_window()  # 加载UI
+        # 加入两个显示的QLabel
+        self.ui.layout().addWidget(
+            initialize_label_indicator("next_lesson_indicator", program_config['next_indicator_text']))
+        self.ui.layout().addWidget(
+            initialize_label_indicator("now_lesson_indicator", program_config['now_indicator_text']))
+        # 开始套娃 执行要渲染窗口完毕后的操作
+        QtCore.QTimer.singleShot(0, self.after_init)
 
     # 需要渲染窗口完毕后执行的函数
     def after_init(self):
@@ -120,7 +128,6 @@ class MainWindow(QMainWindow):
 
     # todo 实现类似wallpaper engine的方式放置在桌面上(现在能基本实现 但是效果并不好)
     # todo 根据目前所看的虚拟桌面自动切换
-    # todo 课表的下节课指示牌
     # todo 可编辑颜色的message
 
     # 刷新时间
@@ -214,7 +221,7 @@ class MainWindow(QMainWindow):
         text_browser = QtWidgets.QTextBrowser(self.ui.lessons_list)
         text_browser.setObjectName("common_course_slots")
         self.lessons_slots.append("common_course_slots")
-        text_browser.setText("延时服务")  # test
+        text_browser.setText("test")
         text_browser.setAlignment(Qt.AlignHCenter)
         self.ui.lessons_list.layout().addWidget(text_browser)
         # 添加剩余len lessons_with_slots个
@@ -281,25 +288,33 @@ class MainWindow(QMainWindow):
         :return: None
         """
         now_time = datetime.now()
-        print(f'refresh mode:{mode}')
-        print(self.lessons_with_slots, self.lessons_slots)
+        print(f'refresh mode:{mode}')  # TODO delete 调试用
+        print(self.lessons_with_slots, self.lessons_slots)  # TODO delete 调试用
         if mode == 0:
             if self.daily_config['lessons_list'][0]['name'] in self.lessons_with_slots:
-                # TODO 指向lesson1(next)
-                pass
+                # 指向lesson1(next)
+                self.now_lesson_indicator = 'hide'
+                self.next_lesson_indicator = self.ui.findChild(QTextBrowser, 'lesson1')
+                self.refresh_the_course_indicator_position()
             else:
                 text_browser = self.ui.findChild(QTextBrowser, "common_course_slots")
                 text_browser.setPlainText(self.daily_config['lessons_list'][0]['name'])
                 text_browser.setAlignment(Qt.AlignHCenter)
                 adjust_the_text_edit_font_size([text_browser], self.min_font_size, self.max_font_size)
-                # TODO 指向common_course_slots(next)
+                # 指向common_course_slots(next)
+                self.now_lesson_indicator = 'hide'
+                self.next_lesson_indicator = self.ui.findChild(QTextBrowser, 'common_course_slots')
+                self.refresh_the_course_indicator_position()
             return
         elif mode == 1:
             text_browser = self.ui.findChild(QTextBrowser, "common_course_slots")
             text_browser.setPlainText("放学")
             text_browser.setAlignment(Qt.AlignHCenter)
             adjust_the_text_edit_font_size([text_browser], self.min_font_size, self.max_font_size)
-            # TODO 指向common_course_slots(now)
+            # 指向common_course_slots(now)
+            self.now_lesson_indicator = self.ui.findChild(QTextBrowser, 'common_course_slots')
+            self.next_lesson_indicator = 'hide'
+            self.refresh_the_course_indicator_position()
             return
         lesson_index = 0
         lesson_now: dict = {}
@@ -318,17 +333,23 @@ class MainWindow(QMainWindow):
             if lesson_index + 1 >= len(self.daily_config['lessons_list']) or \
                     self.daily_config['lessons_list'][lesson_index + 1][
                         'name'] not in self.lessons_with_slots:
-                # TODO 指向common(now)
+                # 指向common(now)
+                self.now_lesson_indicator = self.ui.findChild(QTextBrowser, 'common_course_slots')
+                self.next_lesson_indicator = 'hide'
+                self.refresh_the_course_indicator_position()
                 return
             # 下一节课不用槽位的情况 搜索下一节课是哪个
             tot = search_now_lessons(self.daily_config, self.daily_config["lessons_list"][lesson_index + 1])
             index: int = 0
             for index, i in enumerate(self.lessons_with_slots):
-                if i == self.self.daily_config["lessons_list"][lesson_index + 1]['name']:
+                if i == self.daily_config["lessons_list"][lesson_index + 1]['name']:
                     tot -= 1
                 if tot == 0:
                     break
-            # TODO 指向common(now) self.lessons_slots[index+1](next)
+            # 指向common(now) self.lessons_slots[index+1](next)
+            self.now_lesson_indicator = self.ui.findChild(QTextBrowser, 'common_course_slots')
+            self.next_lesson_indicator = self.ui.findChild(QTextBrowser, self.lessons_slots[index + 1])
+            self.refresh_the_course_indicator_position()
             return
         # 现在不用槽位的情况
         else:
@@ -336,7 +357,7 @@ class MainWindow(QMainWindow):
             tot = search_now_lessons(self.daily_config, self.daily_config["lessons_list"][lesson_index])
             index: int = 0
             for index, i in enumerate(self.lessons_with_slots):
-                if i == self.self.daily_config["lessons_list"][lesson_index]['name']:
+                if i == self.daily_config["lessons_list"][lesson_index]['name']:
                     tot -= 1
                 if tot == 0:
                     break
@@ -346,7 +367,10 @@ class MainWindow(QMainWindow):
                 text_browser.setPlainText('放学')
                 text_browser.setAlignment(Qt.AlignHCenter)
                 adjust_the_text_edit_font_size([text_browser], self.min_font_size, self.max_font_size)
-                # TODO 指向self.lessons_slots[index+1](now) 指向common(next)
+                # 指向self.lessons_slots[index+1](now) 指向common(next)
+                self.now_lesson_indicator = self.ui.findChild(QTextBrowser, self.lessons_slots[index + 1])
+                self.next_lesson_indicator = self.ui.findChild(QTextBrowser, 'common_course_slots')
+                self.refresh_the_course_indicator_position()
                 return
             # 下一节课是课间/special等
             elif self.daily_config['lessons_list'][lesson_index + 1]['name'] not in self.lessons_with_slots:
@@ -354,11 +378,41 @@ class MainWindow(QMainWindow):
                 text_browser.setPlainText(self.daily_config["lessons_list"][lesson_index + 1]['name'])
                 text_browser.setAlignment(Qt.AlignHCenter)
                 adjust_the_text_edit_font_size([text_browser], self.min_font_size, self.max_font_size)
-                # TODO self.lessons_slots[index+1](now) 指向common(next)
+                # self.lessons_slots[index+1](now) 指向common(next)
+                self.now_lesson_indicator = self.ui.findChild(QTextBrowser, self.lessons_slots[index + 1])
+                self.next_lesson_indicator = self.ui.findChild(QTextBrowser, 'common_course_slots')
+                self.refresh_the_course_indicator_position()
                 return
             # 下节课也在lessons_with_slots里面 所以那就正好+1和+2了
-            # TODO 指向self.lessons_slots[index+1](now) self.lessons_slots[index+2](next)
+            # 指向self.lessons_slots[index+1](now) self.lessons_slots[index+2](next)
+            self.now_lesson_indicator = self.ui.findChild(QTextBrowser, self.lessons_slots[index + 1])
+            self.next_lesson_indicator = self.ui.findChild(QTextBrowser, self.lessons_slots[index + 2])
+            self.refresh_the_course_indicator_position()
             return
+
+    # 刷新课程指示器的位置
+    def refresh_the_course_indicator_position(self):
+        # 先检测是否出有没有是False,如果有就把那个TextBrowser隐藏掉
+        # (self.now_lesson_indicator = None
+        # self.next_lesson_indicator = None)
+        # 然后读取位置 读取弹簧的宽度
+        # 然后自适应字体大小一下
+        # hide输入为隐藏,不指示
+        # self.now_lesson_indicator = None和self.next_lesson_indicator = None
+
+        now_label = self.ui.findChild(QLabel, "now_lesson_indicator")  # 先读取label方便操作
+        next_label = self.ui.findChild(QLabel, "next_lesson_indicator")
+        # 先设置now_lesson_indicator
+        if self.now_lesson_indicator == 'hide':
+            now_label.hide()
+        else:
+            pass
+
+        # 然后设置next_lesson_indicator
+        if self.next_lesson_indicator == 'hide':
+            next_label.hide()
+        else:
+            pass
 
 
 if __name__ == '__main__':
@@ -384,7 +438,7 @@ if __name__ == '__main__':
     main_window = MainWindow(config)
     # 创建进程开始定时执行任务,传入刷新的秒数
     scheduled_task_thread = threading.Thread(target=run_schedule,
-                                             args=(float(config["run_schedule_time"]), main_window,))
+                                             args=(float(config["refresh_time"]), main_window,))
     scheduled_task_thread.start()
     # 进入主窗口
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss

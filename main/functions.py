@@ -4,7 +4,9 @@ import shutil
 from datetime import *
 import time
 from PyQt5 import QtGui
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QLabel
 
 
 # 备份 分别为:路径,目标路径,备份槽位,
@@ -218,3 +220,20 @@ def search_now_lessons(daily_config: dict, next_lesson: dict):
         if i == next_lesson:
             break
     return tot
+
+
+# 用于给指示现在课程和下一个课程的QLabel简化代码
+def initialize_label_indicator(name: str, text: str):
+    """
+    用于给指示现在课程和下一个课程的QLabel简化代码
+    :param name:要设置的对象名
+    :param text:要设置的文本
+    :return:初始化好的QLabel
+    """
+    label = QLabel()
+    label.setObjectName(name)
+    label.setFont(QFont("黑体", 16))
+    label.setAlignment(Qt.AlignCenter)
+    label.setText(text)
+    label.hide()
+    return label
