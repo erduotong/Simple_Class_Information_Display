@@ -12,7 +12,6 @@ import time
 
 # 使用了qdarkstyle
 class ReselectTheClassScheduleWindow(QDialog):
-    # todo 不允许用户直接关闭窗口
     returnPressed = pyqtSignal(str)
 
     def __init__(self, week):
@@ -20,16 +19,17 @@ class ReselectTheClassScheduleWindow(QDialog):
         self.week = week
         self.ui = None
         self.result = None
-
         self.init_ui()
 
     def init_ui(self):
         self.ui = uic.loadUi("./ui_rcs.ui")
-        self.ui.mon.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "monday"))
-        self.ui.tue.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "tuesday"))
-        self.ui.wed.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "wednesday"))
-        self.ui.thur.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "thursday"))
-        self.ui.fri.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "friday"))
+        self.ui.monday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "monday"))
+        self.ui.tuesday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "tuesday"))
+        self.ui.wednesday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "wednesday"))
+        self.ui.thursday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "thursday"))
+        self.ui.friday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "friday"))
+        self.ui.saturday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "saturday"))
+        self.ui.sunday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "sunday"))
         self.ui.pushButton.clicked.connect(self.on_push_button_clicked)
         self.ui.pushButton_2.clicked.connect(self.on_push_button_2_clicked)
 
@@ -57,6 +57,7 @@ class ReselectTheClassScheduleWindow(QDialog):
             self.ui.textBrowser.setText(a)
             self.ui.textBrowser.setAlignment(Qt.AlignCenter)
             self.ui.textBrowser.repaint()
+
 
 
 class MainWindow(QMainWindow):
@@ -432,11 +433,11 @@ if __name__ == '__main__':
     initialize_the_file()
     # 如果是周六日并且文件没有在今天被创建过的话就问一下
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)  # 高DPI自适应
-    # 询问课表
-    if (week_name == 'saturday' or week_name == 'sunday') and compare_time is False:
+    lessons_dict = json.loads(read_file('../data/Curriculum/lessons.json'))
+    # 询问课表 如果是没东西的话那么就询问要替换哪个课表
+    if (lessons_dict[week_name][0] == 'None') and compare_time is False:
         app = QApplication(sys.argv)
-        ReselectTheClassSchduleWindow = ReselectTheClassScheduleWindow(
-            json.loads(read_file('../data/Curriculum/lessons.json')))
+        ReselectTheClassSchduleWindow = ReselectTheClassScheduleWindow(lessons_dict)
         ReselectTheClassSchduleWindow.returnPressed.connect(lambda: None)  # 禁用自定义信号
         ReselectTheClassSchduleWindow.ui.show()
         app.exec()
