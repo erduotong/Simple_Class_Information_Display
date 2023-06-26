@@ -146,8 +146,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         QtCore.QTimer.singleShot(0, self.refresh_time)  # 强制刷新时间
 
     # todo 可编辑颜色的message
-    # todo 重写resizeEvent
-    # todo 重写closeEvent
     # todo 可以托盘显示
     # todo 打包成exe
     # 刷新时间
@@ -457,6 +455,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for i in self.lessons_slots:
             adjust_the_text_edit_font_size([self.findChild(QTextBrowser, i)], self.min_font_size,
                                            self.max_font_size)
+
+    # 重写closeEvent 要备份
+    def closeEvent(self, event):
+        # 先存一下
+        self.daily_config["backup"]["msg"] = self.message.toPlainText()
+        self.daily_config["backup"]["homework"] = self.homework.toPlainText()
+        write_file("../data/daily_config.json", json.dumps(self.daily_config, ensure_ascii=False, indent=4))
+        # 退出
+        super().closeEvent(event)
+        event.accept()
+        os._exit(114514)
 
 
 if __name__ == '__main__':
