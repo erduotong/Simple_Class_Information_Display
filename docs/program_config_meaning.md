@@ -10,3 +10,4 @@
 * text_edit_refresh_time: 编辑完文本后 自动刷新字体大小的时间
 * now_indicator_text: 现在的课程指示器的显示的文本 如<Now
 * next_indicator_text: 下一节课的课程指示器的显示的文本 如<Next
+* desktop_wallpaper_mode: 桌面壁纸模式的开关 "true"为开否则为关

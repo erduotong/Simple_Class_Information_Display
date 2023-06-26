@@ -4,8 +4,6 @@
 ## 适用场景
 开发是为了在学校进行使用 用于自动化存放作业，课表等。减少一些日常的枯燥劳动。同时也方便进行使用
 ## 文档
-
-### 你可以在这里阅读文档:
 #### 配置文件
 * [daily_config.json 今日配置文件](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/daily_config_meaning.md)
 * [program_config.json 程序配置文件](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/program_config_meaning.md)
@@ -13,6 +11,9 @@
 * [time.json 课表对应的时间的存储文件](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/time.md)
 #### 其他
 * [快捷键](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/shortcut.md)
+## 感谢
+* PyQt5,Qt5:GUI
+* qdarkstyle:好看的深色qss
 ## 分享协议
 #### https://creativecommons.org/licenses/by-nc-sa/4.0/
 #### 署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0)

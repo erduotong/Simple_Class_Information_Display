@@ -1,7 +1,6 @@
 import sys
 import threading
 from datetime import *
-import qdarkstyle
 from PyQt5 import QtCore, QtWidgets
 from PyQt5 import uic
 from PyQt5.QtCore import *
@@ -59,7 +58,6 @@ class ReselectTheClassScheduleWindow(QDialog):
             self.ui.textBrowser.repaint()
 
 
-
 class MainWindow(QMainWindow):
     refresh_time_singal = pyqtSignal()  # 更新时间
     run_adaptive_text_edit_manually = pyqtSignal()  # 自适应homework和message的字体大小和比例 手动触发
@@ -90,6 +88,7 @@ class MainWindow(QMainWindow):
         self.laa = int(program_config["layout_adjustment_accuracy"])
         self.min_font_size = int(program_config["minimum_font_size"])
         self.max_font_size = int(program_config["maximum_font_size"])
+        self.program_config = program_config
         self.run_window()  # 加载UI
         # 加入两个显示的QLabel
         self.ui.layout().addWidget(
@@ -112,7 +111,14 @@ class MainWindow(QMainWindow):
 
     def run_window(self):
         self.ui = uic.loadUi("./main_window.ui")
-        self.ui.setWindowFlags(Qt.FramelessWindowHint)  # 设置无边框窗口
+        # 设置是否开启桌面模式
+        if self.program_config['desktop_wallpaper_mode'] == 'true':
+            # todo 实现类似wallpaper engine的方式放置在桌面上(现在能基本实现 但是效果并不好)
+            # todo 根据目前所看的虚拟桌面自动切换
+            self.ui.setWindowFlags(Qt.FramelessWindowHint)  # 设置无边框窗口
+        # 普通窗口模式
+        else:
+            self.ui.setWindowTitle("Simple Daily Desktop")
         rect = QDesktopWidget().availableGeometry()  # 初始化大小
         self.ui.resize(rect.width(), rect.height())
         adjust_font_size(self.ui.nowtime, config["time_font_size"])  # 设置时间显示的字体大小
@@ -127,8 +133,6 @@ class MainWindow(QMainWindow):
         self.ui.refresh_font.setShortcut('F5')
         # print(self.ui.__dict__)  # 调试用
 
-    # todo 实现类似wallpaper engine的方式放置在桌面上(现在能基本实现 但是效果并不好)
-    # todo 根据目前所看的虚拟桌面自动切换
     # todo 可编辑颜色的message
 
     # 刷新时间
@@ -289,8 +293,6 @@ class MainWindow(QMainWindow):
         :return: None
         """
         now_time = datetime.now()
-        print(f'refresh mode:{mode}')  # TODO delete 调试用
-        print(self.lessons_with_slots, self.lessons_slots)  # TODO delete 调试用
         if mode == 0:
             if self.daily_config['lessons_list'][0]['name'] in self.lessons_with_slots:
                 # 指向lesson1(next)
@@ -393,18 +395,13 @@ class MainWindow(QMainWindow):
 
     # 刷新课程指示器的位置
     def refresh_the_course_indicator_position(self):
-        # 先检测是否出有没有是hide,如果有就把那个TextBrowser隐藏掉
-        # (self.now_lesson_indicator = None
-        # self.next_lesson_indicator = None)
-        # 然后读取位置 读取弹簧的宽度
-        # 然后自适应字体大小一下
-        # hide输入为隐藏,不指示
-        # self.now_lesson_indicator = None和self.next_lesson_indicator = None
         now_label = self.ui.findChild(QLabel, "now_lesson_indicator")  # 先读取label方便操作
         next_label = self.ui.findChild(QLabel, "next_lesson_indicator")
         spacer_item_x = self.ui.curriculum.width() - self.ui.course_display.width()
+        common = self.ui.findChild(QTextBrowser, "common_course_slots")
+        x = common.width() + common.mapToGlobal(QtCore.QPoint(0, 0)).x() + spacer_item_x // 50  # 获得x坐标
+        spacer_item_x -= spacer_item_x // 25
         # 先设置now_lesson_indicator
-        print()
         if self.now_lesson_indicator == 'hide':
             now_label.hide()
         else:
@@ -412,13 +409,28 @@ class MainWindow(QMainWindow):
             now_label.setFixedSize(spacer_item_x, self.now_lesson_indicator.height())
             now_label.show()
             # 移动到该去的地方
-            # todo 自适应字体大小
-
+            # 获得坐标
+            y = self.now_lesson_indicator.mapToGlobal(
+                QtCore.QPoint(0, 0)).y()  # now_lesson的左上角的y坐标
+            parent_pos = now_label.parent().mapFromGlobal(QtCore.QPoint(x, y))
+            now_label.move(parent_pos)
+            # 自适应字体大小
+            adaptive_label_font_size(now_label, self.max_font_size, self.min_font_size)
         # 然后设置next_lesson_indicator
         if self.next_lesson_indicator == 'hide':
             next_label.hide()
         else:
-            pass
+            # 先设置要指示的长度和高度
+            next_label.setFixedSize(spacer_item_x, self.next_lesson_indicator.height())
+            next_label.show()
+            # 移动到该去的地方
+            # 获得坐标
+            y = self.next_lesson_indicator.mapToGlobal(
+                QtCore.QPoint(0, 0)).y()  # now_lesson的左上角的y坐标
+            parent_pos = next_label.parent().mapFromGlobal(QtCore.QPoint(x, y))
+            next_label.move(parent_pos)
+            # 自适应字体大小
+            adaptive_label_font_size(next_label, self.max_font_size, self.min_font_size)
 
 
 if __name__ == '__main__':
@@ -453,6 +465,7 @@ if __name__ == '__main__':
                                              args=(float(config["refresh_time"]), main_window,))
     scheduled_task_thread.start()
     # 进入主窗口
+    import qdarkstyle
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss
     main_window.ui.show()
     app.exec()

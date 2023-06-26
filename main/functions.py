@@ -232,7 +232,9 @@ def initialize_label_indicator(name: str, text: str):
     """
     label = QLabel()
     label.setObjectName(name)
-    label.setFont(QFont("黑体", 16))
+    font = QFont("黑体", 16)
+    font.setWeight(QFont.Bold)
+    label.setFont(font)
     label.setAlignment(Qt.AlignCenter)
     label.setText(text)
     label.hide()
@@ -278,10 +280,43 @@ def initialize_the_file() -> None:
             "time_font_size": 51,
             "text_edit_refresh_time": 2,
             "now_indicator_text": "<Now",
-            "next_indicator_text": "<Next"
+            "next_indicator_text": "<Next",
+            "desktop_wallpaper_mode": "false"
         }
     }
     for filepath, content in path.items():
         if not os.path.exists(filepath):  # 判断文件是否存在，如果不存在则创建
             with open(filepath, 'w') as f:
                 json.dump(content, f, indent=4, ensure_ascii=False)  # 把content写入文件中
+
+
+# 自适应QLabel的字体大小
+def adaptive_label_font_size(label, max_size: int, min_size: int) -> None:
+    """
+    自适应QLabel的字体大小
+    :param label:要设置的label
+    :param max_size: 最大大小
+    :param min_size: 最小大小
+    :return: None
+    """
+    # 获取当前label的宽度和高度
+    label_width = label.width()
+    label_height = label.height()
+    # 创建字体对象，并设置初始字体大小
+    font = QtGui.QFont()
+    font.setPointSize(max_size)
+    # 获取字体度量对象
+    fm = QtGui.QFontMetrics(font, label)
+    # 获取当前文本在初始字体下的行宽和行高
+    text_width = fm.width(label.text())
+    text_height = fm.lineSpacing()
+    # 如果文本宽度超过了label宽度，或者文本高度超过了label高度，则逐步缩小字体大小
+    while text_width > label_width or text_height > label_height:
+        font.setPointSize(font.pointSize() - 1)
+        fm = QtGui.QFontMetrics(font, label)
+        text_width = fm.width(label.text())
+        text_height = fm.lineSpacing()
+        if font.pointSize() < min_size:
+            break
+    # 将动态调整后的字体应用到label上
+    label.setFont(font)

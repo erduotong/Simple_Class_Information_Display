@@ -9,5 +9,6 @@
     "time_font_size": 51,
     "text_edit_refresh_time": 2,
     "now_indicator_text": "<Now",
-    "next_indicator_text": "<Next"
+    "next_indicator_text": "<Next",
+    "desktop_wallpaper_mode": "false"
 }
