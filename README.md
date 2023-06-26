@@ -1,6 +1,6 @@
 # Simple_Daily_Desktop
 [![Generic badge](https://img.shields.io/badge/编写于_Python_版本-3.11.3-blue.svg)](https://Python.org)  
->这是一个可以交互的,一般来说位于壁纸层的应用
+### 强烈建议**阅读完成readme**后再开始操作/下载
 ## 适用场景
 开发是为了在学校进行使用 用于自动化存放作业，课表等。减少一些日常的枯燥劳动。同时也方便进行使用
 ## 文档
@@ -11,6 +11,9 @@
 * [time.json 课表对应的时间的存储文件](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/time.md)
 #### 其他
 * [快捷键](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/shortcut.md)
+## 常见问题
+* 我想查看昨天的配置文件？
+> 查看data/backup/daily_config
 ## 感谢
 * PyQt5,Qt5:GUI
 * qdarkstyle:好看的深色qss
