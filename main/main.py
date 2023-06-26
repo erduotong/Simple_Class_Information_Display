@@ -2,7 +2,6 @@ import sys
 import threading
 from datetime import *
 from PyQt5 import QtCore, QtWidgets
-from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from daily_initialization import *
@@ -465,7 +464,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 退出
         super().closeEvent(event)
         event.accept()
-        os._exit(114514)
+        os._exit(0)
 
 
 if __name__ == '__main__':
