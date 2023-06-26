@@ -237,3 +237,51 @@ def initialize_label_indicator(name: str, text: str):
     label.setText(text)
     label.hide()
     return label
+
+
+# 检查文件是否存在并在不存在时初始化
+def initialize_the_file() -> None:
+    """
+    检查文件是否存在并在不存在时初始化 路径写在内部
+    :return: None
+    """
+    path = {
+        "../data/Curriculum/lessons.json": {
+            "monday": ["None"],
+            "tuesday": ["None"],
+            "wednesday": ["None"],
+            "thursday": ["None"],
+            "friday": ["None"],
+            "saturday": ["None"],
+            "sunday": ["None"],
+            "special": ["None"],
+            "with_homework": ["None"]
+        },
+        "../data/Curriculum/time.json": {
+            "l1": {
+                "start": "00:01",
+                "end": "23:55"
+            },
+            "None": {
+                "start": "23:55",
+                "end": "23:59"
+            }
+        },
+        "../data/program_config.json": {
+            "backup_slots": {
+                "daily_config": 5
+            },
+            "refresh_time": "1",
+            "layout_adjustment_accuracy": 100,
+            "minimum_font_size": 20,
+            "maximum_font_size": 80,
+            "time_font_size": 51,
+            "text_edit_refresh_time": 2,
+            "now_indicator_text": "<Now",
+            "next_indicator_text": "<Next"
+        }
+    }
+    for filepath, content in path.items():
+        if not os.path.exists(filepath):  # 判断文件是否存在，如果不存在则创建
+            with open(filepath, 'w') as f:
+                json.dump(content, f, indent=4, ensure_ascii=False)  # 把content写入文件中

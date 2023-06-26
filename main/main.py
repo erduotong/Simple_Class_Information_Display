@@ -392,21 +392,26 @@ class MainWindow(QMainWindow):
 
     # 刷新课程指示器的位置
     def refresh_the_course_indicator_position(self):
-        # 先检测是否出有没有是False,如果有就把那个TextBrowser隐藏掉
+        # 先检测是否出有没有是hide,如果有就把那个TextBrowser隐藏掉
         # (self.now_lesson_indicator = None
         # self.next_lesson_indicator = None)
         # 然后读取位置 读取弹簧的宽度
         # 然后自适应字体大小一下
         # hide输入为隐藏,不指示
         # self.now_lesson_indicator = None和self.next_lesson_indicator = None
-
         now_label = self.ui.findChild(QLabel, "now_lesson_indicator")  # 先读取label方便操作
         next_label = self.ui.findChild(QLabel, "next_lesson_indicator")
+        spacer_item_x = self.ui.curriculum.width() - self.ui.course_display.width()
         # 先设置now_lesson_indicator
+        print()
         if self.now_lesson_indicator == 'hide':
             now_label.hide()
         else:
-            pass
+            # 先设置要指示的长度和高度
+            now_label.setFixedSize(spacer_item_x, self.now_lesson_indicator.height())
+            now_label.show()
+            # 移动到该去的地方
+            # todo 自适应字体大小
 
         # 然后设置next_lesson_indicator
         if self.next_lesson_indicator == 'hide':
@@ -419,6 +424,12 @@ if __name__ == '__main__':
     now = datetime.now()
     week_name = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][now.weekday()]
     compare_time = compareTime()
+    # 初始化文件防止报错
+    # 初始化文件夹
+    os.makedirs('../data/backup/daily_config', exist_ok=True)
+    os.makedirs('../data/Curriculum', exist_ok=True)
+    # 初始化文件 具体更改在函数内
+    initialize_the_file()
     # 如果是周六日并且文件没有在今天被创建过的话就问一下
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)  # 高DPI自适应
     # 询问课表
