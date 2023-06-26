@@ -465,8 +465,9 @@ if __name__ == '__main__':
                                              args=(float(config["refresh_time"]), main_window,))
     scheduled_task_thread.start()
     # 进入主窗口
+    # 使用qdarkstyle
     import qdarkstyle
-
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss
+    # 展示窗口
     main_window.ui.show()
     app.exec()
