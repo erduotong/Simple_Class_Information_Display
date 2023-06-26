@@ -7,45 +7,49 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from daily_initialization import *
 import time
+from rcs import Ui_Dialog
+from main_window import Ui_MainWindow
 
 
 # 使用了qdarkstyle
-class ReselectTheClassScheduleWindow(QDialog):
+class ReselectTheClassScheduleWindow(QDialog, Ui_Dialog):
     returnPressed = pyqtSignal(str)
 
     def __init__(self, week):
         super().__init__()
         self.week = week
-        self.ui = None
         self.result = None
+        self.setupUi(self)
+        self.show()
         self.init_ui()
+        self.singal1 = None
 
     def init_ui(self):
-        self.ui = uic.loadUi("./ui_rcs.ui")
-        self.ui.monday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "monday"))
-        self.ui.tuesday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "tuesday"))
-        self.ui.wednesday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "wednesday"))
-        self.ui.thursday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "thursday"))
-        self.ui.friday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "friday"))
-        self.ui.saturday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "saturday"))
-        self.ui.sunday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "sunday"))
-        self.ui.pushButton.clicked.connect(self.on_push_button_clicked)
-        self.ui.pushButton_2.clicked.connect(self.on_push_button_2_clicked)
+        self.monday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "monday"))
+        self.tuesday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "tuesday"))
+        self.wednesday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "wednesday"))
+        self.thursday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "thursday"))
+        self.friday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "friday"))
+        self.saturday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "saturday"))
+        self.sunday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "sunday"))
+        self.pushButton.clicked.connect(self.on_push_button_clicked)
+        self.pushButton_2.clicked.connect(self.on_push_button_2_clicked)
 
     def on_push_button_clicked(self):
         try:
             self.result = \
                 [i for i, v in self.week.items() if
-                 tuple(v) == tuple(self.ui.textBrowser.toPlainText().strip().split())][0]
+                 tuple(v) == tuple(self.textBrowser.toPlainText().strip().split())][0]
         except:
             self.result = "monday"
-
-        self.ui.close()
+        self.singal1 = 'clicked'
+        self.close()
         self.returnPressed.emit(self.result)
 
     def on_push_button_2_clicked(self):
         self.result = datetime.datetime.now().strftime("%A").lower()
-        self.ui.close()
+        self.singal1 = 'clicked'
+        self.close()
         self.returnPressed.emit(self.result)
 
     def on_radio_button_toggled(self, checked, text):
@@ -53,18 +57,25 @@ class ReselectTheClassScheduleWindow(QDialog):
             a = ' '
             for i in self.week[text]:
                 a += f"{i} "
-            self.ui.textBrowser.setText(a)
-            self.ui.textBrowser.setAlignment(Qt.AlignCenter)
-            self.ui.textBrowser.repaint()
+            self.textBrowser.setText(a)
+            self.textBrowser.setAlignment(Qt.AlignCenter)
+            self.textBrowser.repaint()
+
+    def closeEvent(self, event):
+        if self.singal1 == 'clicked':
+            event.accept()
+        else:
+            event.ignore()
 
 
-class MainWindow(QMainWindow):
+class MainWindow(QMainWindow, Ui_MainWindow):
     refresh_time_singal = pyqtSignal()  # 更新时间
     run_adaptive_text_edit_manually = pyqtSignal()  # 自适应homework和message的字体大小和比例 手动触发
     update_the_course_indicator_singal = pyqtSignal(int)  # 刷新课程指示器用的信号
 
     def __init__(self, program_config):
         super().__init__()
+        self.setupUi(self)
         self.refresh_edit_size = QtCore.QTimer()  # 设置一个计时器
         self.refresh_edit_size.setInterval(program_config["text_edit_refresh_time"] * 1000)  # 设置停止编辑刷新的时间
         # 绑定信号&槽
@@ -75,7 +86,6 @@ class MainWindow(QMainWindow):
         # 变量初始化
         self.screen_height = None
         self.screen_width = None
-        self.ui = None
         self.lessons_status = None
         self.daily_config = self.daily_config = json.loads(read_file("../data/daily_config.json"))
         self.lessons_with_slots = []
@@ -89,12 +99,37 @@ class MainWindow(QMainWindow):
         self.min_font_size = int(program_config["minimum_font_size"])
         self.max_font_size = int(program_config["maximum_font_size"])
         self.program_config = program_config
-        self.run_window()  # 加载UI
+        # 设置是否开启桌面壁纸模式
+        if self.program_config['desktop_wallpaper_mode'] == 'true':
+            # todo 实现类似wallpaper engine的方式放置在桌面上(现在能基本实现 但是效果并不好)
+            # todo 根据目前所看的虚拟桌面自动切换
+            self.setWindowFlags(Qt.FramelessWindowHint)  # 设置无边框窗口
+        # 普通窗口模式
+        else:
+            self.setWindowTitle("Simple Daily Desktop")
+        rect = QDesktopWidget().availableGeometry()  # 初始化大小
+        self.resize(rect.width(), rect.height())
+        adjust_font_size(self.nowtime, config["time_font_size"])  # 设置时间显示的字体大小
+        # 绑定要用到信号和槽
+        self.homework.setPlainText(self.daily_config['backup']['homework'])  # 加载之前的文本
+        self.message.setPlainText(self.daily_config['backup']['msg'])
+        self.message.textChanged.connect(self.on_text_changed)  # 两个文本框的超时信号
+        self.homework.textChanged.connect(self.on_text_changed)
+        self.run_adaptive_text_edit_manually.emit()
+        self.refresh_font.clicked.connect(self.run_adaptive_text_edit_manually)
+        # QTimer区
+        self.resize_timer = QTimer(self)  # 刷新窗口的QTimer
+        self.resize_timer.setInterval(int(program_config['the_window_changes_the_refresh_time'] * 1000))
+        self.resize_timer.timeout.connect(self.on_resize_timeout)
+        # 设置快捷键
+        self.refresh_font.setShortcut('F5')
         # 加入两个显示的QLabel
-        self.ui.layout().addWidget(
+        self.layout().addWidget(
             initialize_label_indicator("next_lesson_indicator", program_config['next_indicator_text']))
-        self.ui.layout().addWidget(
+        self.layout().addWidget(
             initialize_label_indicator("now_lesson_indicator", program_config['now_indicator_text']))
+        # print(self.__dict__)  # 调试用
+        self.show()  # 显示
         # 开始套娃 执行要渲染窗口完毕后的操作
         QtCore.QTimer.singleShot(0, self.after_init)
 
@@ -106,33 +141,9 @@ class MainWindow(QMainWindow):
     # 真的是醉了......
     def after_after_init(self):
         for i in self.lessons_slots:
-            adjust_the_text_edit_font_size([self.ui.findChild(QTextBrowser, i)], self.min_font_size, self.max_font_size)
+            adjust_the_text_edit_font_size([self.findChild(QTextBrowser, i)], self.min_font_size, self.max_font_size)
+        self.first_resize = True
         QtCore.QTimer.singleShot(0, self.refresh_time)  # 强制刷新时间
-
-    def run_window(self):
-        self.ui = uic.loadUi("./main_window.ui")
-        # 设置是否开启桌面模式
-        if self.program_config['desktop_wallpaper_mode'] == 'true':
-            # todo 实现类似wallpaper engine的方式放置在桌面上(现在能基本实现 但是效果并不好)
-            # todo 根据目前所看的虚拟桌面自动切换
-            self.ui.setWindowFlags(Qt.FramelessWindowHint)  # 设置无边框窗口
-        # 普通窗口模式
-        else:
-            self.ui.setWindowTitle("Simple Daily Desktop")
-        rect = QDesktopWidget().availableGeometry()  # 初始化大小
-        self.ui.resize(rect.width(), rect.height())
-        adjust_font_size(self.ui.nowtime, config["time_font_size"])  # 设置时间显示的字体大小
-        # 绑定要用到ui的信号和槽
-        self.ui.homework.setPlainText(self.daily_config['backup']['homework'])  # 加载之前的文本
-        self.ui.message.setPlainText(self.daily_config['backup']['msg'])
-        self.ui.message.textChanged.connect(self.on_text_changed)  # 两个文本框的超时信号
-        self.ui.homework.textChanged.connect(self.on_text_changed)
-        self.run_adaptive_text_edit_manually.emit()
-        self.ui.refresh_font.clicked.connect(self.run_adaptive_text_edit_manually)
-        # 设置快捷键
-        self.ui.refresh_font.setShortcut('F5')
-        # print(self.ui.__dict__)  # 调试用
-        print(self.resizeEvent)
 
     # todo 可编辑颜色的message
     # todo 重写resizeEvent
@@ -141,74 +152,71 @@ class MainWindow(QMainWindow):
     # todo 打包成exe
     # 刷新时间
     def refresh_time(self):
-        self.ui.nowtime.setText(time.strftime("%Y/%m/%d %H:%M:%S ", time.localtime()) +
-                                ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"][
-                                    time.localtime().tm_wday])
+        self.nowtime.setText(time.strftime("%Y/%m/%d %H:%M:%S ", time.localtime()) +
+                             ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"][
+                                 time.localtime().tm_wday])
         self.time_to_next_refresh()
-        self.ui.nowtime.repaint()
+        self.nowtime.repaint()
 
     # 更新msg和hw两个的拉伸和字体大小
     def adjust_msg_hw_size(self):
         # 删除 message 和 homework 末尾的空行和空格
-        message_text = self.ui.message.toPlainText().rstrip()
-        homework_text = self.ui.homework.toPlainText().rstrip()
-        message_cursor_pos = self.ui.message.textCursor().position()  # 保存当前光标位置 后面要用
-        homework_cursor_pos = self.ui.homework.textCursor().position()
-        homework_scroll_value = self.ui.homework.verticalScrollBar().value()  # 保留滚动条的位置
-        message_scroll_value = self.ui.message.verticalScrollBar().value()
-        self.ui.message.setPlainText(message_text)  # 设置删除空格后的文本
-        self.ui.homework.setPlainText(homework_text)
+        message_text = self.message.toPlainText().rstrip()
+        homework_text = self.homework.toPlainText().rstrip()
+        message_cursor_pos = self.message.textCursor().position()  # 保存当前光标位置 后面要用
+        homework_cursor_pos = self.homework.textCursor().position()
+        homework_scroll_value = self.homework.verticalScrollBar().value()  # 保留滚动条的位置
+        message_scroll_value = self.message.verticalScrollBar().value()
+        self.message.setPlainText(message_text)  # 设置删除空格后的文本
+        self.homework.setPlainText(homework_text)
         # 根据文本行数计算比值
-        message_lines = get_visible_line_count(self.ui.message)
-        homework_lines = get_visible_line_count(self.ui.homework)
+        message_lines = get_visible_line_count(self.message)
+        homework_lines = get_visible_line_count(self.homework)
         if message_lines + homework_lines == 0:
             ratio = 0.5
         else:
             ratio = message_lines / (message_lines + homework_lines)
         # 根据计算出的比值设置拉伸系数
-        self.ui.msg_hw.layout().setStretchFactor(self.ui.message, int(ratio * self.laa))
-        self.ui.msg_hw.layout().setStretchFactor(self.ui.homework, int((1 - ratio) * self.laa))
+        self.msg_hw.layout().setStretchFactor(self.message, int(ratio * self.laa))
+        self.msg_hw.layout().setStretchFactor(self.homework, int((1 - ratio) * self.laa))
         # 字体大小设置
-        adjust_the_text_edit_font_size([self.ui.message, self.ui.homework], self.min_font_size, self.max_font_size)
+        adjust_the_text_edit_font_size([self.message, self.homework], self.min_font_size, self.max_font_size)
         # 恢复光标位置
-        message_cursor = self.ui.message.textCursor()  # message的位置
+        message_cursor = self.message.textCursor()  # message的位置
         if message_cursor_pos > len(message_text):
             message_cursor.movePosition(QtGui.QTextCursor.End)
         else:
             message_cursor.setPosition(message_cursor_pos)
-        self.ui.message.setTextCursor(message_cursor)
-        homework_cursor = self.ui.homework.textCursor()  # homework的位置
+        self.message.setTextCursor(message_cursor)
+        homework_cursor = self.homework.textCursor()  # homework的位置
         # 如果光标位置超出文本长度，则将光标移动到文本末尾
         if homework_cursor_pos > len(homework_text):
             homework_cursor.movePosition(QtGui.QTextCursor.End)
         else:
             homework_cursor.setPosition(homework_cursor_pos)
-        self.ui.homework.setTextCursor(homework_cursor)
+        self.homework.setTextCursor(homework_cursor)
         # 恢复滚动条的位置
-        self.ui.homework.verticalScrollBar().setValue(homework_scroll_value)
-        self.ui.message.verticalScrollBar().setValue(message_scroll_value)
+        self.homework.verticalScrollBar().setValue(homework_scroll_value)
+        self.message.verticalScrollBar().setValue(message_scroll_value)
 
     # 计时器的函数 如果被改变了那就开始计时
     def on_text_changed(self):
-        # 如果定时器正在运行，则停止定时器
-        if self.refresh_edit_size.isActive():
-            self.refresh_edit_size.stop()
-        # 重新启动定时器
+        # 重启计时器
         self.refresh_edit_size.start()
 
     # 手动触发字体更新
     def manually_refresh_the_text_edit_font(self):
-        self.ui.message.textChanged.disconnect(self.on_text_changed)  # 先断开防止重复触发
-        self.ui.homework.textChanged.disconnect(self.on_text_changed)
+        self.message.textChanged.disconnect(self.on_text_changed)  # 先断开防止重复触发
+        self.homework.textChanged.disconnect(self.on_text_changed)
         self.refresh_edit_size.stop()  # 先把计时器关了
         self.adjust_msg_hw_size()  # 然后再更新一下
         # 备份一下其中的内容
-        self.daily_config["backup"]["msg"] = self.ui.message.toPlainText()
-        self.daily_config["backup"]["homework"] = self.ui.homework.toPlainText()
+        self.daily_config["backup"]["msg"] = self.message.toPlainText()
+        self.daily_config["backup"]["homework"] = self.homework.toPlainText()
         write_file("../data/daily_config.json", json.dumps(self.daily_config, ensure_ascii=False, indent=4))
         # 重新连接textChanged信号与槽函数
-        self.ui.message.textChanged.connect(self.on_text_changed)
-        self.ui.homework.textChanged.connect(self.on_text_changed)
+        self.message.textChanged.connect(self.on_text_changed)
+        self.homework.textChanged.connect(self.on_text_changed)
 
     # 添加课表
     def initialize_the_class_schedule(self):
@@ -222,25 +230,25 @@ class MainWindow(QMainWindow):
             self.lessons_with_slots.append(i["name"])  # 加!
         # 初始化lessons_list
         # 操作的是lessons_list这个widget 先清空其中所有的QTextBrowser
-        for i in self.ui.lessons_list.findChildren(QtWidgets.QTextBrowser):
+        for i in self.lessons_list.findChildren(QtWidgets.QTextBrowser):
             i.deleteLater()
-        self.ui.lessons_list.setMaximumHeight(self.ui.lessons_list.height())  # 防止超出距离
+        self.lessons_list.setMaximumHeight(self.lessons_list.height())  # 防止超出距离
         # 添加第一个用于显示课间等的widget(一定有的) 名称为common_course_slots
         self.lessons_slots = []
-        text_browser = QtWidgets.QTextBrowser(self.ui.lessons_list)
+        text_browser = QtWidgets.QTextBrowser(self.lessons_list)
         text_browser.setObjectName("common_course_slots")
         self.lessons_slots.append("common_course_slots")
         text_browser.setText("test")
         text_browser.setAlignment(Qt.AlignHCenter)
-        self.ui.lessons_list.layout().addWidget(text_browser)
+        self.lessons_list.layout().addWidget(text_browser)
         # 添加剩余len lessons_with_slots个
         for i in range(1, len(self.lessons_with_slots) + 1):
-            text_browser = QtWidgets.QTextBrowser(self.ui.lessons_list)
+            text_browser = QtWidgets.QTextBrowser(self.lessons_list)
             text_browser.setObjectName(f"lesson{i}")
             text_browser.setText(self.lessons_with_slots[i - 1])
             text_browser.setAlignment(Qt.AlignHCenter)
             self.lessons_slots.append(f"lesson{i}")
-            self.ui.lessons_list.layout().addWidget(text_browser)
+            self.lessons_list.layout().addWidget(text_browser)
 
     # 展示到下一个的事件
     def time_to_next_refresh(self) -> None:
@@ -254,7 +262,7 @@ class MainWindow(QMainWindow):
                 self.lessons_status = 0
                 self.update_the_course_indicator_singal.emit(0)
             # 更新一下课程表的指示器
-            self.ui.time_to_next.setPlainText(
+            self.time_to_next.setPlainText(
                 f"距离{self.daily_config['lessons_list'][0]['name']}还有{format_timedelta(time_to_datetime(self.daily_config['lessons_list'][0]['start'], now_time) - now_time)}"
             )
         # 上完最后一节课的情况 为1
@@ -262,7 +270,7 @@ class MainWindow(QMainWindow):
             if self.lessons_status != 1:
                 self.lessons_status = 1
                 self.update_the_course_indicator_singal.emit(1)
-            self.ui.time_to_next.setPlainText(
+            self.time_to_next.setPlainText(
                 f"已放学{format_timedelta(now_time - time_to_datetime(self.daily_config['lessons_list'][-1]['end'], now_time))}"
             )
         # 正常 正在上课的情况 为2
@@ -274,20 +282,20 @@ class MainWindow(QMainWindow):
                         self.update_the_course_indicator_singal.emit(2)
                     break
             if self.next_lesson == len(self.daily_config["lessons_list"]):  # 超过列表最大长度了
-                self.ui.time_to_next.setPlainText(
+                self.time_to_next.setPlainText(
                     f"距离放学还有{format_timedelta(time_to_datetime(self.daily_config['lessons_list'][self.next_lesson - 1]['end'], now_time) - now_time)}")
             else:
-                self.ui.time_to_next.setPlainText(
+                self.time_to_next.setPlainText(
                     f"距离{self.daily_config['lessons_list'][self.next_lesson]['name']}还有{format_timedelta(time_to_datetime(self.daily_config['lessons_list'][self.next_lesson]['start'], now_time) - now_time)}"
                 )
 
         # 设置对齐方式
-        self.ui.time_to_next.setAlignment(Qt.AlignCenter)
+        self.time_to_next.setAlignment(Qt.AlignCenter)
         # 自适应大小
-        if len(self.ui.time_to_next.toPlainText()) != self.time_to_next_len or self.ui.time_to_next.verticalScrollBar().isVisible():
-            self.time_to_next_len = len(self.ui.time_to_next.toPlainText())
+        if len(self.time_to_next.toPlainText()) != self.time_to_next_len or self.time_to_next.verticalScrollBar().isVisible():
+            self.time_to_next_len = len(self.time_to_next.toPlainText())
             # 自适应字体大小
-            adjust_the_text_edit_font_size([self.ui.time_to_next], self.min_font_size, self.max_font_size)
+            adjust_the_text_edit_font_size([self.time_to_next], self.min_font_size, self.max_font_size)
 
     # 刷新这个课程以及下一个课程的指示器
     # 这是一坨
@@ -301,25 +309,25 @@ class MainWindow(QMainWindow):
             if self.daily_config['lessons_list'][0]['name'] in self.lessons_with_slots:
                 # 指向lesson1(next)
                 self.now_lesson_indicator = 'hide'
-                self.next_lesson_indicator = self.ui.findChild(QTextBrowser, 'lesson1')
+                self.next_lesson_indicator = self.findChild(QTextBrowser, 'lesson1')
                 self.refresh_the_course_indicator_position()
             else:
-                text_browser = self.ui.findChild(QTextBrowser, "common_course_slots")
+                text_browser = self.findChild(QTextBrowser, "common_course_slots")
                 text_browser.setPlainText(self.daily_config['lessons_list'][0]['name'])
                 text_browser.setAlignment(Qt.AlignHCenter)
                 adjust_the_text_edit_font_size([text_browser], self.min_font_size, self.max_font_size)
                 # 指向common_course_slots(next)
                 self.now_lesson_indicator = 'hide'
-                self.next_lesson_indicator = self.ui.findChild(QTextBrowser, 'common_course_slots')
+                self.next_lesson_indicator = self.findChild(QTextBrowser, 'common_course_slots')
                 self.refresh_the_course_indicator_position()
             return
         elif mode == 1:
-            text_browser = self.ui.findChild(QTextBrowser, "common_course_slots")
+            text_browser = self.findChild(QTextBrowser, "common_course_slots")
             text_browser.setPlainText("放学")
             text_browser.setAlignment(Qt.AlignHCenter)
             adjust_the_text_edit_font_size([text_browser], self.min_font_size, self.max_font_size)
             # 指向common_course_slots(now)
-            self.now_lesson_indicator = self.ui.findChild(QTextBrowser, 'common_course_slots')
+            self.now_lesson_indicator = self.findChild(QTextBrowser, 'common_course_slots')
             self.next_lesson_indicator = 'hide'
             self.refresh_the_course_indicator_position()
             return
@@ -331,7 +339,7 @@ class MainWindow(QMainWindow):
                 lesson_index = index
                 break
         if lesson_now['name'] not in self.lessons_with_slots:  # 要用到common槽位的情况
-            text_browser = self.ui.findChild(QTextBrowser, "common_course_slots")
+            text_browser = self.findChild(QTextBrowser, "common_course_slots")
             text_browser.setPlainText(lesson_now['name'])
             text_browser.setAlignment(Qt.AlignHCenter)
             adjust_the_text_edit_font_size([text_browser], self.min_font_size, self.max_font_size)
@@ -341,7 +349,7 @@ class MainWindow(QMainWindow):
                     self.daily_config['lessons_list'][lesson_index + 1][
                         'name'] not in self.lessons_with_slots:
                 # 指向common(now)
-                self.now_lesson_indicator = self.ui.findChild(QTextBrowser, 'common_course_slots')
+                self.now_lesson_indicator = self.findChild(QTextBrowser, 'common_course_slots')
                 self.next_lesson_indicator = 'hide'
                 self.refresh_the_course_indicator_position()
                 return
@@ -354,8 +362,8 @@ class MainWindow(QMainWindow):
                 if tot == 0:
                     break
             # 指向common(now) self.lessons_slots[index+1](next)
-            self.now_lesson_indicator = self.ui.findChild(QTextBrowser, 'common_course_slots')
-            self.next_lesson_indicator = self.ui.findChild(QTextBrowser, self.lessons_slots[index + 1])
+            self.now_lesson_indicator = self.findChild(QTextBrowser, 'common_course_slots')
+            self.next_lesson_indicator = self.findChild(QTextBrowser, self.lessons_slots[index + 1])
             self.refresh_the_course_indicator_position()
             return
         # 现在不用槽位的情况
@@ -370,39 +378,39 @@ class MainWindow(QMainWindow):
                     break
             # 下一节课是放学
             if lesson_index + 1 >= len(self.daily_config['lessons_list']):
-                text_browser = self.ui.findChild(QTextBrowser, "common_course_slots")
+                text_browser = self.findChild(QTextBrowser, "common_course_slots")
                 text_browser.setPlainText('放学')
                 text_browser.setAlignment(Qt.AlignHCenter)
                 adjust_the_text_edit_font_size([text_browser], self.min_font_size, self.max_font_size)
                 # 指向self.lessons_slots[index+1](now) 指向common(next)
-                self.now_lesson_indicator = self.ui.findChild(QTextBrowser, self.lessons_slots[index + 1])
-                self.next_lesson_indicator = self.ui.findChild(QTextBrowser, 'common_course_slots')
+                self.now_lesson_indicator = self.findChild(QTextBrowser, self.lessons_slots[index + 1])
+                self.next_lesson_indicator = self.findChild(QTextBrowser, 'common_course_slots')
                 self.refresh_the_course_indicator_position()
                 return
             # 下一节课是课间/special等
             elif self.daily_config['lessons_list'][lesson_index + 1]['name'] not in self.lessons_with_slots:
-                text_browser = self.ui.findChild(QTextBrowser, "common_course_slots")
+                text_browser = self.findChild(QTextBrowser, "common_course_slots")
                 text_browser.setPlainText(self.daily_config["lessons_list"][lesson_index + 1]['name'])
                 text_browser.setAlignment(Qt.AlignHCenter)
                 adjust_the_text_edit_font_size([text_browser], self.min_font_size, self.max_font_size)
                 # self.lessons_slots[index+1](now) 指向common(next)
-                self.now_lesson_indicator = self.ui.findChild(QTextBrowser, self.lessons_slots[index + 1])
-                self.next_lesson_indicator = self.ui.findChild(QTextBrowser, 'common_course_slots')
+                self.now_lesson_indicator = self.findChild(QTextBrowser, self.lessons_slots[index + 1])
+                self.next_lesson_indicator = self.findChild(QTextBrowser, 'common_course_slots')
                 self.refresh_the_course_indicator_position()
                 return
             # 下节课也在lessons_with_slots里面 所以那就正好+1和+2了
             # 指向self.lessons_slots[index+1](now) self.lessons_slots[index+2](next)
-            self.now_lesson_indicator = self.ui.findChild(QTextBrowser, self.lessons_slots[index + 1])
-            self.next_lesson_indicator = self.ui.findChild(QTextBrowser, self.lessons_slots[index + 2])
+            self.now_lesson_indicator = self.findChild(QTextBrowser, self.lessons_slots[index + 1])
+            self.next_lesson_indicator = self.findChild(QTextBrowser, self.lessons_slots[index + 2])
             self.refresh_the_course_indicator_position()
             return
 
     # 刷新课程指示器的位置
     def refresh_the_course_indicator_position(self):
-        now_label = self.ui.findChild(QLabel, "now_lesson_indicator")  # 先读取label方便操作
-        next_label = self.ui.findChild(QLabel, "next_lesson_indicator")
-        spacer_item_x = self.ui.curriculum.width() - self.ui.course_display.width()
-        common = self.ui.findChild(QTextBrowser, "common_course_slots")
+        now_label = self.findChild(QLabel, "now_lesson_indicator")  # 先读取label方便操作
+        next_label = self.findChild(QLabel, "next_lesson_indicator")
+        spacer_item_x = self.curriculum.width() - self.course_display.width()
+        common = self.findChild(QTextBrowser, "common_course_slots")
         x = common.width() + common.mapToGlobal(QtCore.QPoint(0, 0)).x() + spacer_item_x // 50  # 获得x坐标
         spacer_item_x -= spacer_item_x // 25
         # 先设置now_lesson_indicator
@@ -436,8 +444,19 @@ class MainWindow(QMainWindow):
             # 自适应字体大小
             adaptive_label_font_size(next_label, self.max_font_size, self.min_font_size)
 
+    # 重写resizeEvent 实现自动重新自适应字体大小
     def resizeEvent(self, event):
-        print("changed")
+        self.resize_timer.start()  # 重置窗口大小时启动计时器
+        super().resizeEvent(event)
+
+    # 自适应字体大小 窗口调整超时后
+    def on_resize_timeout(self):
+        self.resize_timer.stop()  # 停止计时器
+        self.refresh_the_course_indicator_position()
+        adjust_the_text_edit_font_size([self.time_to_next], self.min_font_size, self.max_font_size)
+        for i in self.lessons_slots:
+            adjust_the_text_edit_font_size([self.findChild(QTextBrowser, i)], self.min_font_size,
+                                           self.max_font_size)
 
 
 if __name__ == '__main__':
@@ -457,8 +476,6 @@ if __name__ == '__main__':
     if (lessons_dict[week_name][0] == 'None') and compare_time is False:
         app = QApplication(sys.argv)
         ReselectTheClassSchduleWindow = ReselectTheClassScheduleWindow(lessons_dict)
-        ReselectTheClassSchduleWindow.returnPressed.connect(lambda: None)  # 禁用自定义信号
-        ReselectTheClassSchduleWindow.ui.show()
         app.exec()
         week_name = ReselectTheClassSchduleWindow.result
     else:  # 防止app忘记创建
@@ -479,5 +496,4 @@ if __name__ == '__main__':
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss
 
     # 展示窗口
-    main_window.ui.show()
-    app.exec()
+    sys.exit(app.exec_())
