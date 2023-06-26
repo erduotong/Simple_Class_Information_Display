@@ -466,6 +466,7 @@ if __name__ == '__main__':
     scheduled_task_thread.start()
     # 进入主窗口
     import qdarkstyle
+
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss
     main_window.ui.show()
     app.exec()
