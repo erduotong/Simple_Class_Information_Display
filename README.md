@@ -9,7 +9,8 @@
 #### 配置文件
 * [daily_config.json 今日配置文件](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/daily_config_meaning.md)
 * [program_config.json 程序配置文件](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/program_config_meaning.md)
-* 
+* [lessons.json 课表的存储文件](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/lessons.md)
+* [time.json 课表对应的时间的存储文件](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/time.md)
 #### 其他
 * [快捷键](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/shortcut.md)
 ## 分享协议
