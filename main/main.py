@@ -132,9 +132,13 @@ class MainWindow(QMainWindow):
         # 设置快捷键
         self.ui.refresh_font.setShortcut('F5')
         # print(self.ui.__dict__)  # 调试用
+        print(self.resizeEvent)
 
     # todo 可编辑颜色的message
-
+    # todo 重写resizeEvent
+    # todo 重写closeEvent
+    # todo 可以托盘显示
+    # todo 打包成exe
     # 刷新时间
     def refresh_time(self):
         self.ui.nowtime.setText(time.strftime("%Y/%m/%d %H:%M:%S ", time.localtime()) +
@@ -432,6 +436,9 @@ class MainWindow(QMainWindow):
             # 自适应字体大小
             adaptive_label_font_size(next_label, self.max_font_size, self.min_font_size)
 
+    def resizeEvent(self, event):
+        print("changed")
+
 
 if __name__ == '__main__':
     now = datetime.now()
@@ -465,9 +472,12 @@ if __name__ == '__main__':
                                              args=(float(config["refresh_time"]), main_window,))
     scheduled_task_thread.start()
     # 进入主窗口
+
     # 使用qdarkstyle
     import qdarkstyle
+
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss
+
     # 展示窗口
     main_window.ui.show()
     app.exec()
