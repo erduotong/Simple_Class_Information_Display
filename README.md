@@ -1,16 +1,16 @@
-# Simple_Daily_Desktop
+# Simple_Class_Information_Display
 [![Generic badge](https://img.shields.io/badge/编写于_Python_版本-3.11.3-blue.svg)](https://Python.org)  
 ### 强烈建议**阅读完成readme**后再开始操作/下载
 ## 适用场景
-开发是为了在学校进行使用 用于自动化存放作业，课表等。减少一些日常的枯燥劳动。同时也方便进行使用
+开发是为了在学校进行使用 用于自动展示作业，课表等。减少一些日常的枯燥劳动。同时也方便进行使用
 ## 文档
 #### 配置文件
-* [daily_config.json 今日配置文件](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/daily_config_meaning.md)
-* [program_config.json 程序配置文件](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/program_config_meaning.md)
-* [lessons.json 课表的存储文件](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/lessons.md)
-* [time.json 课表对应的时间的存储文件](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/time.md)
+* [daily_config.json 今日配置文件](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/docs/daily_config_meaning.md)
+* [program_config.json 程序配置文件](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/docs/program_config_meaning.md)
+* [lessons.json 课表的存储文件](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/docs/lessons.md)
+* [time.json 课表对应的时间的存储文件](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/docs/time.md)
 #### 其他
-* [快捷键](https://github.com/erduotong/Simple_Daily_Desktop/blob/master/docs/shortcut.md)
+* [快捷键](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/docs/shortcut.md)
 ## 常见问题
 * 我想查看昨天的配置文件？
 > 查看data/backup/daily_config

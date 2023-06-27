@@ -113,7 +113,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # win32gui.SetParent(window_h, h)
         # 普通窗口模式
         else:
-            self.setWindowTitle("Simple Daily Desktop")
+            self.setWindowTitle("Simple_Class_Information_Display")
         rect = QDesktopWidget().availableGeometry()  # 初始化大小
         self.resize(rect.width(), rect.height())
         adjust_font_size(self.nowtime, config["time_font_size"])  # 设置时间显示的字体大小
@@ -151,7 +151,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             adjust_the_text_edit_font_size([self.findChild(QTextBrowser, i)], self.min_font_size, self.max_font_size)
         QtCore.QTimer.singleShot(0, self.refresh_time)  # 强制刷新时间
 
-    # todo 可编辑颜色的message
     # 刷新时间
     def refresh_time(self):
         self.nowtime.setText(time.strftime("%Y/%m/%d %H:%M:%S ", time.localtime()) +
