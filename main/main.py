@@ -207,8 +207,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     # 手动触发字体更新
     def manually_refresh_the_text_edit_font(self):
-        self.message.textChanged.disconnect(self.on_text_changed)  # 先断开防止重复触发
-        self.homework.textChanged.disconnect(self.on_text_changed)
+        self.message.textChanged.disconnect()  # 先断开防止重复触发
+        self.homework.textChanged.disconnect()
         self.refresh_edit_size.stop()  # 先把计时器关了
         self.adjust_msg_hw_size()  # 然后再更新一下
         # 备份一下其中的内容
