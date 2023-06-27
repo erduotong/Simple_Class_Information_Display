@@ -112,7 +112,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # window_h = int(self.winId())
             # win32gui.SetParent(win_hwnd, h)
             # win32gui.SetParent(window_h, h)
-            # self.move(0, 0)
         # 普通窗口模式
         else:
             self.setWindowTitle("Simple Daily Desktop")
