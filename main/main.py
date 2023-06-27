@@ -48,7 +48,7 @@ class ReselectTheClassScheduleWindow(QDialog, Ui_Dialog):
         self.returnPressed.emit(self.result)
 
     def on_push_button_2_clicked(self):
-        self.result = datetime.datetime.now().strftime("%A").lower()
+        self.result = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][datetime.now().weekday()]
         self.singal1 = 'clicked'
         self.close()
         self.returnPressed.emit(self.result)
@@ -122,7 +122,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.message.setPlainText(self.daily_config['backup']['msg'])
         self.message.textChanged.connect(self.on_text_changed)  # 两个文本框的超时信号
         self.homework.textChanged.connect(self.on_text_changed)
-        self.run_adaptive_text_edit_manually.emit()
         self.refresh_font.clicked.connect(self.run_adaptive_text_edit_manually)
         # QTimer区
         self.resize_timer = QTimer(self)  # 刷新窗口的QTimer
@@ -147,6 +146,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     # 真的是醉了......
     def after_after_init(self):
+        self.run_adaptive_text_edit_manually.emit()
         for i in self.lessons_slots:
             adjust_the_text_edit_font_size([self.findChild(QTextBrowser, i)], self.min_font_size, self.max_font_size)
         QtCore.QTimer.singleShot(0, self.refresh_time)  # 强制刷新时间
