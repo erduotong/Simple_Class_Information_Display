@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import platform
 import sys
 import threading
 from datetime import *
@@ -106,8 +105,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.setWindowFlags(Qt.FramelessWindowHint)  # 设置无边框窗口
             pretreatmentHandle()  # 杀了其他桌面的程序
             # 下面的代码我也不知道具体是干嘛的 反正就是添加到桌面层 反正能跑
-            h = win32gui.FindWindow("Progman", "Program Manager")
             # TODO 可以交互 暂时不知道如何实现
+            # h = win32gui.FindWindow("Progman", "Program Manager")
             # win_hwnd = int(self.winId())
             # window_h = int(self.winId())
             # win32gui.SetParent(win_hwnd, h)
