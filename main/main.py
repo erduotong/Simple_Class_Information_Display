@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+import platform
 import sys
 import threading
 from datetime import *
@@ -8,6 +10,7 @@ from daily_initialization import *
 import time
 from rcs import Ui_Dialog
 from main_window import Ui_MainWindow
+import win32gui
 
 
 # 使用了qdarkstyle
@@ -100,9 +103,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.program_config = program_config
         # 设置是否开启桌面壁纸模式
         if self.program_config['desktop_wallpaper_mode'] == 'true':
-            # todo 实现类似wallpaper engine的方式放置在桌面上(现在能基本实现 但是效果并不好)
-            # todo 根据目前所看的虚拟桌面自动切换
             self.setWindowFlags(Qt.FramelessWindowHint)  # 设置无边框窗口
+            pretreatmentHandle()  # 杀了其他桌面的程序
+            # 下面的代码我也不知道具体是干嘛的 反正就是添加到桌面层 反正能跑
+            h = win32gui.FindWindow("Progman", "Program Manager")
+            # TODO 可以交互 暂时不知道如何实现
+            # win_hwnd = int(self.winId())
+            # window_h = int(self.winId())
+            # win32gui.SetParent(win_hwnd, h)
+            # win32gui.SetParent(window_h, h)
+            # self.move(0, 0)
         # 普通窗口模式
         else:
             self.setWindowTitle("Simple Daily Desktop")
@@ -141,12 +151,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def after_after_init(self):
         for i in self.lessons_slots:
             adjust_the_text_edit_font_size([self.findChild(QTextBrowser, i)], self.min_font_size, self.max_font_size)
-        self.first_resize = True
         QtCore.QTimer.singleShot(0, self.refresh_time)  # 强制刷新时间
 
     # todo 可编辑颜色的message
-    # todo 可以托盘显示
-    # todo 打包成exe
     # 刷新时间
     def refresh_time(self):
         self.nowtime.setText(time.strftime("%Y/%m/%d %H:%M:%S ", time.localtime()) +
@@ -503,5 +510,4 @@ if __name__ == '__main__':
 
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss
 
-    # 展示窗口
     sys.exit(app.exec_())

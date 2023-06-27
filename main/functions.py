@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 import os
 import shutil
@@ -137,6 +138,8 @@ def adjust_the_text_edit_font_size(text_edits, min_size: int, max_size: int) -> 
         font.setPointSize(font_size)
         for text_edit in text_edits:
             text_edit.setFont(font)
+        if font_size < min_size:
+            break
     if font_size <= 0:  # 否则就出bug了
         font_size = 1
     font.setPointSize(font_size)
@@ -276,9 +279,10 @@ def initialize_the_file() -> None:
             "refresh_time": "1",
             "layout_adjustment_accuracy": 100,
             "minimum_font_size": 20,
-            "maximum_font_size": 80,
+            "maximum_font_size": 200,
             "time_font_size": 51,
             "text_edit_refresh_time": 2,
+            "the_window_changes_the_refresh_time": 0.7,
             "now_indicator_text": "<Now",
             "next_indicator_text": "<Next",
             "desktop_wallpaper_mode": "false"
@@ -320,3 +324,24 @@ def adaptive_label_font_size(label, max_size: int, min_size: int) -> None:
             break
     # 将动态调整后的字体应用到label上
     label.setFont(font)
+
+
+# 关闭所有workW窗口，清空桌面
+def pretreatmentHandle():
+    import win32gui
+    hwnd = win32gui.FindWindow("Progman", "Program Manager")
+    win32gui.SendMessageTimeout(hwnd, 0x052C, 0, None, 0, 0x03E8)
+    hwnd_WorkW = None
+    while 1:
+        hwnd_WorkW = win32gui.FindWindowEx(None, hwnd_WorkW, "WorkerW", None)
+        if not hwnd_WorkW:
+            continue
+        hView = win32gui.FindWindowEx(hwnd_WorkW, None, "SHELLDLL_DefView", None)
+        if not hView:
+            continue
+        h = win32gui.FindWindowEx(None, hwnd_WorkW, "WorkerW", None)
+        while h:
+            win32gui.SendMessage(h, 0x0010, 0, 0)  # WM_CLOSE
+            h = win32gui.FindWindowEx(None, hwnd_WorkW, "WorkerW", None)
+        break
+    return hwnd
