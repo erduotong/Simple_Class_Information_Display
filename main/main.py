@@ -93,8 +93,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.next_lesson = None  # 存储的是lessons_list的下标
         self.time_to_next_len = None
         self.lessons_slots = []
-        self.now_lesson_indicator = None
-        self.next_lesson_indicator = None
+        self.now_lesson_indicator = 'hide'
+        self.next_lesson_indicator = 'hide'
         # config需要用的内容初始化
         self.laa = int(program_config["layout_adjustment_accuracy"])
         self.min_font_size = int(program_config["minimum_font_size"])
