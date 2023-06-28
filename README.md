@@ -4,10 +4,13 @@
 ## 适用场景
 开发是为了在学校进行使用 用于自动展示作业，课表等。减少一些日常的枯燥劳动。同时也方便进行使用
 ## 下载
-#### qdarkstyle
-你可以选择是否含有qdarkstyle 含有的话，就是这样:
+### qdarkstyle
+你可以选择是否含有qdarkstyle     
+>含有的话，就是这样:
+
 ![含有qdarkstyle的情况](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/images/with_qdarkstyle.png '含有qdarkstyle的情况')  
-不含有的话，就是这样:  
+>不含有的话，就是这样:  
+
 ![不含有qdarkstyle的情况](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/images/without_qdarkstyle.png '不含有qdarkstyle的情况')  
 
 
