@@ -6,13 +6,16 @@
 ## 下载
 ### qdarkstyle
 你可以选择是否含有qdarkstyle     
->含有的话，就是这样:
+> 含有的话，就是这样:
 
 ![含有qdarkstyle的情况](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/images/with_qdarkstyle.png '含有qdarkstyle的情况')  
->不含有的话，就是这样:  
+> 不含有的话，就是这样:  
 
 ![不含有qdarkstyle的情况](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/images/without_qdarkstyle.png '不含有qdarkstyle的情况')  
 
+### 从源码启动
+如果你已经拥有**Python环境**并且可以使用**pip安装需要的依赖库** 你可以尝试从源码启动  
+你可以在![这里](https://www.python.org/)安装python  
 
 ## 文档
 #### 配置文件
