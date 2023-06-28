@@ -6,7 +6,10 @@
 ## 下载
 #### qdarkstyle
 你可以选择是否含有qdarkstyle 含有的话，就是这样:
-![image](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/images/with_qdarkstyle.png '1')
+![含有qdarkstyle的情况](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/images/with_qdarkstyle.png '含有qdarkstyle的情况')  
+不含有的话，就是这样:  
+![不含有qdarkstyle的情况](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/images/without_qdarkstyle.png '不含有qdarkstyle的情况')  
+
 
 ## 文档
 #### 配置文件
