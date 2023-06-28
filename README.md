@@ -3,6 +3,8 @@
 ### 强烈建议**阅读完成readme**后再开始操作/下载
 ## 适用场景
 开发是为了在学校进行使用 用于自动展示作业，课表等。减少一些日常的枯燥劳动。同时也方便进行使用
+## 下载
+
 ## 文档
 #### 配置文件
 * [daily_config.json 今日配置文件](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/docs/daily_config_meaning.md)
