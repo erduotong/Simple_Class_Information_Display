@@ -48,7 +48,8 @@ class ReselectTheClassScheduleWindow(QDialog, Ui_Dialog):
         self.returnPressed.emit(self.result)
 
     def on_push_button_2_clicked(self):
-        self.result = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][datetime.now().weekday()]
+        self.result = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][
+            datetime.now().weekday()]
         self.singal1 = 'clicked'
         self.close()
         self.returnPressed.emit(self.result)
@@ -93,7 +94,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.next_lesson = None  # 存储的是lessons_list的下标
         self.time_to_next_len = None
         self.lessons_slots = []
-        self.now_lesson_indicator = 'hide'
+        self.now_lesson_indicator = 'hide'  # 防止后面出现找不到就识别错误
         self.next_lesson_indicator = 'hide'
         # config需要用的内容初始化
         self.laa = int(program_config["layout_adjustment_accuracy"])
