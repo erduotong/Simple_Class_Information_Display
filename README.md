@@ -4,7 +4,7 @@
 ## 适用场景
 开发是为了在学校进行使用 用于自动展示作业，课表等。减少一些日常的枯燥劳动。同时也方便进行使用
 ## 下载
-### qdarkstyle
+### 选择qdarkstyle
 你可以选择是否含有qdarkstyle     
 > 含有的话，就是这样:
 
@@ -15,8 +15,23 @@
 
 ### 从源码启动
 如果你已经拥有**Python环境**并且可以使用**pip安装需要的依赖库** 你可以尝试从源码启动  
-你可以在![这里](https://www.python.org/)安装python  
-
+你可以在[这里](https://www.python.org/)安装python  
+下载:  
+如果你需要**qdarkstyle**美化,请选择**source_code_with_qdarkstyle**下载  
+如果不需要**qdarkstyle**,请选择**source_code_without_qdarkstyle**
+### 从exe启动
+**推荐的方式**  
+相比从源码启动，会占用较多的空间(容纳了运行库) 但是不需要python解释器和PyQt等  
+下载:  
+如果你需要**qdarkstyle**美化,请选择**exe_with_qdarkstyle**下载  
+如果不需要**qdarkstyle**,请选择**exe_without_qdarkstyle**下载
+## 使用
+在下载压缩包后,解压到一个你喜欢的位置。随后打开解压出来的文件夹，再打开其中的app文件夹  
+如果你**从源码启动**,打开其中的main.pyw  
+如果你**从exe启动**,打开其中的Simple_Class_Information_Display.exe
+如果觉得太麻烦，可以创建快捷方式  
+启动后程序会在你解压出来的文件夹生成data文件夹，程序的配置等都位于其中。
+在更改之前，请阅读完下面的文档。如果有某个配置文件损坏，删掉，程序会重新生成
 ## 文档
 #### 配置文件
 * [daily_config.json 今日配置文件](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/docs/daily_config_meaning.md)
@@ -25,9 +40,6 @@
 * [time.json 课表对应的时间的存储文件](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/docs/time.md)
 #### 其他
 * [快捷键](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/docs/shortcut.md)
-## 常见问题
-* 我想查看昨天的配置文件？
-> 查看data/backup/daily_config
 ## 感谢
 * PyQt5,Qt5:GUI
 * qdarkstyle:好看的深色qss
