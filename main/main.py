@@ -113,7 +113,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # win32gui.SetParent(window_h, h)
         # 普通窗口模式
         else:
-            self.setWindowTitle("Simple_Class_Information_Display")
+            self.setWindowTitle("Simple Class Information Display")
         rect = QDesktopWidget().availableGeometry()  # 初始化大小
         self.resize(rect.width(), rect.height())
         adjust_font_size(self.nowtime, config["time_font_size"])  # 设置时间显示的字体大小
