@@ -509,3 +509,7 @@ if __name__ == '__main__':
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss
 
     sys.exit(app.exec_())
+# TODO 可以调整颜色的作业/消息
+# TODO 值日模块
+# 值日模块 用json 然后判断第几周(得有个起始周)
+# 以及特殊修正 ? 格式不知道
