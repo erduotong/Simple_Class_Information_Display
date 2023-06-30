@@ -40,6 +40,11 @@
 * [time.json 课表对应的时间的存储文件](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/docs/time.md)
 #### 其他
 * [快捷键](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/docs/shortcut.md)
+#### 可能有帮助的东西
+使用的nuitka打包的指令:
+```
+nuitka --standalone --mingw64 --show-memory --show-progress  --enable-plugin=pyqt5 --follow-imports --remove-output --output-dir=../exe --windows-disable-console main.py
+```
 ## 感谢
 * PyQt5,Qt5:GUI
 * qdarkstyle:好看的深色qss
