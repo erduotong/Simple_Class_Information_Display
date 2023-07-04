@@ -1,15 +1,15 @@
 {
-  "backup_slots": {
-    "daily_config": 5
-  },
-  "refresh_time": "1",
-  "layout_adjustment_accuracy": 100,
-  "minimum_font_size": 20,
-  "maximum_font_size": 200,
-  "time_font_size": 51,
-  "text_edit_refresh_time": 2,
-  "the_window_changes_the_refresh_time": 0.7,
-  "now_indicator_text": "<Now",
-  "next_indicator_text": "<Next",
-  "desktop_wallpaper_mode": "false"
+    "version": "1.0.1",
+    "backup_slots": {
+        "daily_config": 5
+    },
+    "refresh_time": "1",
+    "layout_adjustment_accuracy": 100,
+    "minimum_font_size": 20,
+    "maximum_font_size": 200,
+    "time_font_size": 51,
+    "text_edit_refresh_time": 10,
+    "the_window_changes_the_refresh_time": 0.7,
+    "now_indicator_text": "<Now",
+    "next_indicator_text": "<Next"
 }

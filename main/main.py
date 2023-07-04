@@ -101,20 +101,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.min_font_size = int(program_config["minimum_font_size"])
         self.max_font_size = int(program_config["maximum_font_size"])
         self.program_config = program_config
-        # 设置是否开启桌面壁纸模式
-        if self.program_config['desktop_wallpaper_mode'] == 'true':
-            self.setWindowFlags(Qt.FramelessWindowHint)  # 设置无边框窗口
-            pretreatmentHandle()  # 杀了其他桌面的程序
-            # 下面的代码我也不知道具体是干嘛的 反正就是添加到桌面层 反正能跑
-            # TODO 可以交互 暂时不知道如何实现
-            # h = win32gui.FindWindow("Progman", "Program Manager")
-            # win_hwnd = int(self.winId())
-            # window_h = int(self.winId())
-            # win32gui.SetParent(win_hwnd, h)
-            # win32gui.SetParent(window_h, h)
-        # 普通窗口模式
-        else:
-            self.setWindowTitle("Simple Class Information Display")
+        self.setWindowTitle("Simple Class Information Display")
         rect = QDesktopWidget().availableGeometry()  # 初始化大小
         self.resize(rect.width(), rect.height())
         adjust_font_size(self.nowtime, config["time_font_size"])  # 设置时间显示的字体大小
@@ -240,7 +227,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         text_browser = QtWidgets.QTextBrowser(self.lessons_list)
         text_browser.setObjectName("common_course_slots")
         self.lessons_slots.append("common_course_slots")
-        text_browser.setText("test")
+        text_browser.setText(" ")
         text_browser.setAlignment(Qt.AlignHCenter)
         self.lessons_list.layout().addWidget(text_browser)
         # 添加剩余len lessons_with_slots个
@@ -473,6 +460,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
 if __name__ == '__main__':
+    version = '1.0.1'
     now = datetime.now()
     week_name = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][now.weekday()]
     compare_time = compareTime()
@@ -480,8 +468,8 @@ if __name__ == '__main__':
     # 初始化文件夹
     os.makedirs('../data/backup/daily_config', exist_ok=True)
     os.makedirs('../data/Curriculum', exist_ok=True)
-    # 初始化文件 具体更改在函数内
-    initialize_the_file()
+    # 初始化文件并且兼容升级 具体更改在函数内
+    initialize_the_file(version)
     # 如果是周六日并且文件没有在今天被创建过的话就问一下
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)  # 高DPI自适应
     lessons_dict = json.loads(read_file('../data/Curriculum/lessons.json'))
@@ -510,6 +498,7 @@ if __name__ == '__main__':
 
     sys.exit(app.exec_())
 # TODO 可以调整颜色的作业/消息
+# TODO GUI编辑json
 # TODO 值日模块
 # 值日模块 用json 然后判断第几周(得有个起始周)
 # 以及特殊修正 ? 格式不知道

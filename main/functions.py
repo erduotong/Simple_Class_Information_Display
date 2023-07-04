@@ -245,7 +245,7 @@ def initialize_label_indicator(name: str, text: str):
 
 
 # 检查文件是否存在并在不存在时初始化
-def initialize_the_file() -> None:
+def initialize_the_file(version: str) -> None:
     """
     检查文件是否存在并在不存在时初始化 路径写在内部
     :return: None
@@ -273,6 +273,7 @@ def initialize_the_file() -> None:
             }
         },
         "../data/program_config.json": {
+            "version": version,
             "backup_slots": {
                 "daily_config": 5
             },
@@ -281,17 +282,32 @@ def initialize_the_file() -> None:
             "minimum_font_size": 20,
             "maximum_font_size": 200,
             "time_font_size": 51,
-            "text_edit_refresh_time": 2,
+            "text_edit_refresh_time": 5,
             "the_window_changes_the_refresh_time": 0.7,
             "now_indicator_text": "<Now",
-            "next_indicator_text": "<Next",
-            "desktop_wallpaper_mode": "false"
+            "next_indicator_text": "<Next"
         }
     }
     for filepath, content in path.items():
         if not os.path.exists(filepath):  # 判断文件是否存在，如果不存在则创建
             with open(filepath, 'w') as f:
                 json.dump(content, f, indent=4, ensure_ascii=False)  # 把content写入文件中
+    config = json.loads(read_file('../data/program_config.json'))
+    if 'version' in config and config['version'] == version:
+        return
+
+    # 包含一下~
+    def update_dict(dict1, dict2):
+        for key in dict1:
+            if key in dict2:
+                if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
+                    update_dict(dict1[key], dict2[key])
+                else:
+                    dict1[key] = dict2[key]
+        return dict1
+
+    config = update_dict(path['../data/program_config.json'], config)
+    write_file('../data/program_config.json', json.dumps(config, ensure_ascii=False, indent=4))
 
 
 # 自适应QLabel的字体大小
@@ -324,24 +340,3 @@ def adaptive_label_font_size(label, max_size: int, min_size: int) -> None:
             break
     # 将动态调整后的字体应用到label上
     label.setFont(font)
-
-
-# 关闭所有workW窗口，清空桌面
-def pretreatmentHandle():
-    import win32gui
-    hwnd = win32gui.FindWindow("Progman", "Program Manager")
-    win32gui.SendMessageTimeout(hwnd, 0x052C, 0, None, 0, 0x03E8)
-    hwnd_WorkW = None
-    while 1:
-        hwnd_WorkW = win32gui.FindWindowEx(None, hwnd_WorkW, "WorkerW", None)
-        if not hwnd_WorkW:
-            continue
-        hView = win32gui.FindWindowEx(hwnd_WorkW, None, "SHELLDLL_DefView", None)
-        if not hView:
-            continue
-        h = win32gui.FindWindowEx(None, hwnd_WorkW, "WorkerW", None)
-        while h:
-            win32gui.SendMessage(h, 0x0010, 0, 0)  # WM_CLOSE
-            h = win32gui.FindWindowEx(None, hwnd_WorkW, "WorkerW", None)
-        break
-    return hwnd

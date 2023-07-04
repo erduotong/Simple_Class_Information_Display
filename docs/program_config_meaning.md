@@ -1,5 +1,6 @@
 # 程序配置文件
 >位置: data/program_config.json
+* version: 程序的版本号
 * backup_slots: 程序的备份槽位设置
   * daily_config: 每日生成的配置文件的备份数量
 * refresh_time: 主窗口刷新时间的间隔
@@ -11,4 +12,3 @@
 * the_window_changes_the_refresh_time：窗口大小改变后刷新字体的时间
 * now_indicator_text: 现在的课程指示器的显示的文本 如<Now
 * next_indicator_text: 下一节课的课程指示器的显示的文本 如<Next
-* desktop_wallpaper_mode: 桌面壁纸模式的开关 "true"为开否则为关 **暂未完成,只能位于壁纸层而无法进行交互。如果有实现方法欢迎提一个issue 现在的效果是无边框窗口** 
