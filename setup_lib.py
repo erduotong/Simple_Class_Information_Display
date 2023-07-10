@@ -1,7 +1,7 @@
 import subprocess
 import sys
 
-libraries = ['PyQt5', 'qdarkstyle']
+libraries = ['PyQt5', 'qdarkstyle']  # qdarkstyle是要记得跟随版本更改的
 for library in libraries:
     try:
         # 检查库是否已经安装
