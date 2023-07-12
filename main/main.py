@@ -9,7 +9,6 @@ from daily_initialization import *
 import time
 from rcs import Ui_Dialog
 from main_window import Ui_MainWindow
-import win32gui
 
 
 # 使用了qdarkstyle
@@ -110,13 +109,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.message.setPlainText(self.daily_config['backup']['msg'])
         self.message.textChanged.connect(self.on_text_changed)  # 两个文本框的超时信号
         self.homework.textChanged.connect(self.on_text_changed)
-        self.refresh_font.clicked.connect(self.run_adaptive_text_edit_manually)
+        self.refresh_font_.clicked.connect(self.run_adaptive_text_edit_manually)
         # QTimer区
         self.resize_timer = QTimer(self)  # 刷新窗口的QTimer
         self.resize_timer.setInterval(int(program_config['the_window_changes_the_refresh_time'] * 1000))
         self.resize_timer.timeout.connect(self.on_resize_timeout)
         # 设置快捷键
-        self.refresh_font.setShortcut('F5')
+        self.refresh_font_.setShortcut('F5')
         # 加入两个显示的QLabel
         self.layout().addWidget(
             initialize_label_indicator("next_lesson_indicator", program_config['next_indicator_text']))
@@ -497,8 +496,8 @@ if __name__ == '__main__':
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss
 
     sys.exit(app.exec_())
+# TODO 1.GUI编辑json 记得删掉辅助用的widget的颜色!!!!!!(object name:settings_
+# 实现方式:1.强制打开一个新窗口并置于顶层(或者直接切换到设置页面？用整个屏幕 然后主程序继续刷新（至少能够完全的避免用户误触?
 # TODO 可以调整颜色的作业/消息
-# TODO GUI编辑json
 # TODO 值日模块
-# 值日模块 用json 然后判断第几周(得有个起始周)
-# 以及特殊修正 ? 格式不知道
+

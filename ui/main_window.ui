@@ -28,7 +28,7 @@
    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="5,1">
     <item>
      <widget class="QWidget" name="widget_2" native="true">
-      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,30">
+      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,30">
        <item>
         <widget class="QWidget" name="widget" native="true">
          <property name="sizePolicy">
@@ -37,7 +37,13 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="30,1">
+         <property name="font">
+          <font>
+           <family>黑体</family>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="20,1,1">
           <item>
            <widget class="QLabel" name="nowtime">
             <property name="font">
@@ -52,9 +58,30 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="refresh_font">
+           <widget class="QPushButton" name="settings_">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <family>黑体</family>
+              <pointsize>12</pointsize>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>设置</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="refresh_font_">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
