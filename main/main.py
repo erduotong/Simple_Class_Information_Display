@@ -9,6 +9,7 @@ from daily_initialization import *
 import time
 from rcs import Ui_Dialog
 from main_window import Ui_MainWindow
+from settings_page import Ui_settings
 
 
 # 使用了qdarkstyle
@@ -69,6 +70,13 @@ class ReselectTheClassScheduleWindow(QDialog, Ui_Dialog):
             event.ignore()
 
 
+class SettingsPage(QWidget, Ui_settings):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setupUi(self)  # 加载UI
+        self.show()  # 展示UI
+
+
 class MainWindow(QMainWindow, Ui_MainWindow):
     refresh_time_singal = pyqtSignal()  # 更新时间
     run_adaptive_text_edit_manually = pyqtSignal()  # 自适应homework和message的字体大小和比例 手动触发
@@ -77,6 +85,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, program_config):
         super().__init__()
         self.setupUi(self)
+
+        # 设置计时器
         self.refresh_edit_size = QtCore.QTimer()  # 设置一个计时器
         self.refresh_edit_size.setInterval(program_config["text_edit_refresh_time"] * 1000)  # 设置停止编辑刷新的时间
         # 绑定信号&槽

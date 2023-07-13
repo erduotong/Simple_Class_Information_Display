@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>settings</class>
+ <widget class="QWidget" name="settings">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -26,8 +26,7 @@
       <item row="1" column="0">
        <widget class="QWidget" name="widget_3" native="true">
         <property name="styleSheet">
-         <string notr="true">
-</string>
+         <string notr="true"/>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
@@ -138,6 +137,7 @@
           <widget class="QTabWidget" name="tabWidget">
            <property name="font">
             <font>
+             <family>黑体</family>
              <pointsize>9</pointsize>
             </font>
            </property>
@@ -145,7 +145,7 @@
             <enum>Qt::TabFocus</enum>
            </property>
            <property name="currentIndex">
-            <number>3</number>
+            <number>0</number>
            </property>
            <widget class="QWidget" name="set_program_config">
             <attribute name="title">
@@ -161,6 +161,7 @@
             <property name="font">
              <font>
               <family>Agency FB</family>
+              <pointsize>9</pointsize>
              </font>
             </property>
             <attribute name="title">
