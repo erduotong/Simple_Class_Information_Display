@@ -45,6 +45,10 @@
 ```
 nuitka --standalone --mingw64 --show-memory --show-progress  --enable-plugin=pyqt5 --follow-imports --remove-output --output-dir=../exe --windows-disable-console main.py
 ```
+## 更新计划
+* 用GUI更改当天的配置文件,课程时间等
+* 自动生成值日表并展示
+* 左侧的作业和信息编辑框可以更改颜色等
 ## 感谢
 * PyQt5,Qt5:GUI
 * qdarkstyle:好看的深色qss
