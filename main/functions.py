@@ -310,7 +310,7 @@ def initialize_the_file(version: str) -> None:
     write_file('../data/program_config.json', json.dumps(config, ensure_ascii=False, indent=4))
 
 
-# 自适应QLabel的字体大小
+# 自适应一些控件的字体大小(例如QPushButton/QLabel)
 def adaptive_label_font_size(label, max_size: int, min_size: int) -> None:
     """
     自适应QLabel的字体大小
@@ -340,3 +340,5 @@ def adaptive_label_font_size(label, max_size: int, min_size: int) -> None:
             break
     # 将动态调整后的字体应用到label上
     label.setFont(font)
+    return
+

@@ -26,7 +26,8 @@
       <item row="1" column="0">
        <widget class="QWidget" name="widget_3" native="true">
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(14, 255, 227);</string>
+         <string notr="true">
+</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
@@ -45,54 +46,78 @@
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <item>
-              <widget class="QPushButton" name="pushButton_3">
+              <widget class="QPushButton" name="to_program_config">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
+               <property name="font">
+                <font>
+                 <family>黑体</family>
+                 <pointsize>20</pointsize>
+                </font>
+               </property>
                <property name="text">
-                <string>PushButton</string>
+                <string>程序基本设置</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_2">
+              <widget class="QPushButton" name="to_daily_config">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
+               <property name="font">
+                <font>
+                 <family>黑体</family>
+                 <pointsize>15</pointsize>
+                </font>
+               </property>
                <property name="text">
-                <string>PushButton</string>
+                <string>今日配置文件更改</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton">
+              <widget class="QPushButton" name="to_lessons">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
+               <property name="font">
+                <font>
+                 <family>黑体</family>
+                 <pointsize>22</pointsize>
+                </font>
+               </property>
                <property name="text">
-                <string>PushButton</string>
+                <string>课表设置</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_4">
+              <widget class="QPushButton" name="to_time">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
+               <property name="font">
+                <font>
+                 <family>黑体</family>
+                 <pointsize>20</pointsize>
+                </font>
+               </property>
                <property name="text">
-                <string>PushButton</string>
+                <string>课程时间设置</string>
                </property>
               </widget>
              </item>
@@ -106,7 +131,7 @@
       <item row="1" column="1">
        <widget class="QWidget" name="widget_4" native="true">
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(14, 255, 227);</string>
+         <string notr="true"/>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
@@ -116,20 +141,23 @@
              <pointsize>9</pointsize>
             </font>
            </property>
-           <property name="currentIndex">
-            <number>1</number>
+           <property name="focusPolicy">
+            <enum>Qt::TabFocus</enum>
            </property>
-           <widget class="QWidget" name="tab">
+           <property name="currentIndex">
+            <number>3</number>
+           </property>
+           <widget class="QWidget" name="set_program_config">
             <attribute name="title">
              <string>Tab 1</string>
             </attribute>
            </widget>
-           <widget class="QWidget" name="tab_3">
+           <widget class="QWidget" name="set_daily_config">
             <attribute name="title">
              <string>页</string>
             </attribute>
            </widget>
-           <widget class="QWidget" name="tab_2">
+           <widget class="QWidget" name="set_lessons">
             <property name="font">
              <font>
               <family>Agency FB</family>
@@ -137,6 +165,77 @@
             </property>
             <attribute name="title">
              <string>Tab 2</string>
+            </attribute>
+           </widget>
+           <widget class="QWidget" name="show_about">
+            <attribute name="title">
+             <string>页</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_6" stretch="3,8">
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="font">
+                <font>
+                 <family>黑体</family>
+                 <pointsize>16</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>Simple_Class_Information_Display</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QWidget" name="widget_5" native="true">
+               <layout class="QVBoxLayout" name="verticalLayout_5">
+                <item>
+                 <widget class="QLabel" name="now_version">
+                  <property name="font">
+                   <font>
+                    <family>黑体</family>
+                    <pointsize>16</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>版本号:等待读取</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_3">
+                  <property name="font">
+                   <font>
+                    <family>黑体</family>
+                    <pointsize>16</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>项目链接:&lt;a href=&quot;https://github.com/erduotong/Simple_Class_Information_Display/&quot;&gt;https://github.com/erduotong/Simple_Class_Information_Display/&lt;/a&gt;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_4">
+                  <property name="font">
+                   <font>
+                    <family>黑体</family>
+                    <pointsize>16</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>制作:耳朵同
+</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="set_time">
+            <attribute name="title">
+             <string>页</string>
             </attribute>
            </widget>
           </widget>
@@ -147,8 +246,67 @@
       <item row="0" column="0" colspan="2">
        <widget class="QWidget" name="widget_2" native="true">
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(14, 255, 227);</string>
+         <string notr="true"/>
         </property>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QPushButton" name="save_exit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>黑体</family>
+             <pointsize>20</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>保存并退出</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="not_save_exit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>黑体</family>
+             <pointsize>17</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>不保存并退出</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="to_about">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>黑体</family>
+             <pointsize>20</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>关于</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>

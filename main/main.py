@@ -496,8 +496,7 @@ if __name__ == '__main__':
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss
 
     sys.exit(app.exec_())
-# TODO 1.GUI编辑json 记得删掉辅助用的widget的颜色!!!!!!(object name:settings_
+# TODO 1.GUI编辑json (object name:settings_ 要先自适应一下字体大小
 # 实现方式:1.强制打开一个新窗口并置于顶层(或者直接切换到设置页面？用整个屏幕 然后主程序继续刷新（至少能够完全的避免用户误触?
 # TODO 可以调整颜色的作业/消息
 # TODO 值日模块
-
