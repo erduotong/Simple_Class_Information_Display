@@ -3,8 +3,11 @@
 [![Generic badge](https://img.shields.io/badge/编写于_Python_版本-3.11.3-blue.svg)](https://Python.org)
 
 ### 强烈建议**阅读完成readme**后再开始操作/下载
->如果你无法正常访问github进行下载，可以尝试从仓库的[gitee](https://gitee.com/erduotong/Simple_Class_Information_Display)下载  
->仓库的[gitee](https://gitee.com/erduotong/Simple_Class_Information_Display)更新可能不及时，推荐从仓库的[github](https://github.com/erduotong/Simple_Class_Information_Display)查看&下载
+
+> 如果你无法正常访问github进行下载，可以尝试从仓库的[gitee](https://gitee.com/erduotong/Simple_Class_Information_Display)
+> 下载  
+> [gitee](https://gitee.com/erduotong/Simple_Class_Information_Display)
+> 的仓库更新可能不及时，推荐从仓库的[github](https://github.com/erduotong/Simple_Class_Information_Display)查看&下载
 
 ## 适用场景
 

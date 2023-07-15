@@ -102,6 +102,7 @@ class SettingsPage(QWidget, Ui_settings):
         self.lessons_dict = json.loads(read_file('../data/Curriculum/lessons.json'))
         self.time_dict = json.loads(read_file('../data/Curriculum/time.json'))
         self.now_version.setText(f"版本号: {self.program_config_dict['version']}")  # 替换 关于 内的版本号
+        # todo 添加所有可更改项
 
     # 保存并退出
     def save_and_exit(self):
