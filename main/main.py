@@ -72,24 +72,46 @@ class ReselectTheClassScheduleWindow(QDialog, Ui_Dialog):
 
 
 class SettingsPage(QWidget, Ui_settings):
-    singal_remove_SettingsPage = pyqtSignal()
+    singal_go_to_the_settings_page = pyqtSignal()
+    singal_exit_SettingsPage = pyqtSignal()
 
     def __init__(self):
         super().__init__()
         self.setupUi(self)  # 加载UI
+        self.tabWidget.findChild(QTabBar).hide()
+        self.tabWidget.setCurrentIndex(3)  # 一开始展示关于
+        # 初始化变量
+        self.program_config_dict = None
+        self.daily_config_dict = None
+        self.lessons_dict = None
+        self.time_dict = None
         # 绑定信号和槽
+        self.singal_go_to_the_settings_page.connect(self.initialize_after_entering)
         self.not_save_exit.clicked.connect(self.do_not_save_and_exit)
         self.save_exit.clicked.connect(self.save_and_exit)
+        self.to_program_config.clicked.connect(lambda: self.tabWidget.setCurrentIndex(0))
+        self.to_daily_config.clicked.connect(lambda: self.tabWidget.setCurrentIndex(1))
+        self.to_lessons.clicked.connect(lambda: self.tabWidget.setCurrentIndex(2))
+        self.to_about.clicked.connect(lambda: self.tabWidget.setCurrentIndex(3))
+        self.to_time.clicked.connect(lambda: self.tabWidget.setCurrentIndex(4))
 
+
+    # 进入后载入一些设置啥的初始化
+    def initialize_after_entering(self):
+        self.program_config_dict = json.loads(read_file('../data/program_config.json'))
+        self.daily_config_dict = json.loads(read_file('../data/daily_config.json'))
+        self.lessons_dict = json.loads(read_file('../data/Curriculum/lessons.json'))
+        self.time_dict = json.loads(read_file('../data/Curriculum/time.json'))
+        self.now_version.setText(f"版本号: {self.program_config_dict['version']}")
     # 保存并退出
     def save_and_exit(self):
         # TODO 保存数据
-        self.singal_remove_SettingsPage.emit()
+        self.singal_exit_SettingsPage.emit()
 
     # 不保存并退出
     def do_not_save_and_exit(self):
         # 啥也不用干
-        self.singal_remove_SettingsPage.emit()
+        self.singal_exit_SettingsPage.emit()
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -107,7 +129,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.refresh_edit_size = QtCore.QTimer()  # 设置一个计时器
         self.refresh_edit_size.setInterval(program_config["text_edit_refresh_time"] * 1000)  # 设置停止编辑刷新的时间
         # 绑定信号&槽
-        self.settings_page.singal_remove_SettingsPage.connect(self.exit_settings_page)  # 绑定设置退出的信号
+        self.settings_page.singal_exit_SettingsPage.connect(self.exit_settings_page)  # 绑定设置退出的信号
         self.settings_.clicked.connect(self.show_settings_page)
         self.refresh_edit_size.timeout.connect(self.manually_refresh_the_text_edit_font)  # 超时后连接到更新字体
         self.refresh_time_singal.connect(self.refresh_time)
@@ -115,7 +137,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.update_the_course_indicator_singal.connect(self.refresh_the_course_indicator)
         # 变量初始化
         self.window_resized: bool = False  # 窗口大小曾经改变过
-        self.settings_page = None  # 设置页面
         self.settings_is_open: bool = False  # 设置页面开启状态
         self.screen_height = None
         self.screen_width = None
@@ -507,6 +528,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settings_is_open = True
         self.run_adaptive_text_edit_manually.emit()  # 先备份一手
         self.refresh_the_course_indicator_position()  # 刷新一下课程指示器的位置
+        self.settings_page.singal_go_to_the_settings_page.emit()
         self.stackedWidget.setCurrentIndex(1)  # 切换到设置的堆叠布局
 
     # 从设置界面退出
