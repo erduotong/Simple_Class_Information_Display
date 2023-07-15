@@ -71,8 +71,8 @@ class ReselectTheClassScheduleWindow(QDialog, Ui_Dialog):
 
 
 class SettingsPage(QWidget, Ui_settings):
-    def __init__(self, parent):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__()
         self.setupUi(self)  # 加载UI
         self.show()  # 展示UI
 
@@ -85,7 +85,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, program_config):
         super().__init__()
         self.setupUi(self)
-
+        # 切换设置页面相关
+        # todo 堆叠布局+实例化应该就可以了
         # 设置计时器
         self.refresh_edit_size = QtCore.QTimer()  # 设置一个计时器
         self.refresh_edit_size.setInterval(program_config["text_edit_refresh_time"] * 1000)  # 设置停止编辑刷新的时间
