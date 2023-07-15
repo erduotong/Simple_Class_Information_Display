@@ -1,6 +1,6 @@
 # Simple_Class_Information_Display
 
-[![Generic badge](https://img.shields.io/badge/编写于_Python_版本-3.11.3-blue.svg)](https://Python.org)  
+[![Generic badge](https://img.shields.io/badge/编写于_Python_版本-3.11.3-blue.svg)](https://Python.org)
 
 ### 强烈建议**阅读完成readme**后再开始操作/下载
 
@@ -15,10 +15,10 @@
 你可以选择是否含有qdarkstyle
 > 含有的话，就是这样:
 
-![含有qdarkstyle的情况](./images/with_qdarkstyle.png '含有qdarkstyle的情况')  
-> 不含有的话，就是这样:  
+![含有qdarkstyle的情况](./images/with_qdarkstyle.png '含有qdarkstyle的情况')
+> 不含有的话，就是这样:
 
-![不含有qdarkstyle的情况](./images/without_qdarkstyle.png '不含有qdarkstyle的情况')  
+![不含有qdarkstyle的情况](./images/without_qdarkstyle.png '不含有qdarkstyle的情况')
 
 ### 从源码启动
 
@@ -26,7 +26,8 @@
 你可以在[这里](https://www.python.org/)安装python
 如果你需要**qdarkstyle**美化,请选择**source_code_with_qdarkstyle**下载  
 如果不需要**qdarkstyle**,请选择**source_code_without_qdarkstyle**  
-[这里是下载地址](https://github.com/erduotong/Simple_Class_Information_Display/releases/latest)
+请在[Releases](https://github.com/erduotong/Simple_Class_Information_Display/releases/latest)下载  
+如果你正在使用gitee,请点击[这个链接](https://gitee.com/erduotong/Simple_Class_Information_Display/releases/latest)
 
 ### 从exe启动
 
@@ -34,7 +35,8 @@
 相比从源码启动，会占用较多的空间(容纳了运行库) 但是不需要python解释器和PyQt等 已经打包  
 如果你需要**qdarkstyle**美化,请选择**exe_with_qdarkstyle**下载  
 如果不需要**qdarkstyle**,请选择**exe_without_qdarkstyle**下载  
-[这里是下载地址](https://github.com/erduotong/Simple_Class_Information_Display/releases/latest)
+请在[Releases](https://github.com/erduotong/Simple_Class_Information_Display/releases/latest)下载  
+如果你正在使用gitee,请点击[这个链接](https://gitee.com/erduotong/Simple_Class_Information_Display/releases/latest)
 
 ## 使用
 
