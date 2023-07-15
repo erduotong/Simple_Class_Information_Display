@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import gc
 import sys
 import threading
 from datetime import *
@@ -71,10 +72,24 @@ class ReselectTheClassScheduleWindow(QDialog, Ui_Dialog):
 
 
 class SettingsPage(QWidget, Ui_settings):
+    singal_remove_SettingsPage = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.setupUi(self)  # 加载UI
-        self.show()  # 展示UI
+        # 绑定信号和槽
+        self.not_save_exit.clicked.connect(self.do_not_save_and_exit)
+        self.save_exit.clicked.connect(self.save_and_exit)
+
+    # 保存并退出
+    def save_and_exit(self):
+        # TODO 保存数据
+        self.singal_remove_SettingsPage.emit()
+
+    # 不保存并退出
+    def do_not_save_and_exit(self):
+        # 啥也不用干
+        self.singal_remove_SettingsPage.emit()
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -85,17 +100,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, program_config):
         super().__init__()
         self.setupUi(self)
-        # 切换设置页面相关
-        # todo 堆叠布局+实例化应该就可以了
+        # 其他页
+        self.settings_page = SettingsPage()  # 设置页面
+        self.stackedWidget.addWidget(self.settings_page)
         # 设置计时器
         self.refresh_edit_size = QtCore.QTimer()  # 设置一个计时器
         self.refresh_edit_size.setInterval(program_config["text_edit_refresh_time"] * 1000)  # 设置停止编辑刷新的时间
         # 绑定信号&槽
+        self.settings_page.singal_remove_SettingsPage.connect(self.exit_settings_page)  # 绑定设置退出的信号
+        self.settings_.clicked.connect(self.show_settings_page)
         self.refresh_edit_size.timeout.connect(self.manually_refresh_the_text_edit_font)  # 超时后连接到更新字体
         self.refresh_time_singal.connect(self.refresh_time)
         self.run_adaptive_text_edit_manually.connect(self.manually_refresh_the_text_edit_font)
         self.update_the_course_indicator_singal.connect(self.refresh_the_course_indicator)
         # 变量初始化
+        self.window_resized: bool = False  # 窗口大小曾经改变过
+        self.settings_page = None  # 设置页面
+        self.settings_is_open: bool = False  # 设置页面开启状态
         self.screen_height = None
         self.screen_width = None
         self.lessons_status = None
@@ -133,6 +154,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.layout().addWidget(
             initialize_label_indicator("now_lesson_indicator", program_config['now_indicator_text']))
         # print(self.__dict__)  # 调试用
+        self.stackedWidget.setCurrentIndex(0)  # 切换到page0
         self.show()  # 显示
         # 开始套娃 执行要渲染窗口完毕后的操作
         QtCore.QTimer.singleShot(0, self.after_init)
@@ -408,6 +430,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def refresh_the_course_indicator_position(self):
         now_label = self.findChild(QLabel, "now_lesson_indicator")  # 先读取label方便操作
         next_label = self.findChild(QLabel, "next_lesson_indicator")
+        if self.settings_is_open:
+            now_label.hide()
+            next_label.hide()
+            return
         spacer_item_x = self.curriculum.width() - self.course_display.width()
         common = self.findChild(QTextBrowser, "common_course_slots")
         x = common.width() + common.mapToGlobal(QtCore.QPoint(0, 0)).x() + spacer_item_x // 50  # 获得x坐标
@@ -451,6 +477,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     # 自适应字体大小 窗口调整超时后
     def on_resize_timeout(self):
         self.resize_timer.stop()  # 停止计时器
+        # 开启设置页面的情况下
+        if self.settings_is_open:
+            self.window_resized = True  # 等下刷新
+            return
         self.refresh_the_course_indicator_position()
         adjust_the_text_edit_font_size([self.time_to_next], self.min_font_size, self.max_font_size)
         for i in self.lessons_slots:
@@ -459,6 +489,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     # 重写closeEvent 要备份
     def closeEvent(self, event):
+        # 设置页面只能通过按钮退出
+        if self.settings_is_open:
+            event.ignore()
+            return
         # 先存一下
         self.daily_config["backup"]["msg"] = self.message.toPlainText()
         self.daily_config["backup"]["homework"] = self.homework.toPlainText()
@@ -467,6 +501,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super().closeEvent(event)
         event.accept()
         os._exit(0)
+
+    # 切换到设置界面
+    def show_settings_page(self):
+        self.settings_is_open = True
+        self.run_adaptive_text_edit_manually.emit()  # 先备份一手
+        self.refresh_the_course_indicator_position()  # 刷新一下课程指示器的位置
+        self.stackedWidget.setCurrentIndex(1)  # 切换到设置的堆叠布局
+
+    # 从设置界面退出
+    def exit_settings_page(self):
+        # 删除对象
+        self.settings_is_open = False
+        self.stackedWidget.setCurrentIndex(0)  # 切换到设置的堆叠布局
+        if self.window_resized:  # 如果设置页面开启的时候字体发生了改变的话就重新设置一下
+            self.on_resize_timeout()
+        # TODO 刷新其他的数据
 
 
 if __name__ == '__main__':
@@ -507,7 +557,5 @@ if __name__ == '__main__':
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss
 
     sys.exit(app.exec_())
-# TODO 1.GUI编辑json (object name:settings_ 要先自适应一下字体大小
-# 实现方式:1.强制打开一个新窗口并置于顶层(或者直接切换到设置页面？用整个屏幕 然后主程序继续刷新（至少能够完全的避免用户误触?
 # TODO 可以调整颜色的作业/消息
 # TODO 值日模块

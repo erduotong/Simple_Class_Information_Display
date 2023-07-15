@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'main_window.ui'
+# Form implementation generated from reading ui file '.\main_window.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -25,33 +25,44 @@ class Ui_MainWindow(object):
         MainWindow.setFont(font)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.centralwidget)
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        self.widget_2 = QtWidgets.QWidget(self.centralwidget)
-        self.widget_2.setObjectName("widget_2")
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.widget_2)
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.widget = QtWidgets.QWidget(self.widget_2)
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.centralwidget)
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
+        self.stackedWidget.setObjectName("stackedWidget")
+        self.page1 = QtWidgets.QWidget()
+        self.page1.setObjectName("page1")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.page1)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.widget = QtWidgets.QWidget(self.page1)
+        self.widget.setObjectName("widget")
+        self.horizontalLayout_7 = QtWidgets.QHBoxLayout(self.widget)
+        self.horizontalLayout_7.setObjectName("horizontalLayout_7")
+        self.widget_4 = QtWidgets.QWidget(self.widget)
+        self.widget_4.setObjectName("widget_4")
+        self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.widget_4)
+        self.verticalLayout_5.setObjectName("verticalLayout_5")
+        self.widget_5 = QtWidgets.QWidget(self.widget_4)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
-        self.widget.setSizePolicy(sizePolicy)
+        sizePolicy.setHeightForWidth(self.widget_5.sizePolicy().hasHeightForWidth())
+        self.widget_5.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("黑体")
         font.setPointSize(12)
-        self.widget.setFont(font)
-        self.widget.setObjectName("widget")
-        self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.widget)
-        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.nowtime = QtWidgets.QLabel(self.widget)
+        self.widget_5.setFont(font)
+        self.widget_5.setObjectName("widget_5")
+        self.horizontalLayout_6 = QtWidgets.QHBoxLayout(self.widget_5)
+        self.horizontalLayout_6.setObjectName("horizontalLayout_6")
+        self.nowtime = QtWidgets.QLabel(self.widget_5)
         font = QtGui.QFont()
         font.setFamily("黑体")
         font.setPointSize(48)
         self.nowtime.setFont(font)
+        self.nowtime.setText("")
         self.nowtime.setObjectName("nowtime")
-        self.horizontalLayout_3.addWidget(self.nowtime)
-        self.settings_ = QtWidgets.QPushButton(self.widget)
+        self.horizontalLayout_6.addWidget(self.nowtime)
+        self.settings_ = QtWidgets.QPushButton(self.widget_5)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -64,8 +75,8 @@ class Ui_MainWindow(object):
         font.setWeight(50)
         self.settings_.setFont(font)
         self.settings_.setObjectName("settings_")
-        self.horizontalLayout_3.addWidget(self.settings_)
-        self.refresh_font_ = QtWidgets.QPushButton(self.widget)
+        self.horizontalLayout_6.addWidget(self.settings_)
+        self.refresh_font_ = QtWidgets.QPushButton(self.widget_5)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -78,15 +89,15 @@ class Ui_MainWindow(object):
         font.setWeight(50)
         self.refresh_font_.setFont(font)
         self.refresh_font_.setObjectName("refresh_font_")
-        self.horizontalLayout_3.addWidget(self.refresh_font_)
-        self.horizontalLayout_3.setStretch(0, 20)
-        self.horizontalLayout_3.setStretch(1, 1)
-        self.horizontalLayout_3.setStretch(2, 1)
-        self.verticalLayout_2.addWidget(self.widget)
-        self.msg_hw = QtWidgets.QWidget(self.widget_2)
+        self.horizontalLayout_6.addWidget(self.refresh_font_)
+        self.horizontalLayout_6.setStretch(0, 20)
+        self.horizontalLayout_6.setStretch(1, 1)
+        self.horizontalLayout_6.setStretch(2, 1)
+        self.verticalLayout_5.addWidget(self.widget_5)
+        self.msg_hw = QtWidgets.QWidget(self.widget_4)
         self.msg_hw.setObjectName("msg_hw")
-        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.msg_hw)
-        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        self.verticalLayout_8 = QtWidgets.QVBoxLayout(self.msg_hw)
+        self.verticalLayout_8.setObjectName("verticalLayout_8")
         self.message = QtWidgets.QTextEdit(self.msg_hw)
         self.message.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
@@ -95,7 +106,7 @@ class Ui_MainWindow(object):
         self.message.setFont(font)
         self.message.setAcceptRichText(False)
         self.message.setObjectName("message")
-        self.verticalLayout_3.addWidget(self.message)
+        self.verticalLayout_8.addWidget(self.message)
         self.homework = QtWidgets.QTextEdit(self.msg_hw)
         font = QtGui.QFont()
         font.setFamily("黑体")
@@ -103,25 +114,26 @@ class Ui_MainWindow(object):
         self.homework.setFont(font)
         self.homework.setAcceptRichText(False)
         self.homework.setObjectName("homework")
-        self.verticalLayout_3.addWidget(self.homework)
-        self.verticalLayout_2.addWidget(self.msg_hw)
-        self.verticalLayout_2.setStretch(1, 30)
-        self.horizontalLayout_2.addWidget(self.widget_2)
-        self.curriculum = QtWidgets.QWidget(self.centralwidget)
+        self.verticalLayout_8.addWidget(self.homework)
+        self.verticalLayout_5.addWidget(self.msg_hw)
+        self.verticalLayout_5.setStretch(1, 30)
+        self.horizontalLayout_7.addWidget(self.widget_4)
+        self.curriculum = QtWidgets.QWidget(self.widget)
         self.curriculum.setObjectName("curriculum")
-        self.horizontalLayout = QtWidgets.QHBoxLayout(self.curriculum)
-        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.curriculum)
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.course_display = QtWidgets.QWidget(self.curriculum)
         self.course_display.setObjectName("course_display")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.course_display)
-        self.verticalLayout.setObjectName("verticalLayout")
+        self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.course_display)
+        self.verticalLayout_4.setObjectName("verticalLayout_4")
         self.time_to_next = QtWidgets.QTextBrowser(self.course_display)
         font = QtGui.QFont()
         font.setFamily("黑体")
         self.time_to_next.setFont(font)
+        self.time_to_next.setMarkdown("")
         self.time_to_next.setAcceptRichText(True)
         self.time_to_next.setObjectName("time_to_next")
-        self.verticalLayout.addWidget(self.time_to_next)
+        self.verticalLayout_4.addWidget(self.time_to_next)
         self.lessons_list = QtWidgets.QWidget(self.course_display)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -132,55 +144,54 @@ class Ui_MainWindow(object):
         font.setFamily("黑体")
         self.lessons_list.setFont(font)
         self.lessons_list.setObjectName("lessons_list")
-        self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.lessons_list)
-        self.verticalLayout_6.setObjectName("verticalLayout_6")
-        self.ctcbc_2 = QtWidgets.QTextBrowser(self.lessons_list)
+        self.verticalLayout_7 = QtWidgets.QVBoxLayout(self.lessons_list)
+        self.verticalLayout_7.setObjectName("verticalLayout_7")
+        self.ctcbc_3 = QtWidgets.QTextBrowser(self.lessons_list)
         font = QtGui.QFont()
         font.setFamily("黑体")
         font.setPointSize(12)
-        self.ctcbc_2.setFont(font)
-        self.ctcbc_2.setObjectName("ctcbc_2")
-        self.verticalLayout_6.addWidget(self.ctcbc_2)
-        self.textBrowser_10 = QtWidgets.QTextBrowser(self.lessons_list)
-        self.textBrowser_10.setObjectName("textBrowser_10")
-        self.verticalLayout_6.addWidget(self.textBrowser_10)
-        self.textBrowser_11 = QtWidgets.QTextBrowser(self.lessons_list)
-        self.textBrowser_11.setObjectName("textBrowser_11")
-        self.verticalLayout_6.addWidget(self.textBrowser_11)
-        self.textBrowser_12 = QtWidgets.QTextBrowser(self.lessons_list)
-        self.textBrowser_12.setObjectName("textBrowser_12")
-        self.verticalLayout_6.addWidget(self.textBrowser_12)
-        self.textBrowser_13 = QtWidgets.QTextBrowser(self.lessons_list)
-        self.textBrowser_13.setObjectName("textBrowser_13")
-        self.verticalLayout_6.addWidget(self.textBrowser_13)
-        self.textBrowser_14 = QtWidgets.QTextBrowser(self.lessons_list)
-        self.textBrowser_14.setObjectName("textBrowser_14")
-        self.verticalLayout_6.addWidget(self.textBrowser_14)
-        self.textBrowser_15 = QtWidgets.QTextBrowser(self.lessons_list)
-        self.textBrowser_15.setObjectName("textBrowser_15")
-        self.verticalLayout_6.addWidget(self.textBrowser_15)
-        self.textBrowser_16 = QtWidgets.QTextBrowser(self.lessons_list)
-        self.textBrowser_16.setObjectName("textBrowser_16")
-        self.verticalLayout_6.addWidget(self.textBrowser_16)
-        self.textBrowser_17 = QtWidgets.QTextBrowser(self.lessons_list)
-        self.textBrowser_17.setObjectName("textBrowser_17")
-        self.verticalLayout_6.addWidget(self.textBrowser_17)
-        self.verticalLayout.addWidget(self.lessons_list)
-        self.verticalLayout.setStretch(0, 1)
-        self.verticalLayout.setStretch(1, 11)
-        self.horizontalLayout.addWidget(self.course_display)
+        self.ctcbc_3.setFont(font)
+        self.ctcbc_3.setObjectName("ctcbc_3")
+        self.verticalLayout_7.addWidget(self.ctcbc_3)
+        self.textBrowser_18 = QtWidgets.QTextBrowser(self.lessons_list)
+        self.textBrowser_18.setObjectName("textBrowser_18")
+        self.verticalLayout_7.addWidget(self.textBrowser_18)
+        self.textBrowser_19 = QtWidgets.QTextBrowser(self.lessons_list)
+        self.textBrowser_19.setObjectName("textBrowser_19")
+        self.verticalLayout_7.addWidget(self.textBrowser_19)
+        self.textBrowser_20 = QtWidgets.QTextBrowser(self.lessons_list)
+        self.textBrowser_20.setObjectName("textBrowser_20")
+        self.verticalLayout_7.addWidget(self.textBrowser_20)
+        self.textBrowser_21 = QtWidgets.QTextBrowser(self.lessons_list)
+        self.textBrowser_21.setObjectName("textBrowser_21")
+        self.verticalLayout_7.addWidget(self.textBrowser_21)
+        self.textBrowser_22 = QtWidgets.QTextBrowser(self.lessons_list)
+        self.textBrowser_22.setObjectName("textBrowser_22")
+        self.verticalLayout_7.addWidget(self.textBrowser_22)
+        self.textBrowser_23 = QtWidgets.QTextBrowser(self.lessons_list)
+        self.textBrowser_23.setObjectName("textBrowser_23")
+        self.verticalLayout_7.addWidget(self.textBrowser_23)
+        self.textBrowser_24 = QtWidgets.QTextBrowser(self.lessons_list)
+        self.textBrowser_24.setObjectName("textBrowser_24")
+        self.verticalLayout_7.addWidget(self.textBrowser_24)
+        self.textBrowser_25 = QtWidgets.QTextBrowser(self.lessons_list)
+        self.textBrowser_25.setObjectName("textBrowser_25")
+        self.verticalLayout_7.addWidget(self.textBrowser_25)
+        self.verticalLayout_4.addWidget(self.lessons_list)
+        self.verticalLayout_4.setStretch(0, 1)
+        self.verticalLayout_4.setStretch(1, 11)
+        self.horizontalLayout_2.addWidget(self.course_display)
         spacerItem = QtWidgets.QSpacerItem(100, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout.addItem(spacerItem)
-        self.horizontalLayout.setStretch(0, 25)
-        self.horizontalLayout.setStretch(1, 10)
-        self.horizontalLayout_2.addWidget(self.curriculum)
-        self.horizontalLayout_2.setStretch(0, 5)
-        self.horizontalLayout_2.setStretch(1, 1)
+        self.horizontalLayout_2.addItem(spacerItem)
+        self.horizontalLayout_2.setStretch(0, 25)
+        self.horizontalLayout_2.setStretch(1, 10)
+        self.horizontalLayout_7.addWidget(self.curriculum)
+        self.horizontalLayout_7.setStretch(0, 5)
+        self.horizontalLayout_7.setStretch(1, 1)
+        self.horizontalLayout.addWidget(self.widget)
+        self.stackedWidget.addWidget(self.page1)
+        self.horizontalLayout_3.addWidget(self.stackedWidget)
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menuBar = QtWidgets.QMenuBar(MainWindow)
-        self.menuBar.setGeometry(QtCore.QRect(0, 0, 1920, 21))
-        self.menuBar.setObjectName("menuBar")
-        MainWindow.setMenuBar(self.menuBar)
         self.action = QtWidgets.QAction(MainWindow)
         self.action.setObjectName("action")
         self.action_2 = QtWidgets.QAction(MainWindow)
@@ -199,12 +210,12 @@ class Ui_MainWindow(object):
         self.action_9.setObjectName("action_9")
 
         self.retranslateUi(MainWindow)
+        self.stackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.nowtime.setText(_translate("MainWindow", "时间刷新"))
         self.settings_.setText(_translate("MainWindow", "设置"))
         self.refresh_font_.setText(_translate("MainWindow", "刷新字体"))
         self.message.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
@@ -221,49 +232,48 @@ class Ui_MainWindow(object):
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'黑体\',\'黑体\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'黑体\';\">time_to_next</span></p>\n"
-"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'黑体\';\"><br /></p></body></html>"))
-        self.ctcbc_2.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
+        self.ctcbc_3.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'黑体\',\'黑体\',\'黑体\'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'黑体\',\'黑体\';\"><br /></p></body></html>"))
-        self.textBrowser_10.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        self.textBrowser_18.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'黑体\',\'黑体\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">      </span></p></body></html>"))
-        self.textBrowser_11.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        self.textBrowser_19.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'黑体\',\'黑体\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">      </span></p></body></html>"))
-        self.textBrowser_12.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        self.textBrowser_20.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'黑体\',\'黑体\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">      </span></p></body></html>"))
-        self.textBrowser_13.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        self.textBrowser_21.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'黑体\',\'黑体\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">l4</span></p></body></html>"))
-        self.textBrowser_14.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        self.textBrowser_22.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'黑体\',\'黑体\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">l5</span></p></body></html>"))
-        self.textBrowser_15.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        self.textBrowser_23.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'黑体\',\'黑体\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">l6</span></p></body></html>"))
-        self.textBrowser_16.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        self.textBrowser_24.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'黑体\',\'黑体\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SimSun\';\">l7</span></p></body></html>"))
-        self.textBrowser_17.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        self.textBrowser_25.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'黑体\',\'黑体\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
