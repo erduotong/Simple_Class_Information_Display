@@ -95,14 +95,14 @@ class SettingsPage(QWidget, Ui_settings):
         self.to_about.clicked.connect(lambda: self.tabWidget.setCurrentIndex(3))
         self.to_time.clicked.connect(lambda: self.tabWidget.setCurrentIndex(4))
 
-
     # 进入后载入一些设置啥的初始化
     def initialize_after_entering(self):
         self.program_config_dict = json.loads(read_file('../data/program_config.json'))
         self.daily_config_dict = json.loads(read_file('../data/daily_config.json'))
         self.lessons_dict = json.loads(read_file('../data/Curriculum/lessons.json'))
         self.time_dict = json.loads(read_file('../data/Curriculum/time.json'))
-        self.now_version.setText(f"版本号: {self.program_config_dict['version']}")
+        self.now_version.setText(f"版本号: {self.program_config_dict['version']}")  # 替换 关于 内的版本号
+
     # 保存并退出
     def save_and_exit(self):
         # TODO 保存数据
@@ -190,6 +190,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.run_adaptive_text_edit_manually.emit()
         for i in self.lessons_slots:
             adjust_the_text_edit_font_size([self.findChild(QTextBrowser, i)], self.min_font_size, self.max_font_size)
+        QtCore.QTimer.singleShot(0, self.adjust_msg_hw_size)
         QtCore.QTimer.singleShot(0, self.refresh_time)  # 强制刷新时间
 
     # 刷新时间
