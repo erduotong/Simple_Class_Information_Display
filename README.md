@@ -43,7 +43,7 @@
 如果你需要**qdarkstyle**美化,请选择**exe_with_qdarkstyle**下载  
 如果不需要**qdarkstyle**,请选择**exe_without_qdarkstyle**下载  
 请在[Releases](https://github.com/erduotong/Simple_Class_Information_Display/releases/latest)下载  
-如果你正在使用gitee,请点击[这个链接](https://gitee.com/erduotong/Simple_Class_Information_Display/releases/latest)
+如果你正在使用gitee,请点击[这个链接](https://gitee.com/erduotong/Simple_Class_Information_Display/releases/latest)下载
 
 ## 使用
 
@@ -58,14 +58,14 @@
 
 #### 配置文件
 
-* [daily_config.json 今日配置文件](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/docs/daily_config_meaning.md)
-* [program_config.json 程序配置文件](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/docs/program_config_meaning.md)
-* [lessons.json 课表的存储文件](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/docs/lessons.md)
-* [time.json 课表对应的时间的存储文件](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/docs/time.md)
+* [daily_config.json 今日配置文件](./docs/daily_config_meaning.md)
+* [program_config.json 程序配置文件](./docs/program_config_meaning.md)
+* [lessons.json 课表的存储文件](./docs/lessons.md)
+* [time.json 课表对应的时间的存储文件](./docs/time.md)
 
 #### 其他
 
-* [快捷键](https://github.com/erduotong/Simple_Class_Information_Display/blob/master/docs/shortcut.md)
+* [快捷键](./docs/shortcut.md)
 
 #### 可能有帮助的东西
 
