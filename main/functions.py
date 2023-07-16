@@ -6,7 +6,7 @@ from datetime import *
 import time
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QFontMetricsF
 from PyQt5.QtWidgets import QLabel
 
 
@@ -122,29 +122,34 @@ def get_visible_line_count(text_edit):
 
 # 传入:调整的的text_edits的列表 最小值 最大值
 def adjust_the_text_edit_font_size(text_edits, min_size: int, max_size: int) -> None:
-    # 计算合适的字体大小
-    font_size = min_size
-    font = QFont()
-    while font_size < max_size:
-        font.setPointSize(font_size)
+    font = QFont("黑体")  # 默认为黑体
+
+    def set_font_size(size):
+        nonlocal font
+        font.setPointSize(size)
         for text_edit in text_edits:
             text_edit.setFont(font)
-        if any(text_edit.verticalScrollBar().isVisible() for text_edit in text_edits):
-            font_size -= 1
-            break
-        font_size += 1
-    while any(text_edit.verticalScrollBar().isVisible() for text_edit in text_edits):
-        font_size -= 1
-        font.setPointSize(font_size)
-        for text_edit in text_edits:
-            text_edit.setFont(font)
-        if font_size < min_size:
-            break
-    if font_size <= 0:  # 否则就出bug了
-        font_size = 1
-    font.setPointSize(font_size)
-    for text_edit in text_edits:
-        text_edit.setFont(font)
+
+    def is_scrollbar_visible():
+        return any(text_edit.verticalScrollBar().isVisible() for text_edit in text_edits)
+
+    left = min_size
+    right = max_size
+    while left <= right:
+        mid = (left + right) // 2
+        set_font_size(mid)
+        if is_scrollbar_visible():
+            right = mid - 1
+        else:
+            left = mid + 1
+
+    optimal_font_size = right
+
+    if optimal_font_size <= 0:  # 否则就出bug了
+        optimal_font_size = 1
+
+    set_font_size(optimal_font_size)
+    return
 
 
 # 设置字体大小 传入对象以及要设置的字体大小
@@ -319,26 +324,32 @@ def adaptive_label_font_size(label, max_size: int, min_size: int) -> None:
     :param min_size: 最小大小
     :return: None
     """
-    # 获取当前label的宽度和高度
     label_width = label.width()
     label_height = label.height()
-    # 创建字体对象，并设置初始字体大小
-    font = QtGui.QFont()
-    font.setPointSize(max_size)
-    # 获取字体度量对象
-    fm = QtGui.QFontMetrics(font, label)
-    # 获取当前文本在初始字体下的行宽和行高
-    text_width = fm.width(label.text())
-    text_height = fm.lineSpacing()
-    # 如果文本宽度超过了label宽度，或者文本高度超过了label高度，则逐步缩小字体大小
-    while text_width > label_width or text_height > label_height:
-        font.setPointSize(font.pointSize() - 1)
-        fm = QtGui.QFontMetrics(font, label)
-        text_width = fm.width(label.text())
+    text = label.text()
+
+    # 设置初始字体大小，根据初始标签大小和文本大小评估
+    initial_font_size = (max_size + min_size) // 2
+    font = label.font()
+    font.setPointSize(initial_font_size)
+
+    # 使用二分法进行快速搜索
+    while max_size >= min_size:
+        current_font_size = (max_size + min_size) // 2
+        font.setPointSize(current_font_size)
+
+        # 测量文本的尺寸
+        fm = QFontMetricsF(font)
+        text_width = fm.boundingRect(text).width()
         text_height = fm.lineSpacing()
-        if font.pointSize() < min_size:
-            break
-    # 将动态调整后的字体应用到label上
+
+        # 根据文本尺寸调整搜索范围
+        if text_width > label_width or text_height > label_height:
+            max_size = current_font_size - 1
+        else:
+            min_size = current_font_size + 1
+
+    # 使用最终确定的字体大小
+    font.setPointSize(max_size)
     label.setFont(font)
     return
-

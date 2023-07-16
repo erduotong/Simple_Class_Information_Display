@@ -86,6 +86,18 @@ class Ui_settings(object):
         self.to_time.setFont(font)
         self.to_time.setObjectName("to_time")
         self.verticalLayout_4.addWidget(self.to_time)
+        self.to_resetting = QtWidgets.QPushButton(self.scrollAreaWidgetContents)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.to_resetting.sizePolicy().hasHeightForWidth())
+        self.to_resetting.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setFamily("黑体")
+        font.setPointSize(20)
+        self.to_resetting.setFont(font)
+        self.to_resetting.setObjectName("to_resetting")
+        self.verticalLayout_4.addWidget(self.to_resetting)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.verticalLayout_3.addWidget(self.scrollArea)
         self.gridLayout.addWidget(self.widget_3, 1, 0, 1, 1)
@@ -103,9 +115,18 @@ class Ui_settings(object):
         self.tabWidget.setObjectName("tabWidget")
         self.set_program_config = QtWidgets.QWidget()
         self.set_program_config.setObjectName("set_program_config")
-        self.textBrowser = QtWidgets.QTextBrowser(self.set_program_config)
-        self.textBrowser.setGeometry(QtCore.QRect(288, 272, 256, 192))
-        self.textBrowser.setObjectName("textBrowser")
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.set_program_config)
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.scrollArea_2 = QtWidgets.QScrollArea(self.set_program_config)
+        self.scrollArea_2.setWidgetResizable(True)
+        self.scrollArea_2.setObjectName("scrollArea_2")
+        self.scrollAreaWidgetContents_2 = QtWidgets.QWidget()
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 1550, 825))
+        self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
+        self.verticalLayout_7 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_2)
+        self.verticalLayout_7.setObjectName("verticalLayout_7")
+        self.scrollArea_2.setWidget(self.scrollAreaWidgetContents_2)
+        self.horizontalLayout_2.addWidget(self.scrollArea_2)
         self.tabWidget.addTab(self.set_program_config, "")
         self.set_daily_config = QtWidgets.QWidget()
         self.set_daily_config.setObjectName("set_daily_config")
@@ -184,6 +205,9 @@ class Ui_settings(object):
         self.textBrowser_4.setGeometry(QtCore.QRect(480, 160, 256, 192))
         self.textBrowser_4.setObjectName("textBrowser_4")
         self.tabWidget.addTab(self.set_time, "")
+        self.resetting = QtWidgets.QWidget()
+        self.resetting.setObjectName("resetting")
+        self.tabWidget.addTab(self.resetting, "")
         self.verticalLayout_2.addWidget(self.tabWidget)
         self.gridLayout.addWidget(self.widget_4, 1, 1, 1, 1)
         self.widget_2 = QtWidgets.QWidget(self.widget)
@@ -235,7 +259,7 @@ class Ui_settings(object):
         self.verticalLayout.addWidget(self.widget)
 
         self.retranslateUi(settings)
-        self.tabWidget.setCurrentIndex(3)
+        self.tabWidget.setCurrentIndex(5)
         QtCore.QMetaObject.connectSlotsByName(settings)
 
     def retranslateUi(self, settings):
@@ -245,11 +269,7 @@ class Ui_settings(object):
         self.to_daily_config.setText(_translate("settings", "今日配置文件更改"))
         self.to_lessons.setText(_translate("settings", "课表设置"))
         self.to_time.setText(_translate("settings", "课程时间设置"))
-        self.textBrowser.setHtml(_translate("settings", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'黑体\',\'黑体\'; font-size:5pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">0 </p></body></html>"))
+        self.to_resetting.setText(_translate("settings", "重置相关"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.set_program_config), _translate("settings", "Tab 1"))
         self.textBrowser_2.setHtml(_translate("settings", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
@@ -274,6 +294,7 @@ class Ui_settings(object):
 "</style></head><body style=\" font-family:\'黑体\',\'黑体\'; font-size:5pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">4</p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.set_time), _translate("settings", "页"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.resetting), _translate("settings", "页"))
         self.save_exit.setText(_translate("settings", "保存并退出"))
         self.not_save_exit.setText(_translate("settings", "不保存并退出"))
         self.to_about.setText(_translate("settings", "关于"))

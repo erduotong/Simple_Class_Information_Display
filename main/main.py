@@ -73,18 +73,24 @@ class ReselectTheClassScheduleWindow(QDialog, Ui_Dialog):
 class SettingsPage(QWidget, Ui_settings):
     singal_go_to_the_settings_page = pyqtSignal()
     singal_exit_SettingsPage = pyqtSignal()
+    signal_switch_to_the_interface = pyqtSignal()  # 在切换到设置页的时候要干啥的信号 现在是打开关于页
 
     def __init__(self):
         super().__init__()
         self.setupUi(self)  # 加载UI
         self.tabWidget.findChild(QTabBar).hide()
-        self.tabWidget.setCurrentIndex(3)  # 一开始展示关于
         # 初始化变量
         self.program_config_dict = None
         self.daily_config_dict = None
         self.lessons_dict = None
         self.time_dict = None
+        self.program_config_opened: bool = False
+        self.daily_config_opened: bool = False
+        self.lessons_opened: bool = False
+        self.about_opened: bool = False
+        self.time_opened: bool = False
         # 绑定信号和槽
+        self.signal_switch_to_the_interface.connect(self.open_about)
         self.singal_go_to_the_settings_page.connect(self.initialize_after_entering)
         self.not_save_exit.clicked.connect(self.do_not_save_and_exit)
         self.save_exit.clicked.connect(self.save_and_exit)
@@ -93,21 +99,50 @@ class SettingsPage(QWidget, Ui_settings):
         self.to_lessons.clicked.connect(self.open_lessons)
         self.to_about.clicked.connect(self.open_about)
         self.to_time.clicked.connect(self.open_time)
+        self.to_resetting.clicked.connect(self.open_resetting)
 
     def open_program_config(self):
         self.tabWidget.setCurrentIndex(0)
+        if not self.program_config_opened:
+            # TODO 初始化program_config页
+            self.program_config_opened = True
 
     def open_daily_config(self):
         self.tabWidget.setCurrentIndex(1)
+        if not self.daily_config_opened:
+            # TODO 初始化daily_config页
+            self.daily_config_opened = True
 
     def open_lessons(self):
         self.tabWidget.setCurrentIndex(2)
+        if not self.lessons_opened:
+            # TODO 初始化lessons页
+            self.lessons_opened = True
 
     def open_about(self):
         self.tabWidget.setCurrentIndex(3)
+        if not self.about_opened:
+            self.initialize_about_widget()
+            self.about_opened = True
 
     def open_time(self):
         self.tabWidget.setCurrentIndex(4)
+        if not self.time_opened:
+            # TODO 初始化time页
+            self.time_opened = True
+
+    def open_resetting(self):
+        self.tabWidget.setCurrentIndex(5)
+        # TODO 为resetting页面加UI
+
+    # 所有的东西都初始化为否，如果打开过那么就把他设成真并且添加，当真的时候就不管
+
+    # 初始化关于内的布局
+    def initialize_about_widget(self):
+        for i in self.show_about.findChildren(QLabel):
+            i.setMaximumSize(i.width(), i.height())
+
+            i.setStyleSheet("border: 2px solid red;")
 
     # 进入后载入一些设置啥的初始化
     def initialize_after_entering(self):
@@ -117,7 +152,11 @@ class SettingsPage(QWidget, Ui_settings):
         self.lessons_dict = json.loads(read_file('../data/Curriculum/lessons.json'))
         self.time_dict = json.loads(read_file('../data/Curriculum/time.json'))
         self.now_version.setText(f"版本号: {self.program_config_dict['version']}")  # 替换 关于 内的版本号
-        # todo 添加所有可更改项
+        self.program_config_opened: bool = False
+        self.daily_config_opened: bool = False
+        self.lessons_opened: bool = False
+        self.about_opened: bool = False
+        self.time_opened: bool = False
 
     # 保存并退出
     def save_and_exit(self):
@@ -126,10 +165,20 @@ class SettingsPage(QWidget, Ui_settings):
         write_file('../data/daily_config.json', json.dumps(self.daily_config_dict, ensure_ascii=False, indent=4))
         write_file('../data/Curriculum/lessons.json', json.dumps(self.lessons_dict, ensure_ascii=False, indent=4))
         write_file('../data/Curriculum/time.json', json.dumps(self.time_dict, ensure_ascii=False, indent=4))
+        # 可能能减少一些内存占用的奇怪操作
+        self.program_config_dict = None
+        self.daily_config_dict = None
+        self.lessons_dict = None
+        self.time_dict = None
         self.singal_exit_SettingsPage.emit()  # 退出!
 
     # 不保存并退出
     def do_not_save_and_exit(self):
+        # 可能能减少一些内存占用的奇怪操作
+        self.program_config_dict = None
+        self.daily_config_dict = None
+        self.lessons_dict = None
+        self.time_dict = None
         # 啥也不用干
         self.singal_exit_SettingsPage.emit()  # 退出!
 
@@ -551,6 +600,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.refresh_the_course_indicator_position()  # 刷新一下课程指示器的位置
         self.settings_page.singal_go_to_the_settings_page.emit()
         self.stackedWidget.setCurrentIndex(1)  # 切换到设置的堆叠布局
+        self.settings_page.signal_switch_to_the_interface.emit()
 
     # 从设置界面退出
     def exit_settings_page(self):
@@ -559,6 +609,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(0)  # 切换到设置的堆叠布局
         if self.window_resized:  # 如果设置页面开启的时候字体发生了改变的话就重新设置一下
             self.on_resize_timeout()
+        self.window_resized = False
         # TODO 刷新其他的数据
 
 
