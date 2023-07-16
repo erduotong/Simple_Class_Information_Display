@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import gc
 import sys
 import threading
 from datetime import *
@@ -112,6 +111,7 @@ class SettingsPage(QWidget, Ui_settings):
 
     # 进入后载入一些设置啥的初始化
     def initialize_after_entering(self):
+        # 根据上一次保存的内容来决定切换到什么地方并且准备初始化
         self.program_config_dict = json.loads(read_file('../data/program_config.json'))
         self.daily_config_dict = json.loads(read_file('../data/daily_config.json'))
         self.lessons_dict = json.loads(read_file('../data/Curriculum/lessons.json'))
@@ -121,13 +121,17 @@ class SettingsPage(QWidget, Ui_settings):
 
     # 保存并退出
     def save_and_exit(self):
-        # TODO 保存数据
-        self.singal_exit_SettingsPage.emit()
+        # 保存文件
+        write_file('../data/program_config.json', json.dumps(self.program_config_dict, ensure_ascii=False, indent=4))
+        write_file('../data/daily_config.json', json.dumps(self.daily_config_dict, ensure_ascii=False, indent=4))
+        write_file('../data/Curriculum/lessons.json', json.dumps(self.lessons_dict, ensure_ascii=False, indent=4))
+        write_file('../data/Curriculum/time.json', json.dumps(self.time_dict, ensure_ascii=False, indent=4))
+        self.singal_exit_SettingsPage.emit()  # 退出!
 
     # 不保存并退出
     def do_not_save_and_exit(self):
         # 啥也不用干
-        self.singal_exit_SettingsPage.emit()
+        self.singal_exit_SettingsPage.emit()  # 退出!
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
