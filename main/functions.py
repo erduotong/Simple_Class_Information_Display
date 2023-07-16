@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import os
+import re
 import shutil
 from datetime import *
 import time
@@ -327,7 +328,7 @@ def adaptive_label_font_size(label, max_size: int, min_size: int) -> None:
     label_width = label.width()
     label_height = label.height()
     text = label.text()
-
+    text =  re.sub(r'<a\b[^>]*>(.*?)</a>', r'\1', text)
     # 设置初始字体大小，根据初始标签大小和文本大小评估
     initial_font_size = (max_size + min_size) // 2
     font = label.font()
@@ -342,7 +343,6 @@ def adaptive_label_font_size(label, max_size: int, min_size: int) -> None:
         fm = QFontMetricsF(font)
         text_width = fm.boundingRect(text).width()
         text_height = fm.lineSpacing()
-
         # 根据文本尺寸调整搜索范围
         if text_width > label_width or text_height > label_height:
             max_size = current_font_size - 1

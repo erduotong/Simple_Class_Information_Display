@@ -101,6 +101,7 @@ class SettingsPage(QWidget, Ui_settings):
         self.to_time.clicked.connect(self.open_time)
         self.to_resetting.clicked.connect(self.open_resetting)
 
+    # 所有的东西都初始化为否，如果打开过那么就把他设成真并且添加，当真的时候就不管
     def open_program_config(self):
         self.tabWidget.setCurrentIndex(0)
         if not self.program_config_opened:
@@ -122,8 +123,8 @@ class SettingsPage(QWidget, Ui_settings):
     def open_about(self):
         self.tabWidget.setCurrentIndex(3)
         if not self.about_opened:
-            self.initialize_about_widget()
             self.about_opened = True
+            QtCore.QTimer.singleShot(0, self.initialize_about_widget)
 
     def open_time(self):
         self.tabWidget.setCurrentIndex(4)
@@ -135,14 +136,11 @@ class SettingsPage(QWidget, Ui_settings):
         self.tabWidget.setCurrentIndex(5)
         # TODO 为resetting页面加UI
 
-    # 所有的东西都初始化为否，如果打开过那么就把他设成真并且添加，当真的时候就不管
-
-    # 初始化关于内的布局
+    # 初始化 关于 内的布局
     def initialize_about_widget(self):
+        # 自适应一下字体大小
         for i in self.show_about.findChildren(QLabel):
-            i.setMaximumSize(i.width(), i.height())
-
-            i.setStyleSheet("border: 2px solid red;")
+            adaptive_label_font_size(i, 50, 1)
 
     # 进入后载入一些设置啥的初始化
     def initialize_after_entering(self):
@@ -155,7 +153,6 @@ class SettingsPage(QWidget, Ui_settings):
         self.program_config_opened: bool = False
         self.daily_config_opened: bool = False
         self.lessons_opened: bool = False
-        self.about_opened: bool = False
         self.time_opened: bool = False
 
     # 保存并退出
@@ -366,7 +363,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def time_to_next_refresh(self) -> None:
         # 先判断时间 然后进行处理
         # 如果没有特殊变化那就不刷新 否则就进行一个刷新
-        #
         now_time = datetime.now()
         # 如果还没开始第一节课的情况 为0
         if now_time < time_to_datetime(self.daily_config["lessons_list"][0]["start"], now_time):
@@ -610,6 +606,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.window_resized:  # 如果设置页面开启的时候字体发生了改变的话就重新设置一下
             self.on_resize_timeout()
         self.window_resized = False
+        # 刷新课表指示器
+        self.lessons_status = None  # 防止拒绝刷新
+        self.next_lesson = None
+        self.time_to_next_refresh()
+
         # TODO 刷新其他的数据
 
 
