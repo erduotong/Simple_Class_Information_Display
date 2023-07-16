@@ -17,7 +17,7 @@
 
 ### 选择qdarkstyle
 
-你可以选择是否含有qdarkstyle
+你可以选择是否含有qdarkstyle进行美化
 > 含有的话，就是这样:
 
 ![含有qdarkstyle的情况](./images/with_qdarkstyle.png '含有qdarkstyle的情况')
@@ -26,6 +26,8 @@
 ![不含有qdarkstyle的情况](./images/without_qdarkstyle.png '不含有qdarkstyle的情况')
 
 ### 从源码启动
+
+> 不推荐，除非你知道你在做什么 推荐[从exe启动](#从exe启动)
 
 如果你已经拥有**Python环境**并且可以使用**pip安装需要的依赖库** 你可以尝试从源码启动  
 你可以在[这里](https://www.python.org/)安装python

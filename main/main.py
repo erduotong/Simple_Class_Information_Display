@@ -89,11 +89,26 @@ class SettingsPage(QWidget, Ui_settings):
         self.singal_go_to_the_settings_page.connect(self.initialize_after_entering)
         self.not_save_exit.clicked.connect(self.do_not_save_and_exit)
         self.save_exit.clicked.connect(self.save_and_exit)
-        self.to_program_config.clicked.connect(lambda: self.tabWidget.setCurrentIndex(0))
-        self.to_daily_config.clicked.connect(lambda: self.tabWidget.setCurrentIndex(1))
-        self.to_lessons.clicked.connect(lambda: self.tabWidget.setCurrentIndex(2))
-        self.to_about.clicked.connect(lambda: self.tabWidget.setCurrentIndex(3))
-        self.to_time.clicked.connect(lambda: self.tabWidget.setCurrentIndex(4))
+        self.to_program_config.clicked.connect(self.open_program_config)
+        self.to_daily_config.clicked.connect(self.open_daily_config)
+        self.to_lessons.clicked.connect(self.open_lessons)
+        self.to_about.clicked.connect(self.open_about)
+        self.to_time.clicked.connect(self.open_time)
+
+    def open_program_config(self):
+        self.tabWidget.setCurrentIndex(0)
+
+    def open_daily_config(self):
+        self.tabWidget.setCurrentIndex(1)
+
+    def open_lessons(self):
+        self.tabWidget.setCurrentIndex(2)
+
+    def open_about(self):
+        self.tabWidget.setCurrentIndex(3)
+
+    def open_time(self):
+        self.tabWidget.setCurrentIndex(4)
 
     # 进入后载入一些设置啥的初始化
     def initialize_after_entering(self):
