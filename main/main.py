@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+import copy
 import sys
 import threading
 from datetime import *
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets, sip
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from daily_initialization import *
@@ -85,6 +86,10 @@ class SettingsPage(QWidget, Ui_settings):
         self.daily_config_dict = None
         self.lessons_dict = None
         self.time_dict = None
+        self.program_config_dict_mirror = None
+        self.daily_config_dict_mirror = None
+        self.lessons_dict_mirror = None
+        self.time_dict_mirror = None
         self.program_config_opened: bool = False
         self.daily_config_opened: bool = False
         self.lessons_opened: bool = False
@@ -152,6 +157,9 @@ class SettingsPage(QWidget, Ui_settings):
         # 用于翻译对照
         compare_dict = {
             "backup_slots<--daily_config": "今日配置文件备份槽位数",
+            "backup_slots<--program_config": "程序配置文件备份槽位数",
+            "backup_slots<--time": "课程默认时间文件备份槽位数",
+            "backup_slots<--lessons": "课表存储文件备份槽位数",
             "refresh_time": "逻辑刷新时间(秒)",
             "layout_adjustment_accuracy": "自适应比例精度",
             "minimum_font_size": "最小自适应字体大小",
@@ -182,7 +190,7 @@ class SettingsPage(QWidget, Ui_settings):
                     key = f"{top_key}<--{key}"
                 # 根据value和key生成widget
                 widget = QWidget()
-                widget.setFixedHeight(self.program_config_show_area.height() // 11)
+                widget.setFixedHeight(self.program_config_scrollarea.height() // 11)
                 # 为widget内添加label
                 layout = QHBoxLayout()  # 设置水平布局
                 label = QLabel(compare_dict.get(key))
@@ -207,15 +215,12 @@ class SettingsPage(QWidget, Ui_settings):
                 widget.setLayout(layout)  # 添加布局
                 self.program_config_show_area.layout().addWidget(widget)  # 加入widget
 
-        self.program_config_show_area.setMaximumSize(self.program_config_show_area.width(),
-                                                     self.program_config_show_area.height())
         add_widget(self.program_config_dict, None)  # 传入None 现在就是在遍历top key
         # 自适应字体大小
         for i in self.program_config_show_area.findChildren(QLabel):
             adaptive_label_font_size(i, 50, 1)
         for i in self.program_config_show_area.findChildren(QLineEdit):
             adaptive_label_font_size(i, 50, 1)
-        # TODO 备份
 
     # 字体变化的时候更新program_config这个dict
     def update_program_config_dict(self, text, key, value_type):
@@ -241,6 +246,11 @@ class SettingsPage(QWidget, Ui_settings):
         self.daily_config_dict = json.loads(read_file('../data/daily_config.json'))
         self.lessons_dict = json.loads(read_file('../data/Curriculum/lessons.json'))
         self.time_dict = json.loads(read_file('../data/Curriculum/time.json'))
+        # 设置镜像,后续要进行操作
+        self.program_config_dict_mirror = copy.deepcopy(self.program_config_dict)
+        self.daily_config_dict_mirror = copy.deepcopy(self.daily_config_dict)
+        self.lessons_dict_mirror = copy.deepcopy(self.lessons_dict)
+        self.time_dict_mirror = copy.deepcopy(self.time_dict)
         self.now_version.setText(f"版本号: {self.program_config_dict['version']}")  # 替换 关于 内的版本号
         self.program_config_opened: bool = False
         self.daily_config_opened: bool = False
@@ -249,11 +259,27 @@ class SettingsPage(QWidget, Ui_settings):
 
     # 保存并退出
     def save_and_exit(self):
-        # 保存文件
-        write_file('../data/program_config.json', json.dumps(self.program_config_dict, ensure_ascii=False, indent=4))
-        write_file('../data/daily_config.json', json.dumps(self.daily_config_dict, ensure_ascii=False, indent=4))
-        write_file('../data/Curriculum/lessons.json', json.dumps(self.lessons_dict, ensure_ascii=False, indent=4))
-        write_file('../data/Curriculum/time.json', json.dumps(self.time_dict, ensure_ascii=False, indent=4))
+        # 保存文件 如果发生了更改就要备份 然后再覆写
+        if self.program_config_dict != self.program_config_dict_mirror:
+            backup('../data/program_config.json', '../data/backup/program_config',
+                   self.program_config_dict["backup_slots"]["program_config"])
+            write_file('../data/program_config.json',
+                       json.dumps(self.program_config_dict, ensure_ascii=False, indent=4))
+        if self.daily_config_dict != self.daily_config_dict_mirror:
+            backup('../data/daily_config.json', '../data/backup/daily_config',
+                   self.program_config_dict["backup_slots"]["daily_config"])
+            write_file('../data/daily_config.json',
+                       json.dumps(self.daily_config_dict, ensure_ascii=False, indent=4))
+        if self.time_dict != self.time_dict_mirror:
+            backup('../data/Curriculum/time.json', '../data/backup/time',
+                   self.program_config_dict["backup_slots"]["time"])
+            write_file('../data/Curriculum/time.json',
+                       json.dumps(self.time_dict, ensure_ascii=False, indent=4))
+        if self.lessons_dict != self.lessons_dict_mirror:
+            backup('../data/Curriculum/lessons.json', '../data/backup/lessons',
+                   self.program_config_dict["backup_slots"]["lessons"])
+            write_file('../data/Curriculum/lessons.json',
+                       json.dumps(self.lessons_dict, ensure_ascii=False, indent=4))
         # 减少内存占用
         self.remove_unwanted()
         self.singal_exit_SettingsPage.emit()  # 退出!
@@ -271,6 +297,10 @@ class SettingsPage(QWidget, Ui_settings):
         self.daily_config_dict = None
         self.lessons_dict = None
         self.time_dict = None
+        self.program_config_dict_mirror = None
+        self.daily_config_dict_mirror = None
+        self.lessons_dict_mirror = None
+        self.time_dict_mirror = None
         # 控件大小相关
         maxsize = 16777215
         self.program_config_show_area.setMaximumSize(maxsize, maxsize)
@@ -718,6 +748,9 @@ if __name__ == '__main__':
     # 初始化文件防止报错
     # 初始化文件夹
     os.makedirs('../data/backup/daily_config', exist_ok=True)
+    os.makedirs('../data/backup/program_config', exist_ok=True)
+    os.makedirs('../data/backup/time', exist_ok=True)
+    os.makedirs('../data/backup/lessons', exist_ok=True)
     os.makedirs('../data/Curriculum', exist_ok=True)
     # 初始化文件并且兼容升级 具体更改在函数内
     initialize_the_file(version)

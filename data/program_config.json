@@ -1,7 +1,10 @@
 {
-    "version": "1.0.1",
+    "version": "1.10.1",
     "backup_slots": {
-        "daily_config": 5
+        "program_config": 5,
+        "daily_config": 5,
+        "time": 5,
+        "lessons": 5
     },
     "refresh_time": 1,
     "layout_adjustment_accuracy": 100,

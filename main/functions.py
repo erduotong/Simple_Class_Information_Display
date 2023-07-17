@@ -28,7 +28,8 @@ def backup(path: str, destination_path: str, backup_slot: int) -> None:
     backups.sort(key=lambda f: os.path.getmtime(f))
     # 如果备份文件数量超过 backup_slot，删除最早的备份文件
     if len(backups) > backup_slot:
-        os.remove(backups[0])
+        for i in backups[:-backup_slot]:
+            os.remove(i)
 
 
 # 读取文件函数
@@ -281,7 +282,10 @@ def initialize_the_file(version: str) -> None:
         "../data/program_config.json": {
             "version": version,
             "backup_slots": {
-                "daily_config": 5
+                "program_config": 5,
+                "daily_config": 5,
+                "time": 5,
+                "lessons": 5
             },
             "refresh_time": 1,
             "layout_adjustment_accuracy": 100,
