@@ -3,7 +3,7 @@
     "backup_slots": {
         "daily_config": 5
     },
-    "refresh_time": "1",
+    "refresh_time": 1,
     "layout_adjustment_accuracy": 100,
     "minimum_font_size": 20,
     "maximum_font_size": 200,

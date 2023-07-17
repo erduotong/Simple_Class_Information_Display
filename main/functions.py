@@ -101,7 +101,7 @@ def compareTime():
 
 
 # schedule计时任务的运行模块 传入等待时间
-def run_schedule(sec: float, window) -> None:
+def run_schedule(sec: int, window) -> None:
     # 对齐整数秒
     time_to_next_second = 1 - time.time() % 1
     time.sleep(time_to_next_second)
@@ -283,13 +283,13 @@ def initialize_the_file(version: str) -> None:
             "backup_slots": {
                 "daily_config": 5
             },
-            "refresh_time": "1",
+            "refresh_time": 1,
             "layout_adjustment_accuracy": 100,
             "minimum_font_size": 20,
             "maximum_font_size": 200,
             "time_font_size": 51,
             "text_edit_refresh_time": 5,
-            "the_window_changes_the_refresh_time": 0.7,
+            "the_window_changes_the_refresh_time": 1,
             "now_indicator_text": "<Now",
             "next_indicator_text": "<Next"
         }
@@ -325,10 +325,13 @@ def adaptive_label_font_size(label, max_size: int, min_size: int) -> None:
     :param min_size: 最小大小
     :return: None
     """
-    label_width = label.width()
-    label_height = label.height()
+    if min_size > max_size:
+        max_size, min_size = min_size, max_size
+    contents_rect = label.contentsRect()
+    label_width = contents_rect.width()
+    label_height = contents_rect.height()
     text = label.text()
-    text =  re.sub(r'<a\b[^>]*>(.*?)</a>', r'\1', text)
+    text = re.sub(r'<a\b[^>]*>(.*?)</a>', r'\1', text)
     # 设置初始字体大小，根据初始标签大小和文本大小评估
     initial_font_size = (max_size + min_size) // 2
     font = label.font()
@@ -348,7 +351,6 @@ def adaptive_label_font_size(label, max_size: int, min_size: int) -> None:
             max_size = current_font_size - 1
         else:
             min_size = current_font_size + 1
-
     # 使用最终确定的字体大小
     font.setPointSize(max_size)
     label.setFont(font)

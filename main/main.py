@@ -7,6 +7,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from daily_initialization import *
 import time
+from PyQt5.QtGui import QDoubleValidator, QIntValidator, QRegExpValidator
 from rcs import Ui_Dialog
 from main_window import Ui_MainWindow
 from settings_page import Ui_settings
@@ -105,8 +106,8 @@ class SettingsPage(QWidget, Ui_settings):
     def open_program_config(self):
         self.tabWidget.setCurrentIndex(0)
         if not self.program_config_opened:
-            # TODO 初始化program_config页
             self.program_config_opened = True
+            self.initialize_program_config_widget()
 
     def open_daily_config(self):
         self.tabWidget.setCurrentIndex(1)
@@ -124,7 +125,7 @@ class SettingsPage(QWidget, Ui_settings):
         self.tabWidget.setCurrentIndex(3)
         if not self.about_opened:
             self.about_opened = True
-            QtCore.QTimer.singleShot(0, self.initialize_about_widget)
+            self.initialize_about_widget()
 
     def open_time(self):
         self.tabWidget.setCurrentIndex(4)
@@ -141,6 +142,97 @@ class SettingsPage(QWidget, Ui_settings):
         # 自适应一下字体大小
         for i in self.show_about.findChildren(QLabel):
             adaptive_label_font_size(i, 50, 1)
+
+    # 初始化program_config 页
+    def initialize_program_config_widget(self):
+        # 首先清空 然后计算出最大和最小高度 框死
+        # 清空其中的所有widget保险
+        for i in self.program_config_show_area.findChildren(QWidget):
+            i.deleteLater()
+        # 用于翻译对照
+        compare_dict = {
+            "backup_slots<--daily_config": "今日配置文件备份槽位数",
+            "refresh_time": "逻辑刷新时间(秒)",
+            "layout_adjustment_accuracy": "自适应比例精度",
+            "minimum_font_size": "最小自适应字体大小",
+            "maximum_font_size": "最大自适应字体大小",
+            "time_font_size": "时间显示器字体大小",
+            "text_edit_refresh_time": "文本编辑后自动自适应间隔",
+            "the_window_changes_the_refresh_time": "窗口改变后自动自适应间隔",
+            "now_indicator_text": "现在课程指示器显示文本",
+            "next_indicator_text": "下节课程指示器显示文本"
+        }
+
+        # 递归的函数
+        def add_widget(a: dict, top_key):
+
+            for key, value in a.items():
+                # 递归,保证嵌套正常
+                if isinstance(value, dict):
+                    if top_key is not None:
+                        add_widget(value, f"{top_key}-{key}")
+                    else:
+                        add_widget(value, key)
+                    continue
+                # version不显示
+                if key == "version":
+                    continue
+                # 替换成单一字符串
+                if top_key is not None:
+                    key = f"{top_key}<--{key}"
+                # 根据value和key生成widget
+                widget = QWidget()
+                widget.setFixedHeight(self.program_config_show_area.height() // 11)
+                # 为widget内添加label
+                layout = QHBoxLayout()  # 设置水平布局
+                label = QLabel(compare_dict.get(key))
+                font = QFont("黑体")
+                label.setFont(font)
+                label.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
+                layout.addWidget(label)
+                # 添加编辑框 判断类型并设置能输入什么东西
+                line_edit = QLineEdit()
+                line_edit.setText(str(value))  # 添加文本
+                # 判断类型
+                if isinstance(value, float):
+                    validator = QDoubleValidator()
+                elif isinstance(value, int):
+                    validator = QIntValidator()
+                else:
+                    validator = QRegExpValidator()
+                line_edit.setValidator(validator)  # 添加类型限制,加强鲁棒性
+                line_edit.textChanged.connect(lambda text, key1=key, value_type=type(value):
+                                              self.update_program_config_dict(text, key1, value_type))
+                layout.addWidget(line_edit)
+                widget.setLayout(layout)  # 添加布局
+                self.program_config_show_area.layout().addWidget(widget)  # 加入widget
+
+        self.program_config_show_area.setMaximumSize(self.program_config_show_area.width(),
+                                                     self.program_config_show_area.height())
+        add_widget(self.program_config_dict, None)  # 传入None 现在就是在遍历top key
+        # 自适应字体大小
+        for i in self.program_config_show_area.findChildren(QLabel):
+            adaptive_label_font_size(i, 50, 1)
+        for i in self.program_config_show_area.findChildren(QLineEdit):
+            adaptive_label_font_size(i, 50, 1)
+        # TODO 备份
+
+    # 字体变化的时候更新program_config这个dict
+    def update_program_config_dict(self, text, key, value_type):
+        if text == '':
+            return
+        if value_type == int:
+            text = int(text)
+        elif value_type == float:
+            text = float(text)
+        else:
+            text = str(text)
+        # 更改字典的值
+        key = key.split("<--")
+        dict1 = self.program_config_dict
+        for i in key[:-1]:
+            dict1 = dict1[i]
+        dict1[key[-1]] = text
 
     # 进入后载入一些设置啥的初始化
     def initialize_after_entering(self):
@@ -162,22 +254,26 @@ class SettingsPage(QWidget, Ui_settings):
         write_file('../data/daily_config.json', json.dumps(self.daily_config_dict, ensure_ascii=False, indent=4))
         write_file('../data/Curriculum/lessons.json', json.dumps(self.lessons_dict, ensure_ascii=False, indent=4))
         write_file('../data/Curriculum/time.json', json.dumps(self.time_dict, ensure_ascii=False, indent=4))
-        # 可能能减少一些内存占用的奇怪操作
-        self.program_config_dict = None
-        self.daily_config_dict = None
-        self.lessons_dict = None
-        self.time_dict = None
+        # 减少内存占用
+        self.remove_unwanted()
         self.singal_exit_SettingsPage.emit()  # 退出!
 
     # 不保存并退出
     def do_not_save_and_exit(self):
-        # 可能能减少一些内存占用的奇怪操作
+        # 减少内存占用
+        self.remove_unwanted()
+        # 啥也不用干
+        self.singal_exit_SettingsPage.emit()  # 退出!
+
+    # 删除一些之后要重新生成的东西以减少内存占用(是否需要多线程存疑
+    def remove_unwanted(self):
         self.program_config_dict = None
         self.daily_config_dict = None
         self.lessons_dict = None
         self.time_dict = None
-        # 啥也不用干
-        self.singal_exit_SettingsPage.emit()  # 退出!
+        # 控件大小相关
+        maxsize = 16777215
+        self.program_config_show_area.setMaximumSize(maxsize, maxsize)
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -642,7 +738,7 @@ if __name__ == '__main__':
     main_window = MainWindow(config)
     # 创建进程开始定时执行任务,传入刷新的秒数
     scheduled_task_thread = threading.Thread(target=run_schedule,
-                                             args=(float(config["refresh_time"]), main_window,))
+                                             args=(int(config["refresh_time"]), main_window,))
     scheduled_task_thread.start()
     # 进入主窗口
 
