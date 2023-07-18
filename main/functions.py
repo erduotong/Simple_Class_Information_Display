@@ -293,7 +293,7 @@ def initialize_the_file(version: str) -> None:
             "maximum_font_size": 200,
             "time_font_size": 51,
             "text_edit_refresh_time": 5,
-            "the_window_changes_the_refresh_time": 1,
+            "the_window_changes_the_refresh_time": 0.7,
             "now_indicator_text": "<Now",
             "next_indicator_text": "<Next"
         }
@@ -313,10 +313,21 @@ def initialize_the_file(version: str) -> None:
                 if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
                     update_dict(dict1[key], dict2[key])
                 else:
-                    dict1[key] = dict2[key]
+                    # 检查类型是否一致
+                    if isinstance(dict2[key], type(dict1[key])):
+                        dict1[key] = dict2[key]
+                    else:
+                        try:
+                            # 尝试转换类型
+                            converted_value = type(dict1[key])(dict2[key])
+                            dict1[key] = converted_value
+                        except (ValueError, TypeError):
+                            # 转换失败，从 dict1 中复制
+                            dict1[key] = dict1[key]
         return dict1
 
     config = update_dict(path['../data/program_config.json'], config)
+    config['version'] = version
     write_file('../data/program_config.json', json.dumps(config, ensure_ascii=False, indent=4))
 
 

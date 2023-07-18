@@ -3,7 +3,7 @@ import copy
 import sys
 import threading
 from datetime import *
-from PyQt5 import QtCore, QtWidgets, sip
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from daily_initialization import *
