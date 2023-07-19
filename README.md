@@ -1,6 +1,7 @@
 # Simple_Class_Information_Display
 
-[![Generic badge](https://img.shields.io/badge/编写于_Python_版本-3.11.3-blue.svg)](https://Python.org)
+[![Generic badge](https://img.shields.io/badge/编写于_Python_版本-3.11.3-blue.svg?style=for-the-badge)](https://Python.org)
+![](https://img.shields.io/github/last-commit/erduotong/Simple_Class_Information_Display?style=for-the-badge)
 
 ### 强烈建议**阅读完成readme**后再开始操作/下载
 
@@ -25,17 +26,6 @@
 
 ![不含有qdarkstyle的情况](./images/without_qdarkstyle.png '不含有qdarkstyle的情况')
 
-### 从源码启动
-
-> 不推荐，除非你知道你在做什么 推荐[从exe启动](#从exe启动)
-
-如果你已经拥有**Python环境**并且可以使用**pip安装需要的依赖库** 你可以尝试从源码启动  
-你可以在[这里](https://www.python.org/)安装python
-如果你需要**qdarkstyle**美化,请选择**source_code_with_qdarkstyle**下载  
-如果不需要**qdarkstyle**,请选择**source_code_without_qdarkstyle**  
-请在[Releases](https://github.com/erduotong/Simple_Class_Information_Display/releases/latest)下载  
-如果你正在使用gitee,请点击[这个链接](https://gitee.com/erduotong/Simple_Class_Information_Display/releases/latest)
-
 ### 从exe启动
 
 **推荐的方式**  
@@ -44,6 +34,24 @@
 如果不需要**qdarkstyle**,请选择**exe_without_qdarkstyle**下载  
 请在[Releases](https://github.com/erduotong/Simple_Class_Information_Display/releases/latest)下载  
 如果你正在使用gitee,请点击[这个链接](https://gitee.com/erduotong/Simple_Class_Information_Display/releases/latest)下载
+
+### 从源码启动
+
+> 不推荐，除非你知道你在做什么 推荐[从exe启动](#从exe启动)
+
+如果你已经拥有**Python环境**并且可以使用**pip安装需要的依赖库** 你可以尝试从源码启动  
+你可以在[这里](https://www.python.org/)安装python
+如果你需要**qdarkstyle**美化,请选择**source_code_with_qdarkstyle**下载  
+如果不需要**qdarkstyle**,请选择**source_code_without_qdarkstyle**  
+如果你**可以使用pip**安装库,请在拥有python解释器的情况下启动setup_lib.py
+#### 需求依赖
+
+* Python解释器(推荐3.11+,其余版本未测试)
+* PyQt5
+* 如果下载了需求qdarkstyle的版本,请安装
+
+请在[Releases](https://github.com/erduotong/Simple_Class_Information_Display/releases/latest)下载  
+如果你正在使用gitee,请点击[这个链接](https://gitee.com/erduotong/Simple_Class_Information_Display/releases/latest)
 
 ## 使用
 
@@ -55,8 +63,11 @@
 在更改之前，请**阅读完下面的文档**。如果有某个配置文件损坏，删掉/点击重置，程序会重新生成
 
 ## 文档
+
 #### 使用相关
+
 * [设置页面](./docs/about_settings.md)
+
 #### 配置文件
 
 * [daily_config.json 今日配置文件](./docs/daily_config_meaning.md)
