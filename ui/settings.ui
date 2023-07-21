@@ -145,7 +145,7 @@
             <enum>Qt::TabFocus</enum>
            </property>
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="set_program_config">
             <attribute name="title">
@@ -182,23 +182,32 @@
             <attribute name="title">
              <string>页</string>
             </attribute>
-            <widget class="QTextBrowser" name="textBrowser_2">
-             <property name="geometry">
-              <rect>
-               <x>232</x>
-               <y>264</y>
-               <width>256</width>
-               <height>192</height>
-              </rect>
-             </property>
-             <property name="html">
-              <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'黑体','黑体'; font-size:5pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-            </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <item>
+              <widget class="QTabWidget" name="tabWidget_2">
+               <property name="font">
+                <font>
+                 <family>黑体</family>
+                 <pointsize>20</pointsize>
+                </font>
+               </property>
+               <property name="contextMenuPolicy">
+                <enum>Qt::ActionsContextMenu</enum>
+               </property>
+               <property name="currentIndex">
+                <number>0</number>
+               </property>
+               <property name="movable">
+                <bool>true</bool>
+               </property>
+               <widget class="QWidget" name="tab_lessons_edit">
+                <attribute name="title">
+                 <string>课表</string>
+                </attribute>
+               </widget>
+              </widget>
+             </item>
+            </layout>
            </widget>
            <widget class="QWidget" name="set_lessons">
             <property name="font">

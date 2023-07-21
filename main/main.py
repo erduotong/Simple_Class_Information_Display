@@ -107,48 +107,33 @@ class SettingsPage(QWidget, Ui_settings):
         self.to_time.clicked.connect(self.open_time)
         self.to_resetting.clicked.connect(self.open_resetting)
 
-    # 所有的东西都初始化为否，如果打开过那么就把他设成真并且添加，当真的时候就不管
+    # 进入后载入一些设置啥的初始化
+    def initialize_after_entering(self):
+        # 根据上一次保存的内容来决定切换到什么地方并且准备初始化
+        self.program_config_dict = json.loads(read_file('../data/program_config.json'))
+        self.daily_config_dict = json.loads(read_file('../data/daily_config.json'))
+        self.lessons_dict = json.loads(read_file('../data/Curriculum/lessons.json'))
+        self.time_dict = json.loads(read_file('../data/Curriculum/time.json'))
+        # 设置镜像,后续要进行操作
+        self.program_config_dict_mirror = copy.deepcopy(self.program_config_dict)
+        self.daily_config_dict_mirror = copy.deepcopy(self.daily_config_dict)
+        self.lessons_dict_mirror = copy.deepcopy(self.lessons_dict)
+        self.time_dict_mirror = copy.deepcopy(self.time_dict)
+        self.now_version.setText(f"版本号: {self.program_config_dict['version']}")  # 替换 关于 内的版本号
+        self.program_config_opened: bool = False
+        self.daily_config_opened: bool = False
+        self.lessons_opened: bool = False
+        self.time_opened: bool = False
+
+    # //////////////////
+    # program_config编辑
+
     def open_program_config(self):
         self.tabWidget.setCurrentIndex(0)
         if not self.program_config_opened:
             self.program_config_opened = True
             self.initialize_program_config_widget()
 
-    def open_daily_config(self):
-        self.tabWidget.setCurrentIndex(1)
-        if not self.daily_config_opened:
-            # TODO 初始化daily_config页
-            self.daily_config_opened = True
-
-    def open_lessons(self):
-        self.tabWidget.setCurrentIndex(2)
-        if not self.lessons_opened:
-            # TODO 初始化lessons页
-            self.lessons_opened = True
-
-    def open_about(self):
-        self.tabWidget.setCurrentIndex(3)
-        if not self.about_opened:
-            self.about_opened = True
-            self.initialize_about_widget()
-
-    def open_time(self):
-        self.tabWidget.setCurrentIndex(4)
-        if not self.time_opened:
-            # TODO 初始化time页
-            self.time_opened = True
-
-    def open_resetting(self):
-        self.tabWidget.setCurrentIndex(5)
-        # TODO 为resetting页面加UI
-
-    # 初始化 关于 内的布局
-    def initialize_about_widget(self):
-        # 自适应一下字体大小
-        for i in self.show_about.findChildren(QLabel):
-            adaptive_label_font_size(i, 50, 1)
-
-    # 初始化program_config 页
     def initialize_program_config_widget(self):
         # 首先清空 然后计算出最大和最小高度 框死
         # 清空其中的所有widget保险
@@ -222,7 +207,8 @@ class SettingsPage(QWidget, Ui_settings):
         for i in self.program_config_show_area.findChildren(QLineEdit):
             adaptive_label_font_size(i, 50, 1)
 
-    # 字体变化的时候更新program_config这个dict
+            # 字体变化的时候更新program_config这个dict
+
     def update_program_config_dict(self, text, key, value_type):
         if text == '':
             return
@@ -239,24 +225,55 @@ class SettingsPage(QWidget, Ui_settings):
             dict1 = dict1[i]
         dict1[key[-1]] = text
 
-    # 进入后载入一些设置啥的初始化
-    def initialize_after_entering(self):
-        # 根据上一次保存的内容来决定切换到什么地方并且准备初始化
-        self.program_config_dict = json.loads(read_file('../data/program_config.json'))
-        self.daily_config_dict = json.loads(read_file('../data/daily_config.json'))
-        self.lessons_dict = json.loads(read_file('../data/Curriculum/lessons.json'))
-        self.time_dict = json.loads(read_file('../data/Curriculum/time.json'))
-        # 设置镜像,后续要进行操作
-        self.program_config_dict_mirror = copy.deepcopy(self.program_config_dict)
-        self.daily_config_dict_mirror = copy.deepcopy(self.daily_config_dict)
-        self.lessons_dict_mirror = copy.deepcopy(self.lessons_dict)
-        self.time_dict_mirror = copy.deepcopy(self.time_dict)
-        self.now_version.setText(f"版本号: {self.program_config_dict['version']}")  # 替换 关于 内的版本号
-        self.program_config_opened: bool = False
-        self.daily_config_opened: bool = False
-        self.lessons_opened: bool = False
-        self.time_opened: bool = False
+    # //////////////////
+    # daily_config编辑
 
+    def open_daily_config(self):
+        self.tabWidget.setCurrentIndex(1)
+        if not self.daily_config_opened:
+            # TODO 初始化daily_config页
+            self.daily_config_opened = True
+
+    # //////////////////
+    # 课程编辑
+
+    def open_lessons(self):
+        self.tabWidget.setCurrentIndex(2)
+        if not self.lessons_opened:
+            # TODO 初始化lessons页
+            self.lessons_opened = True
+
+    # //////////////////
+    # 关于显示
+
+    def open_about(self):
+        self.tabWidget.setCurrentIndex(3)
+        if not self.about_opened:
+            self.about_opened = True
+            self.initialize_about_widget()
+
+    def initialize_about_widget(self):
+        # 自适应一下字体大小
+        for i in self.show_about.findChildren(QLabel):
+            adaptive_label_font_size(i, 50, 1)
+
+    # //////////////////
+    # 时间编辑
+
+    def open_time(self):
+        self.tabWidget.setCurrentIndex(4)
+        if not self.time_opened:
+            # TODO 初始化time页
+            self.time_opened = True
+
+    # //////////////////
+    # 重置
+
+    def open_resetting(self):
+        self.tabWidget.setCurrentIndex(5)
+        # TODO 为resetting页面加UI
+
+    # //////////////////
     # 保存并退出
     def save_and_exit(self):
         # 保存文件 如果发生了更改就要备份 然后再覆写
