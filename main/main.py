@@ -231,7 +231,7 @@ class SettingsPage(QWidget, Ui_settings):
     def open_daily_config(self):
         self.tabWidget.setCurrentIndex(1)
         if not self.daily_config_opened:
-            # TODO 初始化daily_config页
+            # TODO 初始化daily_config页 用QTableWidget
             self.daily_config_opened = True
 
     # //////////////////
