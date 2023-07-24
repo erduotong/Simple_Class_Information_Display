@@ -219,7 +219,7 @@
                       <property name="font">
                        <font>
                         <family>黑体</family>
-                        <pointsize>11</pointsize>
+                        <pointsize>17</pointsize>
                        </font>
                       </property>
                       <property name="text">
@@ -238,7 +238,7 @@
                       <property name="font">
                        <font>
                         <family>黑体</family>
-                        <pointsize>11</pointsize>
+                        <pointsize>16</pointsize>
                        </font>
                       </property>
                       <property name="text">
@@ -250,7 +250,16 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QTableWidget" name="tableWidget">
+                  <widget class="QTableWidget" name="daily_config_tableWidget">
+                   <property name="font">
+                    <font>
+                     <family>黑体</family>
+                     <pointsize>25</pointsize>
+                    </font>
+                   </property>
+                   <attribute name="horizontalHeaderStretchLastSection">
+                    <bool>false</bool>
+                   </attribute>
                    <column>
                     <property name="text">
                      <string>名称</string>

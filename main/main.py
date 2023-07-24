@@ -95,6 +95,8 @@ class SettingsPage(QWidget, Ui_settings):
         self.lessons_opened: bool = False
         self.about_opened: bool = False
         self.time_opened: bool = False
+        # ==========daily config
+        self.today_lessons_edit_opened: bool = False
         # 绑定信号和槽
         self.signal_switch_to_the_interface.connect(self.open_about)
         self.singal_go_to_the_settings_page.connect(self.initialize_after_entering)
@@ -126,6 +128,7 @@ class SettingsPage(QWidget, Ui_settings):
         self.daily_config_opened: bool = False
         self.lessons_opened: bool = False
         self.time_opened: bool = False
+        self.today_lessons_edit_opened: bool = False
 
     # //////////////////
     # program_config编辑
@@ -234,7 +237,7 @@ class SettingsPage(QWidget, Ui_settings):
         self.tabWidget.setCurrentIndex(1)
         if not self.daily_config_opened:
             self.daily_config_tab_changed(0)
-            # TODO 初始化daily_config页 用QTableWidget
+
             self.daily_config_opened = True
 
     def daily_config_tab_changed(self, index):
@@ -242,6 +245,16 @@ class SettingsPage(QWidget, Ui_settings):
         # 如果index还没有进行过初始化，那么就进行一下初始化
         # 否则就该干嘛干嘛(比如重排序?
         print(index)
+        self.today_lessons_edit_opened: bool = False
+        # 课程编辑
+        if index == 0:
+            if not self.today_lessons_edit_opened:  # 本次进入没有启用过，需要进行一次初始化~
+                self.today_lessons_edit_opened = True
+                # 初始化列的格式
+                self.daily_config_tableWidget.horizontalHeader().resizeSections(QtWidgets.QHeaderView.Stretch)
+                # self.daily_config_tableWidget.horizontalHeader().setFixedHeight(50)
+                # TODO 设置固定大小并且自适应字体(可能要丢到进入的设置里面(? 并且重新排序
+                print(1)
 
     # //////////////////
     # 课程编辑
