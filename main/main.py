@@ -106,6 +106,8 @@ class SettingsPage(QWidget, Ui_settings):
         self.to_about.clicked.connect(self.open_about)
         self.to_time.clicked.connect(self.open_time)
         self.to_resetting.clicked.connect(self.open_resetting)
+        # ================
+        self.daily_config_tab_widget.currentChanged.connect(self.daily_config_tab_changed)
 
     # 进入后载入一些设置啥的初始化
     def initialize_after_entering(self):
@@ -231,8 +233,15 @@ class SettingsPage(QWidget, Ui_settings):
     def open_daily_config(self):
         self.tabWidget.setCurrentIndex(1)
         if not self.daily_config_opened:
+            self.daily_config_tab_changed(0)
             # TODO 初始化daily_config页 用QTableWidget
             self.daily_config_opened = True
+
+    def daily_config_tab_changed(self, index):
+        # 根据index判断要进行什么操作
+        # 如果index还没有进行过初始化，那么就进行一下初始化
+        # 否则就该干嘛干嘛(比如重排序?
+        print(index)
 
     # //////////////////
     # 课程编辑

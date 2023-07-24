@@ -184,7 +184,7 @@
             </attribute>
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
-              <widget class="QTabWidget" name="tabWidget_2">
+              <widget class="QTabWidget" name="daily_config_tab_widget">
                <property name="font">
                 <font>
                  <family>黑体</family>
@@ -204,6 +204,76 @@
                 <attribute name="title">
                  <string>课表</string>
                 </attribute>
+                <layout class="QVBoxLayout" name="verticalLayout_8" stretch="1,10">
+                 <item>
+                  <widget class="QWidget" name="widget_6" native="true">
+                   <layout class="QHBoxLayout" name="horizontalLayout_4">
+                    <item>
+                     <widget class="QPushButton" name="pushButton_2">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>黑体</family>
+                        <pointsize>11</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>新建项</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="pushButton">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>黑体</family>
+                        <pointsize>11</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>按时间排序</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QTableWidget" name="tableWidget">
+                   <column>
+                    <property name="text">
+                     <string>名称</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>起始时间</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>终止时间</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>点击删除</string>
+                    </property>
+                   </column>
+                  </widget>
+                 </item>
+                </layout>
                </widget>
               </widget>
              </item>
