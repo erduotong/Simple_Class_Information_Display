@@ -8,7 +8,7 @@ import time
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QFontMetricsF
-from PyQt5.QtWidgets import QLabel
+from PyQt5.QtWidgets import QLabel, QTimeEdit
 
 
 # 备份 分别为:路径,目标路径,备份槽位,
@@ -370,3 +370,9 @@ def adaptive_label_font_size(label, max_size: int, min_size: int) -> None:
     font.setPointSize(max_size)
     label.setFont(font)
     return
+
+
+# 重写QTimeEdit 更严格的QTimeEdit 用户不可以用滚轮修改 TODO 优化逻辑
+class StrictQTimeEdit(QTimeEdit):
+    def wheelEvent(self, event):
+        event.ignore()

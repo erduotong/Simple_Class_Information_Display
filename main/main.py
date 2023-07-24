@@ -95,6 +95,8 @@ class SettingsPage(QWidget, Ui_settings):
         self.lessons_opened: bool = False
         self.about_opened: bool = False
         self.time_opened: bool = False
+        # ==========daily config
+        self.today_lessons_edit_opened: bool = False
         # 绑定信号和槽
         self.signal_switch_to_the_interface.connect(self.open_about)
         self.singal_go_to_the_settings_page.connect(self.initialize_after_entering)
@@ -126,6 +128,7 @@ class SettingsPage(QWidget, Ui_settings):
         self.daily_config_opened: bool = False
         self.lessons_opened: bool = False
         self.time_opened: bool = False
+        self.today_lessons_edit_opened: bool = False
 
     # //////////////////
     # program_config编辑
@@ -233,8 +236,8 @@ class SettingsPage(QWidget, Ui_settings):
     def open_daily_config(self):
         self.tabWidget.setCurrentIndex(1)
         if not self.daily_config_opened:
-            self.daily_config_tab_changed(0)
-            # TODO 初始化daily_config页 用QTableWidget
+            QTimer.singleShot(0, lambda: self.daily_config_tab_changed(0))
+
             self.daily_config_opened = True
 
     def daily_config_tab_changed(self, index):
@@ -242,6 +245,49 @@ class SettingsPage(QWidget, Ui_settings):
         # 如果index还没有进行过初始化，那么就进行一下初始化
         # 否则就该干嘛干嘛(比如重排序?
         print(index)
+        self.today_lessons_edit_opened: bool = False
+        # 课程编辑
+        if index == 0:
+            if not self.today_lessons_edit_opened:  # 本次进入没有启用过，需要进行一次初始化~
+                self.today_lessons_edit_opened = True
+                # 初始化列的大小
+                self.daily_config_tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+                self.daily_config_tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+                self.daily_config_tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
+                self.daily_config_tableWidget.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)
+                self.daily_config_tableWidget.setRowCount(0)  # 清空其中的内容
+                # 生成表格
+                for i in self.daily_config_dict.get("lessons_list"):
+                    row_position = self.daily_config_tableWidget.rowCount()  # 获得行数
+                    self.daily_config_tableWidget.insertRow(row_position)  # 添加一行
+                    # 添加课程名称更改
+                    line_edit = QLineEdit(str(i.get("name")))
+                    # TODO 添加信号 自适应字体大小
+                    self.daily_config_tableWidget.setCellWidget(row_position, 0, line_edit)
+                    # start时间更改
+                    time_edit_start = StrictQTimeEdit()
+                    time_edit_start.setDisplayFormat("hh:mm")
+                    time_edit_start.setTime(QTime.fromString(i.get("start"), "hh:mm"))
+
+                    self.daily_config_tableWidget.setCellWidget(row_position, 1, time_edit_start)
+                    # end时间更改
+                    time_edit_end = StrictQTimeEdit()
+                    time_edit_end.setDisplayFormat("hh:mm")
+                    time_edit_end.setTime(QTime.fromString(i.get("end", "hh:mm")))
+
+                    self.daily_config_tableWidget.setCellWidget(row_position, 2, time_edit_end)
+                    # 删除按钮更改
+                    button = QPushButton("delete")
+                    button.setStyleSheet("""
+                        QPushButton:hover, QPushButton:focus {
+                            border: 3px solid #346792;
+                        }
+                    """)
+
+                    self.daily_config_tableWidget.setCellWidget(row_position, 3, button)
+                    print(i)
+
+            # 重排序(根据时间 实现:交换单元格中的内容 如果执行了删除操作 那么就重新生成
 
     # //////////////////
     # 课程编辑
