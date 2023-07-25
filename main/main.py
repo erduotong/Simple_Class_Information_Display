@@ -244,13 +244,13 @@ class SettingsPage(QWidget, Ui_settings):
         # 根据index判断要进行什么操作
         # 如果index还没有进行过初始化，那么就进行一下初始化
         # 否则就该干嘛干嘛(比如重排序?
-        print(index)
         self.today_lessons_edit_opened: bool = False
         # 课程编辑
         if index == 0:
             if not self.today_lessons_edit_opened:  # 本次进入没有启用过，需要进行一次初始化~
                 self.today_lessons_edit_opened = True
                 # 初始化列的大小
+                # TODO 3:3:3:1?
                 self.daily_config_tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
                 self.daily_config_tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
                 self.daily_config_tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
@@ -260,24 +260,29 @@ class SettingsPage(QWidget, Ui_settings):
                 for i in self.daily_config_dict.get("lessons_list"):
                     row_position = self.daily_config_tableWidget.rowCount()  # 获得行数
                     self.daily_config_tableWidget.insertRow(row_position)  # 添加一行
+                    font = QFont("黑体")
                     # 添加课程名称更改
                     line_edit = QLineEdit(str(i.get("name")))
+                    line_edit.setFont(font)
                     # TODO 添加信号 自适应字体大小
                     self.daily_config_tableWidget.setCellWidget(row_position, 0, line_edit)
                     # start时间更改
                     time_edit_start = StrictQTimeEdit()
+                    time_edit_start.setFont(font)
                     time_edit_start.setDisplayFormat("hh:mm")
                     time_edit_start.setTime(QTime.fromString(i.get("start"), "hh:mm"))
 
                     self.daily_config_tableWidget.setCellWidget(row_position, 1, time_edit_start)
                     # end时间更改
                     time_edit_end = StrictQTimeEdit()
+                    time_edit_end.setFont(font)
                     time_edit_end.setDisplayFormat("hh:mm")
                     time_edit_end.setTime(QTime.fromString(i.get("end", "hh:mm")))
 
                     self.daily_config_tableWidget.setCellWidget(row_position, 2, time_edit_end)
                     # 删除按钮更改
-                    button = QPushButton("delete")
+                    button = QPushButton("删除")
+                    button.setFont(font)
                     button.setStyleSheet("""
                         QPushButton:hover, QPushButton:focus {
                             border: 3px solid #346792;
@@ -285,7 +290,6 @@ class SettingsPage(QWidget, Ui_settings):
                     """)
 
                     self.daily_config_tableWidget.setCellWidget(row_position, 3, button)
-                    print(i)
 
             # 重排序(根据时间 实现:交换单元格中的内容 如果执行了删除操作 那么就重新生成
 

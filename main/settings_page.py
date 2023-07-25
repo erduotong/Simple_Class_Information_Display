@@ -350,7 +350,7 @@ class Ui_settings(object):
         item = self.daily_config_tableWidget.horizontalHeaderItem(2)
         item.setText(_translate("settings", "终止时间"))
         item = self.daily_config_tableWidget.horizontalHeaderItem(3)
-        item.setText(_translate("settings", "点击删除"))
+        item.setText(_translate("settings", "点击删除(不可撤销)"))
         __sortingEnabled = self.daily_config_tableWidget.isSortingEnabled()
         self.daily_config_tableWidget.setSortingEnabled(False)
         item = self.daily_config_tableWidget.item(0, 0)

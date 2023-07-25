@@ -282,7 +282,7 @@
                    </column>
                    <column>
                     <property name="text">
-                     <string>点击删除</string>
+                     <string>点击删除(不可撤销)</string>
                     </property>
                    </column>
                    <item row="0" column="0">
