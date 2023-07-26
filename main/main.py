@@ -256,42 +256,68 @@ class SettingsPage(QWidget, Ui_settings):
                 self.daily_config_tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
                 self.daily_config_tableWidget.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)
                 self.daily_config_tableWidget.setRowCount(0)  # 清空其中的内容
+                table_row_height = self.daily_config_tableWidget.height() // 13  # 设置单格的高度
+                self.daily_config_tableWidget.horizontalHeader().setFixedHeight(table_row_height)
                 # 生成表格
                 for i in self.daily_config_dict.get("lessons_list"):
                     row_position = self.daily_config_tableWidget.rowCount()  # 获得行数
                     self.daily_config_tableWidget.insertRow(row_position)  # 添加一行
+                    self.daily_config_tableWidget.setRowHeight(row_position, table_row_height)
                     font = QFont("黑体")
                     # 添加课程名称更改
                     line_edit = QLineEdit(str(i.get("name")))
                     line_edit.setFont(font)
-                    # TODO 添加信号 自适应字体大小
+                    line_edit.textChanged.connect(
+                        lambda content, row=row_position: self.update_daily_config_lessons(content, 1, row))
                     self.daily_config_tableWidget.setCellWidget(row_position, 0, line_edit)
                     # start时间更改
                     time_edit_start = StrictQTimeEdit()
                     time_edit_start.setFont(font)
                     time_edit_start.setDisplayFormat("hh:mm")
                     time_edit_start.setTime(QTime.fromString(i.get("start"), "hh:mm"))
-
+                    time_edit_start.timeChanged.connect(
+                        lambda content, row=row_position: self.update_daily_config_lessons(content.toString("hh:mm"), 2,
+                                                                                           row))
                     self.daily_config_tableWidget.setCellWidget(row_position, 1, time_edit_start)
                     # end时间更改
                     time_edit_end = StrictQTimeEdit()
                     time_edit_end.setFont(font)
                     time_edit_end.setDisplayFormat("hh:mm")
                     time_edit_end.setTime(QTime.fromString(i.get("end", "hh:mm")))
-
+                    time_edit_end.timeChanged.connect(
+                        lambda content, row=row_position: self.update_daily_config_lessons(content.toString("hh:mm"), 3,
+                                                                                           row))
                     self.daily_config_tableWidget.setCellWidget(row_position, 2, time_edit_end)
                     # 删除按钮更改
                     button = QPushButton("删除")
                     button.setFont(font)
+                    button.clicked.connect(lambda _, row=row_position: self.update_daily_config_lessons(None, 4, row))
                     button.setStyleSheet("""
                         QPushButton:hover, QPushButton:focus {
                             border: 3px solid #346792;
                         }
                     """)
-
                     self.daily_config_tableWidget.setCellWidget(row_position, 3, button)
 
-            # 重排序(根据时间 实现:交换单元格中的内容 如果执行了删除操作 那么就重新生成
+            # todo 重排序(根据时间 实现:交换单元格中的内容 如果执行了删除操作 那么就重新生成
+            # Todo 字体自适应并重排序
+
+    def update_daily_config_lessons(self, content, mode, row) -> None:
+        print(f"content:{content} mode:{mode} row:{row}")
+        if mode == 1:  # 刷新课程名称
+            if content and not content.isspace():  # 只有在内容不为空的情况下才进行变更
+                content = content.rstrip()  # 删除末尾空格
+                self.daily_config_dict["lessons_list"][row]["name"] = content  # 设置该项为content
+            return
+        elif mode == 2:  # 刷新开始时间
+            self.daily_config_dict["lessons_list"][row]["start"] = content
+            return
+        elif mode == 3:  # 刷新结束时间
+            self.daily_config_dict["lessons_list"][row]["end"] = content
+            return
+        else:  # todo 删除该项并重新生成
+
+            return
 
     # //////////////////
     # 课程编辑
@@ -802,9 +828,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     # 从设置界面退出
     def exit_settings_page(self):
-        # 删除对象
         self.settings_is_open = False
         self.stackedWidget.setCurrentIndex(0)  # 切换到设置的堆叠布局
+        # TODO 刷新其他的数据
+        self.daily_config = json.loads(read_file('../data/daily_config.json'))
+
         if self.window_resized:  # 如果设置页面开启的时候字体发生了改变的话就重新设置一下
             self.on_resize_timeout()
         self.window_resized = False
@@ -812,8 +840,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lessons_status = None  # 防止拒绝刷新
         self.next_lesson = None
         self.time_to_next_refresh()
-
-        # TODO 刷新其他的数据
 
 
 if __name__ == '__main__':
