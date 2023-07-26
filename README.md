@@ -5,10 +5,10 @@
 
 ### 强烈建议**阅读完成readme**后再开始操作/下载
 
-> 如果你无法正常访问github进行下载，可以尝试从仓库的[gitee](https://gitee.com/erduotong/Simple_Class_Information_Display)
+> 如果你无法正常访问**Github**进行下载，可以尝试从仓库的[Gitee](https://gitee.com/erduotong/Simple_Class_Information_Display)
 > 下载  
-> [gitee](https://gitee.com/erduotong/Simple_Class_Information_Display)
-> 的仓库更新可能不及时，推荐从仓库的[github](https://github.com/erduotong/Simple_Class_Information_Display)查看&下载
+> [Gitee](https://gitee.com/erduotong/Simple_Class_Information_Display)
+> 的仓库更新可能不及时，推荐从仓库的[Github](https://github.com/erduotong/Simple_Class_Information_Display)查看&下载
 
 ## 适用场景
 
@@ -19,10 +19,10 @@
 ### 选择qdarkstyle
 
 你可以选择是否含有qdarkstyle进行美化
-> 含有的话，就是这样:
+> 含有时:
 
 ![含有qdarkstyle的情况](./images/with_qdarkstyle.png '含有qdarkstyle的情况')
-> 不含有的话，就是这样:
+> 不含有时:
 
 ![不含有qdarkstyle的情况](./images/without_qdarkstyle.png '不含有qdarkstyle的情况')
 
