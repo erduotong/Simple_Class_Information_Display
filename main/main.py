@@ -240,6 +240,51 @@ class SettingsPage(QWidget, Ui_settings):
 
             self.daily_config_opened = True
 
+    def generate_daily_config_table(self):
+        self.daily_config_tableWidget.setRowCount(0)  # 清空其中的内容
+        table_row_height = self.daily_config_tableWidget.height() // 15  # 设置单格的高度
+        self.daily_config_tableWidget.horizontalHeader().setFixedHeight(table_row_height)
+        # 生成表格
+        for i in self.daily_config_dict.get("lessons_list"):
+            row_position = self.daily_config_tableWidget.rowCount()  # 获得行数
+            self.daily_config_tableWidget.insertRow(row_position)  # 添加一行
+            self.daily_config_tableWidget.setRowHeight(row_position, table_row_height)
+            font = QFont("黑体")
+            # 添加课程名称更改
+            line_edit = QLineEdit(str(i.get("name")))
+            line_edit.setFont(font)
+            line_edit.textChanged.connect(
+                lambda content, row=row_position: self.update_daily_config_lessons(content, 1, row))
+            self.daily_config_tableWidget.setCellWidget(row_position, 0, line_edit)
+            # start时间更改
+            time_edit_start = StrictQTimeEdit()
+            time_edit_start.setFont(font)
+            time_edit_start.setDisplayFormat("hh:mm")
+            time_edit_start.setTime(QTime.fromString(i.get("start"), "hh:mm"))
+            time_edit_start.timeChanged.connect(
+                lambda content, row=row_position: self.update_daily_config_lessons(content.toString("hh:mm"), 2,
+                                                                                   row))
+            self.daily_config_tableWidget.setCellWidget(row_position, 1, time_edit_start)
+            # end时间更改
+            time_edit_end = StrictQTimeEdit()
+            time_edit_end.setFont(font)
+            time_edit_end.setDisplayFormat("hh:mm")
+            time_edit_end.setTime(QTime.fromString(i.get("end", "hh:mm")))
+            time_edit_end.timeChanged.connect(
+                lambda content, row=row_position: self.update_daily_config_lessons(content.toString("hh:mm"), 3,
+                                                                                   row))
+            self.daily_config_tableWidget.setCellWidget(row_position, 2, time_edit_end)
+            # 删除按钮更改
+            button = QPushButton("删除")
+            button.setFont(font)
+            button.clicked.connect(lambda _, row=row_position: self.update_daily_config_lessons(None, 4, row))
+            button.setStyleSheet("""
+                                QPushButton:hover, QPushButton:focus {
+                                    border: 3px solid #346792;
+                                }
+                            """)
+            self.daily_config_tableWidget.setCellWidget(row_position, 3, button)
+
     def daily_config_tab_changed(self, index):
         # 根据index判断要进行什么操作
         # 如果index还没有进行过初始化，那么就进行一下初始化
@@ -251,72 +296,40 @@ class SettingsPage(QWidget, Ui_settings):
                 self.today_lessons_edit_opened = True
                 # 初始化列的大小
                 # TODO 3:3:3:1?
+                self.daily_config_dict["lessons_list"] = sorted(self.daily_config_dict["lessons_list"],
+                                                                key=lambda x: x["start"])  # 对其中的数据按开始时间进行一次排序
                 self.daily_config_tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
                 self.daily_config_tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
                 self.daily_config_tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
                 self.daily_config_tableWidget.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)
-                self.daily_config_tableWidget.setRowCount(0)  # 清空其中的内容
-                table_row_height = self.daily_config_tableWidget.height() // 13  # 设置单格的高度
-                self.daily_config_tableWidget.horizontalHeader().setFixedHeight(table_row_height)
-                # 生成表格
-                for i in self.daily_config_dict.get("lessons_list"):
-                    row_position = self.daily_config_tableWidget.rowCount()  # 获得行数
-                    self.daily_config_tableWidget.insertRow(row_position)  # 添加一行
-                    self.daily_config_tableWidget.setRowHeight(row_position, table_row_height)
-                    font = QFont("黑体")
-                    # 添加课程名称更改
-                    line_edit = QLineEdit(str(i.get("name")))
-                    line_edit.setFont(font)
-                    line_edit.textChanged.connect(
-                        lambda content, row=row_position: self.update_daily_config_lessons(content, 1, row))
-                    self.daily_config_tableWidget.setCellWidget(row_position, 0, line_edit)
-                    # start时间更改
-                    time_edit_start = StrictQTimeEdit()
-                    time_edit_start.setFont(font)
-                    time_edit_start.setDisplayFormat("hh:mm")
-                    time_edit_start.setTime(QTime.fromString(i.get("start"), "hh:mm"))
-                    time_edit_start.timeChanged.connect(
-                        lambda content, row=row_position: self.update_daily_config_lessons(content.toString("hh:mm"), 2,
-                                                                                           row))
-                    self.daily_config_tableWidget.setCellWidget(row_position, 1, time_edit_start)
-                    # end时间更改
-                    time_edit_end = StrictQTimeEdit()
-                    time_edit_end.setFont(font)
-                    time_edit_end.setDisplayFormat("hh:mm")
-                    time_edit_end.setTime(QTime.fromString(i.get("end", "hh:mm")))
-                    time_edit_end.timeChanged.connect(
-                        lambda content, row=row_position: self.update_daily_config_lessons(content.toString("hh:mm"), 3,
-                                                                                           row))
-                    self.daily_config_tableWidget.setCellWidget(row_position, 2, time_edit_end)
-                    # 删除按钮更改
-                    button = QPushButton("删除")
-                    button.setFont(font)
-                    button.clicked.connect(lambda _, row=row_position: self.update_daily_config_lessons(None, 4, row))
-                    button.setStyleSheet("""
-                        QPushButton:hover, QPushButton:focus {
-                            border: 3px solid #346792;
-                        }
-                    """)
-                    self.daily_config_tableWidget.setCellWidget(row_position, 3, button)
+                self.generate_daily_config_table()  # 生成表格
+            # todo 新建项和重排序
+            # 字体自适应
+            for i in self.daily_config_tableWidget.findChildren((QLineEdit, QPushButton, StrictQTimeEdit)):
+                adaptive_label_font_size(i, 50, 1)
 
-            # todo 重排序(根据时间 实现:交换单元格中的内容 如果执行了删除操作 那么就重新生成
-            # Todo 字体自适应并重排序
-
-    def update_daily_config_lessons(self, content, mode, row) -> None:
-        print(f"content:{content} mode:{mode} row:{row}")
+    def update_daily_config_lessons(self, content_1, mode, row_) -> None:
         if mode == 1:  # 刷新课程名称
-            if content and not content.isspace():  # 只有在内容不为空的情况下才进行变更
-                content = content.rstrip()  # 删除末尾空格
-                self.daily_config_dict["lessons_list"][row]["name"] = content  # 设置该项为content
+            if content_1 and not content_1.isspace():  # 只有在内容不为空的情况下才进行变更
+                content_11 = content_1.rstrip()  # 删除末尾空格
+                if content_11 != content_1:
+                    self.daily_config_tableWidget.cellWidget(row_, 0).setText(content_11)
+                self.daily_config_dict["lessons_list"][row_]["name"] = content_11  # 设置该项为content_11
             return
         elif mode == 2:  # 刷新开始时间
-            self.daily_config_dict["lessons_list"][row]["start"] = content
+            self.daily_config_dict["lessons_list"][row_]["start"] = content_1
             return
         elif mode == 3:  # 刷新结束时间
-            self.daily_config_dict["lessons_list"][row]["end"] = content
+            self.daily_config_dict["lessons_list"][row_]["end"] = content_1
             return
-        else:  # todo 删除该项并重新生成
-
+        else:  # 删除该项
+            del self.daily_config_dict["lessons_list"][row_]  # 删除该项
+            self.daily_config_dict["lessons_list"] = sorted(self.daily_config_dict["lessons_list"],
+                                                            key=lambda x: x["start"])  # 对其中的数据按开始时间进行一次排序
+            self.generate_daily_config_table()  # 生成表格
+            # 字体自适应
+            for i in self.daily_config_tableWidget.findChildren((QLineEdit, QPushButton, StrictQTimeEdit)):
+                adaptive_label_font_size(i, 50, 1)
             return
 
     # //////////////////
