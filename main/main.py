@@ -97,6 +97,7 @@ class SettingsPage(QWidget, Ui_settings):
         self.time_opened: bool = False
         # ==========daily config
         self.today_lessons_edit_opened: bool = False
+        self.add_dailyconfig_lessons.clicked.connect(self.add_daily_config_lessons)
         # 绑定信号和槽
         self.signal_switch_to_the_interface.connect(self.open_about)
         self.singal_go_to_the_settings_page.connect(self.initialize_after_entering)
@@ -303,8 +304,10 @@ class SettingsPage(QWidget, Ui_settings):
                 self.daily_config_tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
                 self.daily_config_tableWidget.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)
                 self.generate_daily_config_table()  # 生成表格
-            # todo 新建项和重排序
-            # 字体自适应
+                for i in self.widget_6.findChildren(QPushButton):
+                    adaptive_label_font_size(i, 25, 1)
+            # todo 重排序(重新生成)
+            # 字体自适应 todo 最后三个问题&表头
             for i in self.daily_config_tableWidget.findChildren((QLineEdit, QPushButton, StrictQTimeEdit)):
                 adaptive_label_font_size(i, 50, 1)
 
@@ -332,6 +335,57 @@ class SettingsPage(QWidget, Ui_settings):
                 adaptive_label_font_size(i, 50, 1)
             return
 
+    # 添加新的一项在末尾
+    def add_daily_config_lessons(self):
+        self.daily_config_dict["lessons_list"].append({
+            "name": "新建项",
+            "start": "11:45",
+            "end": "19:19"
+        })
+        table_row_height = self.daily_config_tableWidget.height() // 15  # 设置单格的高度
+        i = self.daily_config_dict["lessons_list"][-1]
+        row_position = self.daily_config_tableWidget.rowCount()  # 获得行数
+        self.daily_config_tableWidget.insertRow(row_position)  # 添加一行
+        self.daily_config_tableWidget.setRowHeight(row_position, table_row_height)
+        font = QFont("黑体")
+        # 添加课程名称更改
+        line_edit = QLineEdit(str(i.get("name")))
+        line_edit.setFont(font)
+        line_edit.textChanged.connect(
+            lambda content, row=row_position: self.update_daily_config_lessons(content, 1, row))
+        self.daily_config_tableWidget.setCellWidget(row_position, 0, line_edit)
+        adaptive_label_font_size(line_edit, 50, 1) # 自适应字体
+        # start时间更改
+        time_edit_start = StrictQTimeEdit()
+        time_edit_start.setFont(font)
+        time_edit_start.setDisplayFormat("hh:mm")
+        time_edit_start.setTime(QTime.fromString(i.get("start"), "hh:mm"))
+        time_edit_start.timeChanged.connect(
+            lambda content, row=row_position: self.update_daily_config_lessons(content.toString("hh:mm"), 2,
+                                                                               row))
+        self.daily_config_tableWidget.setCellWidget(row_position, 1, time_edit_start)
+        adaptive_label_font_size(time_edit_start, 50, 1)  # 自适应字体
+        # end时间更改
+        time_edit_end = StrictQTimeEdit()
+        time_edit_end.setFont(font)
+        time_edit_end.setDisplayFormat("hh:mm")
+        time_edit_end.setTime(QTime.fromString(i.get("end", "hh:mm")))
+        time_edit_end.timeChanged.connect(
+            lambda content, row=row_position: self.update_daily_config_lessons(content.toString("hh:mm"), 3,
+                                                                               row))
+        self.daily_config_tableWidget.setCellWidget(row_position, 2, time_edit_end)
+        adaptive_label_font_size(time_edit_end, 50, 1)  # 自适应字体
+        # 删除按钮更改
+        button = QPushButton("删除")
+        button.setFont(font)
+        button.clicked.connect(lambda _, row=row_position: self.update_daily_config_lessons(None, 4, row))
+        button.setStyleSheet("""
+                                        QPushButton:hover, QPushButton:focus {
+                                            border: 3px solid #346792;
+                                        }
+                                    """)
+        self.daily_config_tableWidget.setCellWidget(row_position, 3, button)
+        adaptive_label_font_size(button, 50, 1)  # 自适应字体
     # //////////////////
     # 课程编辑
 
