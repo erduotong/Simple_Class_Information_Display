@@ -308,7 +308,7 @@ class SettingsPage(QWidget, Ui_settings):
                 for i in self.widget_6.findChildren(QPushButton):
                     adaptive_label_font_size(i, 25, 1)
 
-            # 字体自适应  todo 最后三个问题&表头
+            # 字体自适应
             def adjust_table_widget_font_size():
                 for i in self.daily_config_tableWidget.findChildren((QLineEdit, QPushButton, StrictQTimeEdit)):
                     adaptive_label_font_size(i, 50, 1)
@@ -334,9 +334,13 @@ class SettingsPage(QWidget, Ui_settings):
             self.daily_config_dict["lessons_list"] = sorted(self.daily_config_dict["lessons_list"],
                                                             key=lambda x: x["start"])  # 对其中的数据按开始时间进行一次排序
             self.generate_daily_config_table()  # 生成表格
+
             # 字体自适应
-            for i in self.daily_config_tableWidget.findChildren((QLineEdit, QPushButton, StrictQTimeEdit)):
-                adaptive_label_font_size(i, 50, 1)
+            def adjust_table_widget_font_size():
+                for i in self.daily_config_tableWidget.findChildren((QLineEdit, QPushButton, StrictQTimeEdit)):
+                    adaptive_label_font_size(i, 50, 1)
+
+            QTimer.singleShot(0, adjust_table_widget_font_size)
             return
 
     # 添加新的一项在末尾
@@ -895,7 +899,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def closeEvent(self, event):
         # 设置页面只能通过按钮退出
         if self.settings_is_open:
-            event.ignore()
+            event.ignore()  # todo 添加提示窗口提醒用户要从左上角进行关闭
             return
         # 先存一下
         self.daily_config["backup"]["msg"] = self.message.toPlainText()
