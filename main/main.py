@@ -245,7 +245,7 @@ class SettingsPage(QWidget, Ui_settings):
 
     def generate_daily_config_table(self):
         self.daily_config_tableWidget.setRowCount(0)  # 清空其中的内容
-        table_row_height = self.daily_config_tableWidget.height() // 15  # 设置单格的高度
+        table_row_height = self.daily_config_tableWidget.height() // 18  # 设置单格的高度
         self.daily_config_tableWidget.horizontalHeader().setFixedHeight(table_row_height)
         # 生成表格
         for i in self.daily_config_dict.get("lessons_list"):
@@ -343,7 +343,7 @@ class SettingsPage(QWidget, Ui_settings):
             "start": "11:45",
             "end": "19:19"
         })
-        table_row_height = self.daily_config_tableWidget.height() // 15  # 设置单格的高度
+        table_row_height = self.daily_config_tableWidget.height() // 18  # 设置单格的高度
         i = self.daily_config_dict["lessons_list"][-1]
         row_position = self.daily_config_tableWidget.rowCount()  # 获得行数
         self.daily_config_tableWidget.insertRow(row_position)  # 添加一行
