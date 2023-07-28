@@ -98,6 +98,7 @@ class SettingsPage(QWidget, Ui_settings):
         # ==========daily config
         self.today_lessons_edit_opened: bool = False
         self.add_dailyconfig_lessons.clicked.connect(self.add_daily_config_lessons)
+        self.sort_by_time.clicked.connect(self.reorder_by_time)
         # 绑定信号和槽
         self.signal_switch_to_the_interface.connect(self.open_about)
         self.singal_go_to_the_settings_page.connect(self.initialize_after_entering)
@@ -296,7 +297,6 @@ class SettingsPage(QWidget, Ui_settings):
             if not self.today_lessons_edit_opened:  # 本次进入没有启用过，需要进行一次初始化~
                 self.today_lessons_edit_opened = True
                 # 初始化列的大小
-                # TODO 3:3:3:1?
                 self.daily_config_dict["lessons_list"] = sorted(self.daily_config_dict["lessons_list"],
                                                                 key=lambda x: x["start"])  # 对其中的数据按开始时间进行一次排序
                 self.daily_config_tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
@@ -306,8 +306,8 @@ class SettingsPage(QWidget, Ui_settings):
                 self.generate_daily_config_table()  # 生成表格
                 for i in self.widget_6.findChildren(QPushButton):
                     adaptive_label_font_size(i, 25, 1)
-            # todo 重排序(重新生成)
-            # 字体自适应 todo 最后三个问题&表头
+
+            # 字体自适应  todo 最后三个问题&表头
             for i in self.daily_config_tableWidget.findChildren((QLineEdit, QPushButton, StrictQTimeEdit)):
                 adaptive_label_font_size(i, 50, 1)
 
@@ -354,7 +354,7 @@ class SettingsPage(QWidget, Ui_settings):
         line_edit.textChanged.connect(
             lambda content, row=row_position: self.update_daily_config_lessons(content, 1, row))
         self.daily_config_tableWidget.setCellWidget(row_position, 0, line_edit)
-        adaptive_label_font_size(line_edit, 50, 1) # 自适应字体
+        adaptive_label_font_size(line_edit, 50, 1)  # 自适应字体
         # start时间更改
         time_edit_start = StrictQTimeEdit()
         time_edit_start.setFont(font)
@@ -386,6 +386,16 @@ class SettingsPage(QWidget, Ui_settings):
                                     """)
         self.daily_config_tableWidget.setCellWidget(row_position, 3, button)
         adaptive_label_font_size(button, 50, 1)  # 自适应字体
+
+    # 按时间重排序
+    def reorder_by_time(self):
+        self.daily_config_dict["lessons_list"] = sorted(self.daily_config_dict["lessons_list"],
+                                                        key=lambda x: x["start"])  # 对其中的数据按开始时间进行一次排序
+        self.generate_daily_config_table()  # 生成表格
+        # 字体自适应(最后三行问题
+        for i in self.daily_config_tableWidget.findChildren((QLineEdit, QPushButton, StrictQTimeEdit)):
+            adaptive_label_font_size(i, 50, 1)
+
     # //////////////////
     # 课程编辑
 
@@ -428,6 +438,8 @@ class SettingsPage(QWidget, Ui_settings):
     # //////////////////
     # 保存并退出
     def save_and_exit(self):
+        self.daily_config_dict["lessons_list"] = sorted(self.daily_config_dict["lessons_list"],
+                                                        key=lambda x: x["start"])  # 对其中的数据按开始时间进行一次排序
         # 保存文件 如果发生了更改就要备份 然后再覆写
         if self.program_config_dict != self.program_config_dict_mirror:
             backup('../data/program_config.json', '../data/backup/program_config',
@@ -502,7 +514,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.screen_height = None
         self.screen_width = None
         self.lessons_status = None
-        self.daily_config = self.daily_config = json.loads(read_file("../data/daily_config.json"))
+        self.daily_config = json.loads(read_file("../data/daily_config.json"))
         self.lessons_with_slots = []
         self.next_lesson = None  # 存储的是lessons_list的下标
         self.time_to_next_len = None
@@ -899,14 +911,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(0)  # 切换到设置的堆叠布局
         # TODO 刷新其他的数据
         self.daily_config = json.loads(read_file('../data/daily_config.json'))
+        # 刷新program_config
+        self.program_config = json.loads(read_file('../data/program_config.json'))
+        program_config = self.program_config
+        self.laa = int(program_config["layout_adjustment_accuracy"])
+        self.min_font_size = int(program_config["minimum_font_size"])
+        self.max_font_size = int(program_config["maximum_font_size"])
+        self.resize_timer.setInterval(int(program_config['the_window_changes_the_refresh_time'] * 1000))
+        self.findChild(QLabel, "next_lesson_indicator").setText(program_config['next_indicator_text'])
+        self.findChild(QLabel, "now_lesson_indicator").setText(program_config['now_indicator_text'])
 
-        if self.window_resized:  # 如果设置页面开启的时候字体发生了改变的话就重新设置一下
-            self.on_resize_timeout()
-        self.window_resized = False
         # 刷新课表指示器
+        self.window_resized: bool = False
         self.lessons_status = None  # 防止拒绝刷新
         self.next_lesson = None
         self.time_to_next_refresh()
+        # todo 刷新课表
+
+
 
 
 if __name__ == '__main__':
