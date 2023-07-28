@@ -929,8 +929,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # todo 刷新课表
 
 
-
-
 if __name__ == '__main__':
     version = '1.0.1'
     now = datetime.now()

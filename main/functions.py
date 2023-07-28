@@ -350,6 +350,7 @@ def adaptive_label_font_size(label, max_size: int, min_size: int) -> None:
     # 设置初始字体大小，根据初始标签大小和文本大小评估
     initial_font_size = (max_size + min_size) // 2
     font = label.font()
+    font.setFamily("黑体")
     font.setPointSize(initial_font_size)
 
     # 使用二分法进行快速搜索
