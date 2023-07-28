@@ -309,8 +309,11 @@ class SettingsPage(QWidget, Ui_settings):
                     adaptive_label_font_size(i, 25, 1)
 
             # 字体自适应  todo 最后三个问题&表头
-            for i in self.daily_config_tableWidget.findChildren((QLineEdit, QPushButton, StrictQTimeEdit)):
-                adaptive_label_font_size(i, 50, 1)
+            def adjust_table_widget_font_size():
+                for i in self.daily_config_tableWidget.findChildren((QLineEdit, QPushButton, StrictQTimeEdit)):
+                    adaptive_label_font_size(i, 50, 1)
+
+            QTimer.singleShot(0, adjust_table_widget_font_size)
 
     def update_daily_config_lessons(self, content_1, mode, row_) -> None:
         if mode == 1:  # 刷新课程名称
@@ -355,7 +358,6 @@ class SettingsPage(QWidget, Ui_settings):
         line_edit.textChanged.connect(
             lambda content, row=row_position: self.update_daily_config_lessons(content, 1, row))
         self.daily_config_tableWidget.setCellWidget(row_position, 0, line_edit)
-        adaptive_label_font_size(line_edit, 50, 1)  # 自适应字体
         # start时间更改
         time_edit_start = StrictQTimeEdit()
         time_edit_start.setFont(font)
@@ -365,7 +367,6 @@ class SettingsPage(QWidget, Ui_settings):
             lambda content, row=row_position: self.update_daily_config_lessons(content.toString("hh:mm"), 2,
                                                                                row))
         self.daily_config_tableWidget.setCellWidget(row_position, 1, time_edit_start)
-        adaptive_label_font_size(time_edit_start, 50, 1)  # 自适应字体
         # end时间更改
         time_edit_end = StrictQTimeEdit()
         time_edit_end.setFont(font)
@@ -375,7 +376,6 @@ class SettingsPage(QWidget, Ui_settings):
             lambda content, row=row_position: self.update_daily_config_lessons(content.toString("hh:mm"), 3,
                                                                                row))
         self.daily_config_tableWidget.setCellWidget(row_position, 2, time_edit_end)
-        adaptive_label_font_size(time_edit_end, 50, 1)  # 自适应字体
         # 删除按钮更改
         button = QPushButton("删除")
         button.setFont(font)
@@ -386,16 +386,25 @@ class SettingsPage(QWidget, Ui_settings):
                                         }
                                     """)
         self.daily_config_tableWidget.setCellWidget(row_position, 3, button)
-        adaptive_label_font_size(button, 50, 1)  # 自适应字体
+
+        def adjust_table_widget_font_size():
+            for i in self.daily_config_tableWidget.findChildren((QLineEdit, QPushButton, StrictQTimeEdit)):
+                adaptive_label_font_size(i, 50, 1)
+
+        QTimer.singleShot(0, adjust_table_widget_font_size)
 
     # 按时间重排序
     def reorder_by_time(self):
         self.daily_config_dict["lessons_list"] = sorted(self.daily_config_dict["lessons_list"],
                                                         key=lambda x: x["start"])  # 对其中的数据按开始时间进行一次排序
         self.generate_daily_config_table()  # 生成表格
-        # 字体自适应(最后三行问题
-        for i in self.daily_config_tableWidget.findChildren((QLineEdit, QPushButton, StrictQTimeEdit)):
-            adaptive_label_font_size(i, 50, 1)
+
+        # 字体自适应
+        def adjust_table_widget_font_size():
+            for i in self.daily_config_tableWidget.findChildren((QLineEdit, QPushButton, StrictQTimeEdit)):
+                adaptive_label_font_size(i, 50, 1)
+
+        QTimer.singleShot(0, adjust_table_widget_font_size)
 
     # //////////////////
     # 课程编辑
