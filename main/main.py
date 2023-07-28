@@ -146,6 +146,7 @@ class SettingsPage(QWidget, Ui_settings):
         # 清空其中的所有widget保险
         for i in self.program_config_show_area.findChildren(QWidget):
             i.deleteLater()
+            pass
         # 用于翻译对照
         compare_dict = {
             "backup_slots<--daily_config": "今日配置文件备份槽位数",
@@ -925,8 +926,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.window_resized: bool = False
         self.lessons_status = None  # 防止拒绝刷新
         self.next_lesson = None
-        self.time_to_next_refresh()
-        # todo 刷新课表
+        self.after_init()
 
 
 if __name__ == '__main__':
