@@ -1,5 +1,5 @@
 .idea/
 ./main/__pycache__/
 ./data/backup/
-./data/daily_config.json
 ./data/Curriculum/
+/data/daily_config.json
