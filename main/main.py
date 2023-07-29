@@ -899,7 +899,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def closeEvent(self, event):
         # 设置页面只能通过按钮退出
         if self.settings_is_open:
-            event.ignore()  # todo 添加提示窗口提醒用户要从左上角进行关闭
+            event.ignore()
+            # 添加提示窗口提醒用户要从左上角进行关闭
+            QMessageBox.information(self, "提醒",
+                                    "请从左上角选择保存并退出/直接退出回到主窗口后再关闭应用",
+                                    QMessageBox.Yes)  # 添加提示窗口提醒用户要从左上角进行关闭
             return
         # 先存一下
         self.daily_config["backup"]["msg"] = self.message.toPlainText()
