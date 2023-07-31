@@ -145,7 +145,7 @@
             <enum>Qt::TabFocus</enum>
            </property>
            <property name="currentIndex">
-            <number>1</number>
+            <number>2</number>
            </property>
            <widget class="QWidget" name="set_program_config">
             <attribute name="title">
@@ -162,8 +162,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
-                  <height>44</height>
+                  <width>1550</width>
+                  <height>825</height>
                  </rect>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -323,23 +323,69 @@
             <attribute name="title">
              <string>Tab 2</string>
             </attribute>
-            <widget class="QTextBrowser" name="textBrowser_3">
-             <property name="geometry">
-              <rect>
-               <x>416</x>
-               <y>208</y>
-               <width>256</width>
-               <height>192</height>
-              </rect>
-             </property>
-             <property name="html">
-              <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Agency FB','黑体','黑体'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-            </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <item>
+              <widget class="QTabWidget" name="set_lessons_tabWidget">
+               <property name="font">
+                <font>
+                 <family>黑体</family>
+                 <pointsize>18</pointsize>
+                </font>
+               </property>
+               <property name="tabPosition">
+                <enum>QTabWidget::North</enum>
+               </property>
+               <property name="currentIndex">
+                <number>1</number>
+               </property>
+               <widget class="QWidget" name="lessons_monday">
+                <attribute name="title">
+                 <string>周一</string>
+                </attribute>
+               </widget>
+               <widget class="QWidget" name="lessons_tuesday">
+                <attribute name="title">
+                 <string>周二</string>
+                </attribute>
+               </widget>
+               <widget class="QWidget" name="lessons_wednesday">
+                <attribute name="title">
+                 <string>周三</string>
+                </attribute>
+               </widget>
+               <widget class="QWidget" name="lessons_thursday">
+                <attribute name="title">
+                 <string>周四</string>
+                </attribute>
+               </widget>
+               <widget class="QWidget" name="lessons_friday">
+                <attribute name="title">
+                 <string>周五</string>
+                </attribute>
+               </widget>
+               <widget class="QWidget" name="lessons_saturday">
+                <attribute name="title">
+                 <string>周六</string>
+                </attribute>
+               </widget>
+               <widget class="QWidget" name="lessons_sunday">
+                <attribute name="title">
+                 <string>周日</string>
+                </attribute>
+               </widget>
+               <widget class="QWidget" name="lessons_special">
+                <attribute name="title">
+                 <string>特殊</string>
+                </attribute>
+               </widget>
+               <widget class="QWidget" name="lessons_with_homework">
+                <attribute name="title">
+                 <string>需生成作业</string>
+                </attribute>
+               </widget>
+              </widget>
+             </item>
+            </layout>
            </widget>
            <widget class="QWidget" name="show_about">
             <property name="font">
