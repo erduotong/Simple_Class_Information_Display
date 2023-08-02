@@ -417,6 +417,18 @@ class SettingsPage(QWidget, Ui_settings):
         self.tabWidget.setCurrentIndex(2)
         if not self.lessons_opened:
             # TODO 初始化lessons页
+            for index, (key, value) in enumerate(self.lessons_dict.items()):
+                print(f"Index: {index}, Key: {key}, Value: {value}")
+                list_widget = QListWidget()
+                for i in value:  # 添加每个元素到list-widget里面
+                    item = QtWidgets.QListWidgetItem(i)
+                    item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
+                    list_widget.addItem(item)
+                # 设置list-widget
+                list_widget.setSpacing(2)  # 设置间隔
+                list_widget.setAcceptDrops(True)  # 可拖拽!
+                list_widget.setDragDropMode(QListWidget.InternalMove)  # 允许在内部进行拖拽操作
+                # todo 创建编辑按钮
             self.lessons_opened = True
 
     # //////////////////
