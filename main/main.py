@@ -110,6 +110,7 @@ class SettingsPage(QWidget, Ui_settings):
         self.to_about.clicked.connect(self.open_about)
         self.to_time.clicked.connect(self.open_time)
         self.to_resetting.clicked.connect(self.open_resetting)
+        # todo 给lessons编辑绑定一个切换界面就自适应字体的信号
         # ================
         self.daily_config_tab_widget.currentChanged.connect(self.daily_config_tab_changed)
 
@@ -419,6 +420,7 @@ class SettingsPage(QWidget, Ui_settings):
             # TODO 初始化lessons页
             for index, (key, value) in enumerate(self.lessons_dict.items()):
                 print(f"Index: {index}, Key: {key}, Value: {value}")
+                layout_father = QHBoxLayout()
                 list_widget = QListWidget()
                 for i in value:  # 添加每个元素到list-widget里面
                     item = QtWidgets.QListWidgetItem(i)
@@ -428,8 +430,36 @@ class SettingsPage(QWidget, Ui_settings):
                 list_widget.setSpacing(2)  # 设置间隔
                 list_widget.setAcceptDrops(True)  # 可拖拽!
                 list_widget.setDragDropMode(QListWidget.InternalMove)  # 允许在内部进行拖拽操作
-                # todo 创建编辑按钮
+                # 创建编辑按钮
+                button_layout = QGridLayout()
+                button_add = QPushButton("+")  # 设置增加按钮
+                button_del = QPushButton("-")  # 删除按钮
+                button_move_up = QPushButton("↑")  # 上移按钮
+                button_move_down = QPushButton("↓")  # 下移按钮
+                # 设置字体颜色
+                button_add.setStyleSheet("color:green;font-weight:bold;")
+                button_del.setStyleSheet("color:red;font-weight:bold;")
+                button_move_up.setStyleSheet("font-weight:bold")
+                button_move_down.setStyleSheet("font-weight:bold")
+                # 丢到布局里面
+                button_layout.addWidget(button_add, 0, 0)
+                button_layout.addWidget(button_del, 0, 1)
+                button_layout.addWidget(button_move_up, 1, 0)
+                button_layout.addWidget(button_move_down, 1, 1)
+                button_add.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)  # 设置缩放策略
+                button_del.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                button_move_up.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                button_move_down.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                button_layout.setSpacing(50)
+                button_widget = QWidget()  # 丢到widget里面
+                button_widget.setLayout(button_layout)
+                layout_father.addWidget(list_widget, 10)
+                layout_father.addWidget(button_widget, 6)
+                self.set_lessons_tabWidget.widget(index).setLayout(layout_father)  # 设置第i页的布局
+                # todo 绑定信号
             self.lessons_opened = True
+
+    # todo 自适应当前页的字体
 
     # //////////////////
     # 关于显示
