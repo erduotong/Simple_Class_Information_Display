@@ -417,11 +417,23 @@ class SettingsPage(QWidget, Ui_settings):
     def open_lessons(self):
         self.tabWidget.setCurrentIndex(2)
         if not self.lessons_opened:
-            # TODO 初始化lessons页
+            # 初始化lessons页
+            # 清空tabWidget中的控件
+            for i in range(self.set_lessons_tabWidget.count()):  # 遍历self.set_lessons_tabWidget中的所有tab
+                tab = self.set_lessons_tabWidget.widget(i)  # 获取当前tab
+                layout = tab.layout()  # 获取当前tab的布局
+                if layout is not None:  # 如果布局不为空
+                    while layout.count():  # 遍历布局中的所有控件
+                        item = layout.takeAt(0)  # 获取当前控件
+                        widget = item.widget()
+                        if widget is not None:
+                            widget.deleteLater()  # 删除控件
+                    QWidget().setLayout(layout)  # 清空布局
+
             for index, (key, value) in enumerate(self.lessons_dict.items()):
-                print(f"Index: {index}, Key: {key}, Value: {value}")
                 layout_father = QHBoxLayout()
                 list_widget = QListWidget()
+                list_widget.setStyleSheet("QListWidget::item:selected {border: 2px solid #346792}")
                 for i in value:  # 添加每个元素到list-widget里面
                     item = QtWidgets.QListWidgetItem(i)
                     item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
@@ -457,9 +469,58 @@ class SettingsPage(QWidget, Ui_settings):
                 layout_father.addWidget(button_widget, 6)
                 self.set_lessons_tabWidget.widget(index).setLayout(layout_father)  # 设置第i页的布局
                 # todo 绑定信号
+                button_add.clicked.connect(lambda f, listWidget=list_widget: self.lessons_edit_add(listWidget))
+                button_del.clicked.connect(lambda f, listWidget=list_widget: self.lessons_edit_del(listWidget))
+                button_move_up.clicked.connect(lambda f, listWidget=list_widget: self.lessons_edit_move_up(listWidget))
+                button_move_down.clicked.connect(
+                    lambda f, listWidget=list_widget: self.lessons_edit_move_down(listWidget))
             self.lessons_opened = True
 
     # todo 自适应当前页的字体
+    # todo 当行发生变化的时候重新写入lessons内
+    # 添加一节课在当前的list_widget中
+    def lessons_edit_add(self, list_widget):
+        item = QtWidgets.QListWidgetItem("None")  # 添加一个
+        item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
+        list_widget.addItem(item)
+
+    # 删除
+    def lessons_edit_del(self, list_widget):
+        will_del = list_widget.currentItem()
+        if will_del is None:
+            QMessageBox.warning(self, "警告",
+                                "请选中一项后再删除",
+                                QMessageBox.Yes)  # 添加提示窗口提醒用户
+            return
+        list_widget.takeItem(list_widget.row(will_del))
+
+    # 和上一个元素交换以达成上移的目的
+    def lessons_edit_move_up(self, list_widget):
+        item = list_widget.currentItem()  # 获得当前的item
+        if item is None:
+            QMessageBox.warning(self, "警告", "请选中一项后再进行移动操作", QMessageBox.Yes)  # 添加提示窗口提醒用户
+            return
+        item_row = list_widget.row(item)
+        if item_row > 0:
+            item1 = list_widget.takeItem(item_row)  # 获取两个项目
+            item2 = list_widget.takeItem(item_row - 1)
+            list_widget.insertItem(item_row - 1, item2)  # 交换两个项目
+            list_widget.insertItem(item_row - 1, item1)
+            list_widget.setCurrentRow(item_row - 1)  # 将选定的行更改为item_row-1
+
+    # 和下一个元素交换以达成下移的目的
+    def lessons_edit_move_down(self, list_widget):
+        item = list_widget.currentItem()  # 获得当前的item
+        if item is None:
+            QMessageBox.warning(self, "警告", "请选中一项后再进行移动操作", QMessageBox.Yes)  # 添加提示窗口提醒用户
+            return
+        item_row = list_widget.row(item)
+        if item_row < list_widget.count() - 1:
+            item1 = list_widget.takeItem(item_row)  # 获取两个项目
+            item2 = list_widget.takeItem(item_row + 1)
+            list_widget.insertItem(item_row + 1, item2)  # 交换两个项目
+            list_widget.insertItem(item_row + 1, item1)
+            list_widget.setCurrentRow(item_row + 1)  # 将选定的行更改为item_row+1
 
     # //////////////////
     # 关于显示
