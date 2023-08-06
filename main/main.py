@@ -2,15 +2,14 @@
 import copy
 import sys
 import threading
-from datetime import *
+import datetime
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import *
+from PyQt5.QtGui import QDoubleValidator, QIntValidator, QRegExpValidator
 from PyQt5.QtWidgets import *
 from daily_initialization import *
-import time
-from PyQt5.QtGui import QDoubleValidator, QIntValidator, QRegExpValidator
-from rcs import Ui_Dialog
 from main_window import Ui_MainWindow
+from rcs import Ui_Dialog
 from settings_page import Ui_settings
 
 
@@ -110,7 +109,7 @@ class SettingsPage(QWidget, Ui_settings):
         self.to_about.clicked.connect(self.open_about)
         self.to_time.clicked.connect(self.open_time)
         self.to_resetting.clicked.connect(self.open_resetting)
-        # todo 给lessons编辑绑定一个切换界面就自适应字体的信号
+        self.set_lessons_tabWidget.currentChanged.connect(self.on_lessons_edit_current_changed)
         # ================
         self.daily_config_tab_widget.currentChanged.connect(self.daily_config_tab_changed)
 
@@ -479,8 +478,23 @@ class SettingsPage(QWidget, Ui_settings):
                                                                                                             listWidget))
                 list_widget.itemsChanged.connect(lambda lw=list_widget, k=key: self.lessons_edit_row_changed(lw, k))
             self.lessons_opened = True
+        self.on_lessons_edit_current_changed(self.set_lessons_tabWidget.currentIndex())
 
-    # todo 自适应当前页的字体
+    # 当切换到新的tab的时候自适应其中的字体
+    def on_lessons_edit_current_changed(self, index):
+        tab = self.set_lessons_tabWidget.widget(index)  # 得到tab!
+        fixed_size_policy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        expanding_size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        for i in tab.findChildren(QPushButton):
+            i.setSizePolicy(fixed_size_policy)  # 先锁定
+            adaptive_label_font_size(i, 100, 1)
+            i.setSizePolicy(expanding_size_policy)  # 后自由防止出现一些奇奇怪怪的bug
+        list_widget = tab.findChild(ListWidgetWithRowChanged)  # 找一下listWidget
+        height = tab.height() // 15
+        list_widget.setStyleSheet(f'''QListWidget::item {{height: {height}px;}}''')  # 设置高度
+        for i in range(list_widget.count()):  # 遍历其中的item
+            item = list_widget.item(i)
+            # adaptive_label_font_size(item,50,1) TODO 这里还是有问题
 
     # 添加一节课在当前的list_widget中
     def lessons_edit_add(self, list_widget):
@@ -532,7 +546,6 @@ class SettingsPage(QWidget, Ui_settings):
         self.lessons_dict[key].clear()  # 先清空
         for i in range(list_widget.count()):
             self.lessons_dict[key].append(list_widget.item(i).text())  # 获得并添加到末尾!
-
 
     # 内容发生变化
     def lessons_edit_content_changed(self, item, lessons_key, list_widget):

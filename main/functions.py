@@ -8,7 +8,7 @@ import time
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont, QFontMetricsF
-from PyQt5.QtWidgets import QLabel, QTimeEdit, QListWidget
+from PyQt5.QtWidgets import QLabel, QTimeEdit, QListWidget, QListWidgetItem
 
 
 # 备份 分别为:路径,目标路径,备份槽位,
