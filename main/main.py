@@ -432,7 +432,7 @@ class SettingsPage(QWidget, Ui_settings):
 
             for index, (key, value) in enumerate(self.lessons_dict.items()):
                 layout_father = QHBoxLayout()
-                list_widget = QListWidget()
+                list_widget = ListWidgetWithRowChanged()
                 list_widget.setStyleSheet("QListWidget::item:selected {border: 2px solid #346792}")
                 for i in value:  # 添加每个元素到list-widget里面
                     item = QtWidgets.QListWidgetItem(i)
@@ -474,6 +474,11 @@ class SettingsPage(QWidget, Ui_settings):
                 button_move_up.clicked.connect(lambda f, listWidget=list_widget: self.lessons_edit_move_up(listWidget))
                 button_move_down.clicked.connect(
                     lambda f, listWidget=list_widget: self.lessons_edit_move_down(listWidget))
+                list_widget.itemChanged.connect(
+                    lambda item, lessons_key=key, listWidget=list_widget: self.lessons_edit_content_changed(item,
+                                                                                                            lessons_key,
+                                                                                                            listWidget))
+                list_widget.itemsChanged.connect(lambda lw=list_widget, k=key: self.lessons_edit_row_changed(lw, k))
             self.lessons_opened = True
 
     # todo 自适应当前页的字体
@@ -521,6 +526,21 @@ class SettingsPage(QWidget, Ui_settings):
             list_widget.insertItem(item_row + 1, item2)  # 交换两个项目
             list_widget.insertItem(item_row + 1, item1)
             list_widget.setCurrentRow(item_row + 1)  # 将选定的行更改为item_row+1
+
+    # 行数发生变化
+    def lessons_edit_row_changed(self, list_widget, key):
+        # 遍历其中的item并且重新添加到key里面
+        self.lessons_dict[key].clear()  # 先清空
+        for i in range(list_widget.count()):
+            self.lessons_dict[key].append(list_widget.item(i).text())  # 获得并添加到末尾!
+
+
+    # 内容发生变化
+    def lessons_edit_content_changed(self, item, lessons_key, list_widget):
+        text = item.text().rstrip()  # 获得文本并丢掉末尾的空格
+        item.setText(text)  # 覆盖，正则判断不是好文明!
+        if text:  # 当里面非空的时候才处理
+            self.lessons_dict[lessons_key][list_widget.row(item)] = text  # 将lessons_dict里面的key中的第item的row个元素设置成当前的更改!
 
     # //////////////////
     # 关于显示

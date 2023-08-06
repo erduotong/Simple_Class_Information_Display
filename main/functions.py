@@ -6,9 +6,9 @@ import shutil
 from datetime import *
 import time
 from PyQt5 import QtGui
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont, QFontMetricsF
-from PyQt5.QtWidgets import QLabel, QTimeEdit
+from PyQt5.QtWidgets import QLabel, QTimeEdit, QListWidget
 
 
 # 备份 分别为:路径,目标路径,备份槽位,
@@ -373,7 +373,33 @@ def adaptive_label_font_size(label, max_size: int, min_size: int) -> None:
     return
 
 
-# 重写QTimeEdit 更严格的QTimeEdit 用户不可以用滚轮修改 TODO 优化逻辑
+# 重写QTimeEdit 更严格的QTimeEdit 用户不可以用滚轮修改
 class StrictQTimeEdit(QTimeEdit):
     def wheelEvent(self, event):
         event.ignore()
+
+
+# 重写QListWidget 实现了其中任意行发生变化的时候发射items_changed信号
+class ListWidgetWithRowChanged(QListWidget):
+    itemsChanged = pyqtSignal()
+
+    def insertItem(self, row, item):
+        super().insertItem(row, item)
+        self.itemsChanged.emit()
+
+    def addItem(self, item):
+        super().addItem(item)
+        self.itemsChanged.emit()
+
+    def takeItem(self, row):
+        item = super().takeItem(row)
+        self.itemsChanged.emit()
+        return item
+
+    def clear(self):
+        super().clear()
+        self.itemsChanged.emit()
+
+    def dropEvent(self, event):
+        super().dropEvent(event)
+        self.itemsChanged.emit()
