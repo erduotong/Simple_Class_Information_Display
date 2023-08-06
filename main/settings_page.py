@@ -111,7 +111,7 @@ class Ui_settings(object):
         self.program_config_scrollarea.setWidgetResizable(True)
         self.program_config_scrollarea.setObjectName("program_config_scrollarea")
         self.scrollAreaWidgetContents_2 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 1550, 825))
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 98, 44))
         self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
         self.verticalLayout_7 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_2)
         self.verticalLayout_7.setObjectName("verticalLayout_7")
@@ -362,7 +362,7 @@ class Ui_settings(object):
         self.retranslateUi(settings)
         self.tabWidget.setCurrentIndex(2)
         self.daily_config_tab_widget.setCurrentIndex(0)
-        self.set_lessons_tabWidget.setCurrentIndex(1)
+        self.set_lessons_tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(settings)
 
     def retranslateUi(self, settings):

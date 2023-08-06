@@ -468,7 +468,6 @@ class SettingsPage(QWidget, Ui_settings):
                 layout_father.addWidget(list_widget, 10)
                 layout_father.addWidget(button_widget, 6)
                 self.set_lessons_tabWidget.widget(index).setLayout(layout_father)  # 设置第i页的布局
-                # todo 绑定信号
                 button_add.clicked.connect(lambda f, listWidget=list_widget: self.lessons_edit_add(listWidget))
                 button_del.clicked.connect(lambda f, listWidget=list_widget: self.lessons_edit_del(listWidget))
                 button_move_up.clicked.connect(lambda f, listWidget=list_widget: self.lessons_edit_move_up(listWidget))
@@ -482,7 +481,7 @@ class SettingsPage(QWidget, Ui_settings):
             self.lessons_opened = True
 
     # todo 自适应当前页的字体
-    # todo 当行发生变化的时候重新写入lessons内
+
     # 添加一节课在当前的list_widget中
     def lessons_edit_add(self, list_widget):
         item = QtWidgets.QListWidgetItem("None")  # 添加一个
