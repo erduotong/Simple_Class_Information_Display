@@ -465,15 +465,16 @@ class SettingsPage(QWidget, Ui_settings):
                 layout_father.addWidget(list_widget, 10)
                 layout_father.addWidget(button_widget, 6)
                 self.set_lessons_tabWidget.widget(index).setLayout(layout_father)  # 设置第i页的布局
-                button_add.clicked.connect(lambda f, listWidget=list_widget: self.lessons_edit_add(listWidget))
-                button_del.clicked.connect(lambda f, listWidget=list_widget: self.lessons_edit_del(listWidget))
-                button_move_up.clicked.connect(lambda f, listWidget=list_widget: self.lessons_edit_move_up(listWidget))
+                button_add.clicked.connect(lambda f, list_widget1=list_widget: self.lessons_edit_add(list_widget1))
+                button_del.clicked.connect(lambda f, list_widget1=list_widget: self.lessons_edit_del(list_widget1))
+                button_move_up.clicked.connect(
+                    lambda f, list_widget1=list_widget: self.lessons_edit_move_up(list_widget1))
                 button_move_down.clicked.connect(
-                    lambda f, listWidget=list_widget: self.lessons_edit_move_down(listWidget))
+                    lambda f, list_widget1=list_widget: self.lessons_edit_move_down(list_widget1))
                 list_widget.itemChanged.connect(
-                    lambda item, lessons_key=key, listWidget=list_widget: self.lessons_edit_content_changed(item,
-                                                                                                            lessons_key,
-                                                                                                            listWidget))
+                    lambda item1, lessons_key=key, list_widget1=list_widget: self.lessons_edit_content_changed(item1,
+                                                                                                               lessons_key,
+                                                                                                               list_widget1))
                 list_widget.itemsChanged.connect(lambda lw=list_widget, k=key: self.lessons_edit_row_changed(lw, k))
             self.lessons_opened = True
         QTimer.singleShot(0, lambda: self.on_lessons_edit_current_changed(self.set_lessons_tabWidget.currentIndex()))
