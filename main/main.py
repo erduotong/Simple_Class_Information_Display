@@ -432,15 +432,14 @@ class SettingsPage(QWidget, Ui_settings):
             for index, (key, value) in enumerate(self.lessons_dict.items()):
                 layout_father = QHBoxLayout()
                 list_widget = ListWidgetWithRowChanged()
-                list_widget.setStyleSheet("QListWidget::item:selected {border: 2px solid #346792}")
                 for i in value:  # 添加每个元素到list-widget里面
                     item = QtWidgets.QListWidgetItem(i)
                     item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
                     list_widget.addItem(item)
                 # 设置list-widget
                 list_widget.setSpacing(2)  # 设置间隔
-                list_widget.setAcceptDrops(True)  # 可拖拽!
-                list_widget.setDragDropMode(QListWidget.InternalMove)  # 允许在内部进行拖拽操作
+
+
                 # 创建编辑按钮
                 button_layout = QGridLayout()
                 button_add = QPushButton("+")  # 设置增加按钮
@@ -455,8 +454,8 @@ class SettingsPage(QWidget, Ui_settings):
                 # 丢到布局里面
                 button_layout.addWidget(button_add, 0, 0)
                 button_layout.addWidget(button_del, 0, 1)
-                button_layout.addWidget(button_move_up, 1, 0)
-                button_layout.addWidget(button_move_down, 1, 1)
+                button_layout.addWidget(button_move_down, 1, 0)
+                button_layout.addWidget(button_move_up, 1, 1)
                 button_add.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)  # 设置缩放策略
                 button_del.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
                 button_move_up.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -478,7 +477,7 @@ class SettingsPage(QWidget, Ui_settings):
                                                                                                             listWidget))
                 list_widget.itemsChanged.connect(lambda lw=list_widget, k=key: self.lessons_edit_row_changed(lw, k))
             self.lessons_opened = True
-        self.on_lessons_edit_current_changed(self.set_lessons_tabWidget.currentIndex())
+        QTimer.singleShot(0, lambda: self.on_lessons_edit_current_changed(self.set_lessons_tabWidget.currentIndex()))
 
     # 当切换到新的tab的时候自适应其中的字体
     def on_lessons_edit_current_changed(self, index):
@@ -491,16 +490,23 @@ class SettingsPage(QWidget, Ui_settings):
             i.setSizePolicy(expanding_size_policy)  # 后自由防止出现一些奇奇怪怪的bug
         list_widget = tab.findChild(ListWidgetWithRowChanged)  # 找一下listWidget
         height = tab.height() // 15
-        list_widget.setStyleSheet(f'''QListWidget::item {{height: {height}px;}}''')  # 设置高度
+        list_widget.setStyleSheet(f'''
+            QListWidget::item {{height: {height}px;}}
+            QListWidget::item:selected {{
+                border: 3px solid #346792;
+            }}
+        ''')
+
         for i in range(list_widget.count()):  # 遍历其中的item
             item = list_widget.item(i)
-            # adaptive_label_font_size(item,50,1) TODO 这里还是有问题
+            adaptive_item_font_size(item, 50, 1, list_widget)  # 自适应大小
 
     # 添加一节课在当前的list_widget中
     def lessons_edit_add(self, list_widget):
         item = QtWidgets.QListWidgetItem("None")  # 添加一个
         item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
         list_widget.addItem(item)
+        adaptive_item_font_size(item, 50, 1, list_widget)  # 自适应大小
 
     # 删除
     def lessons_edit_del(self, list_widget):

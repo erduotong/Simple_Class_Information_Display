@@ -7,7 +7,7 @@ from datetime import *
 import time
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QFont, QFontMetricsF
+from PyQt5.QtGui import QFont, QFontMetricsF, QFontMetrics
 from PyQt5.QtWidgets import QLabel, QTimeEdit, QListWidget, QListWidgetItem
 
 
@@ -370,6 +370,48 @@ def adaptive_label_font_size(label, max_size: int, min_size: int) -> None:
     # 使用最终确定的字体大小
     font.setPointSize(max_size)
     label.setFont(font)
+    return
+
+
+def adaptive_item_font_size(item, max_size: int, min_size: int, widget) -> None:
+    """
+    自适应各种item的字体大小
+    :param item:要设置的item
+    :param max_size: 最大大小
+    :param min_size: 最小大小
+    :param widget: 在哪个widget里面?
+    :return: None
+    """
+    if min_size > max_size:
+        max_size, min_size = min_size, max_size
+    contents_rect = widget.visualItemRect(item)
+    item_width = contents_rect.width()
+    item_height = contents_rect.height()
+    text = item.text()
+    text = re.sub(r'<a\b[^>]*>(.*?)</a>', r'\1', text)
+    # 设置初始字体大小，根据初始标签大小和文本大小评估
+    initial_font_size = (max_size + min_size) // 2
+    font = item.font()
+    font.setFamily("黑体")
+    font.setPointSize(initial_font_size)
+
+    # 使用二分法进行快速搜索
+    while max_size >= min_size:
+        current_font_size = (max_size + min_size) // 2
+        font.setPointSize(current_font_size)
+
+        # 测量文本的尺寸
+        fm = QFontMetricsF(font)
+        text_width = fm.boundingRect(text).width()
+        text_height = fm.lineSpacing()
+        # 根据文本尺寸调整搜索范围
+        if text_width > item_width or text_height > item_height:
+            max_size = current_font_size - 1
+        else:
+            min_size = current_font_size + 1
+    # 使用最终确定的字体大小
+    font.setPointSize(max_size)
+    item.setFont(font)
     return
 
 
