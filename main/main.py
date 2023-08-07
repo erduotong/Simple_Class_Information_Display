@@ -447,7 +447,7 @@ class SettingsPage(QWidget, Ui_settings):
                 button_move_up = QPushButton("↑")  # 上移按钮
                 button_move_down = QPushButton("↓")  # 下移按钮
                 # 设置字体颜色
-                button_add.setStyleSheet("color:lighten;font-weight:bold;")
+                button_add.setStyleSheet("color:lightgreen;font-weight:bold;")
                 button_del.setStyleSheet("color:red;font-weight:bold;")
                 button_move_up.setStyleSheet("font-weight:bold")
                 button_move_down.setStyleSheet("font-weight:bold")
