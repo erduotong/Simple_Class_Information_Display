@@ -108,7 +108,7 @@ def run_schedule(sec: int, window) -> None:
     time.sleep(time_to_next_second)
     while 1:
         time.sleep(sec)
-        window.refresh_time_singal.emit()
+        window.refresh_time_signal.emit()
 
 
 # 获得实际的行数 包括自动换行 传入控件

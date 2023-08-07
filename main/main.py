@@ -24,7 +24,7 @@ class ReselectTheClassScheduleWindow(QDialog, Ui_Dialog):
         self.setupUi(self)
         self.show()
         self.init_ui()
-        self.singal1 = None
+        self.signal1 = None
 
     def init_ui(self):
         self.monday.toggled.connect(lambda checked: self.on_radio_button_toggled(checked, "monday"))
@@ -44,14 +44,14 @@ class ReselectTheClassScheduleWindow(QDialog, Ui_Dialog):
                  tuple(v) == tuple(self.textBrowser.toPlainText().strip().split())][0]
         except:
             self.result = "monday"
-        self.singal1 = 'clicked'
+        self.signal1 = 'clicked'
         self.close()
         self.returnPressed.emit(self.result)
 
     def on_push_button_2_clicked(self):
         self.result = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][
             datetime.now().weekday()]
-        self.singal1 = 'clicked'
+        self.signal1 = 'clicked'
         self.close()
         self.returnPressed.emit(self.result)
 
@@ -65,15 +65,15 @@ class ReselectTheClassScheduleWindow(QDialog, Ui_Dialog):
             self.textBrowser.repaint()
 
     def closeEvent(self, event):
-        if self.singal1 == 'clicked':
+        if self.signal1 == 'clicked':
             event.accept()
         else:
             event.ignore()
 
 
 class SettingsPage(QWidget, Ui_settings):
-    singal_go_to_the_settings_page = pyqtSignal()
-    singal_exit_SettingsPage = pyqtSignal()
+    signal_go_to_the_settings_page = pyqtSignal()
+    signal_exit_SettingsPage = pyqtSignal()
     signal_switch_to_the_interface = pyqtSignal()  # 在切换到设置页的时候要干啥的信号 现在是打开关于页
 
     def __init__(self):
@@ -100,7 +100,7 @@ class SettingsPage(QWidget, Ui_settings):
         self.sort_by_time.clicked.connect(self.reorder_by_time)
         # 绑定信号和槽
         self.signal_switch_to_the_interface.connect(self.open_about)
-        self.singal_go_to_the_settings_page.connect(self.initialize_after_entering)
+        self.signal_go_to_the_settings_page.connect(self.initialize_after_entering)
         self.not_save_exit.clicked.connect(self.do_not_save_and_exit)
         self.save_exit.clicked.connect(self.save_and_exit)
         self.to_program_config.clicked.connect(self.open_program_config)
@@ -453,8 +453,8 @@ class SettingsPage(QWidget, Ui_settings):
                 # 丢到布局里面
                 button_layout.addWidget(button_add, 0, 0)
                 button_layout.addWidget(button_del, 0, 1)
-                button_layout.addWidget(button_move_down, 1, 0)
-                button_layout.addWidget(button_move_up, 1, 1)
+                button_layout.addWidget(button_move_down, 1, 1)
+                button_layout.addWidget(button_move_up, 1, 0)
                 button_add.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)  # 设置缩放策略
                 button_del.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
                 button_move_up.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -617,14 +617,14 @@ class SettingsPage(QWidget, Ui_settings):
                        json.dumps(self.lessons_dict, ensure_ascii=False, indent=4))
         # 减少内存占用
         self.remove_unwanted()
-        self.singal_exit_SettingsPage.emit()  # 退出!
+        self.signal_exit_SettingsPage.emit()  # 退出!
 
     # 不保存并退出
     def do_not_save_and_exit(self):
         # 减少内存占用
         self.remove_unwanted()
         # 啥也不用干
-        self.singal_exit_SettingsPage.emit()  # 退出!
+        self.signal_exit_SettingsPage.emit()  # 退出!
 
     # 删除一些之后要重新生成的东西以减少内存占用(是否需要多线程存疑
     def remove_unwanted(self):
@@ -642,9 +642,9 @@ class SettingsPage(QWidget, Ui_settings):
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
-    refresh_time_singal = pyqtSignal()  # 更新时间
+    refresh_time_signal = pyqtSignal()  # 更新时间
     run_adaptive_text_edit_manually = pyqtSignal()  # 自适应homework和message的字体大小和比例 手动触发
-    update_the_course_indicator_singal = pyqtSignal(int)  # 刷新课程指示器用的信号
+    update_the_course_indicator_signal = pyqtSignal(int)  # 刷新课程指示器用的信号
 
     def __init__(self, program_config):
         super().__init__()
@@ -656,12 +656,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.refresh_edit_size = QtCore.QTimer()  # 设置一个计时器
         self.refresh_edit_size.setInterval(program_config["text_edit_refresh_time"] * 1000)  # 设置停止编辑刷新的时间
         # 绑定信号&槽
-        self.settings_page.singal_exit_SettingsPage.connect(self.exit_settings_page)  # 绑定设置退出的信号
+        self.settings_page.signal_exit_SettingsPage.connect(self.exit_settings_page)  # 绑定设置退出的信号
         self.settings_.clicked.connect(self.show_settings_page)
         self.refresh_edit_size.timeout.connect(self.manually_refresh_the_text_edit_font)  # 超时后连接到更新字体
-        self.refresh_time_singal.connect(self.refresh_time)
+        self.refresh_time_signal.connect(self.refresh_time)
         self.run_adaptive_text_edit_manually.connect(self.manually_refresh_the_text_edit_font)
-        self.update_the_course_indicator_singal.connect(self.refresh_the_course_indicator)
+        self.update_the_course_indicator_signal.connect(self.refresh_the_course_indicator)
         # 变量初始化
         self.window_resized: bool = False  # 窗口大小曾经改变过
         self.settings_is_open: bool = False  # 设置页面开启状态
@@ -829,7 +829,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if now_time < time_to_datetime(self.daily_config["lessons_list"][0]["start"], now_time):
             if self.lessons_status != 0:
                 self.lessons_status = 0
-                self.update_the_course_indicator_singal.emit(0)
+                self.update_the_course_indicator_signal.emit(0)
             # 更新一下课程表的指示器
             self.time_to_next.setPlainText(
                 f"距离{self.daily_config['lessons_list'][0]['name']}还有{format_timedelta(time_to_datetime(self.daily_config['lessons_list'][0]['start'], now_time) - now_time)}"
@@ -838,7 +838,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         elif now_time > time_to_datetime(self.daily_config["lessons_list"][-1]["end"], now_time):
             if self.lessons_status != 1:
                 self.lessons_status = 1
-                self.update_the_course_indicator_singal.emit(1)
+                self.update_the_course_indicator_signal.emit(1)
             self.time_to_next.setPlainText(
                 f"已放学{format_timedelta(now_time - time_to_datetime(self.daily_config['lessons_list'][-1]['end'], now_time))}"
             )
@@ -848,7 +848,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if time_to_datetime(lesson["start"], now_time) <= now_time < time_to_datetime(lesson["end"], now):
                     if self.next_lesson != index + 1:
                         self.next_lesson = index + 1
-                        self.update_the_course_indicator_singal.emit(2)
+                        self.update_the_course_indicator_signal.emit(2)
                     break
             if self.next_lesson == len(self.daily_config["lessons_list"]):  # 超过列表最大长度了
                 self.time_to_next.setPlainText(
@@ -1059,7 +1059,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settings_is_open = True
         self.run_adaptive_text_edit_manually.emit()  # 先备份一手
         self.refresh_the_course_indicator_position()  # 刷新一下课程指示器的位置
-        self.settings_page.singal_go_to_the_settings_page.emit()
+        self.settings_page.signal_go_to_the_settings_page.emit()
         self.stackedWidget.setCurrentIndex(1)  # 切换到设置的堆叠布局
         self.settings_page.signal_switch_to_the_interface.emit()
 
@@ -1106,9 +1106,9 @@ if __name__ == '__main__':
     # 询问课表 如果是没东西的话那么就询问要替换哪个课表
     if (lessons_dict[week_name][0] == 'None') and compare_time is False:
         app = QApplication(sys.argv)
-        ReselectTheClassSchduleWindow = ReselectTheClassScheduleWindow(lessons_dict)
+        ReselectTheClassScheduleWindow = ReselectTheClassScheduleWindow(lessons_dict)
         app.exec()
-        week_name = ReselectTheClassSchduleWindow.result
+        week_name = ReselectTheClassScheduleWindow.result
     else:  # 防止app忘记创建
         app = QApplication(sys.argv)
     config = json.loads(read_file("../data/program_config.json"))  # 把program_config读了
