@@ -439,7 +439,6 @@ class SettingsPage(QWidget, Ui_settings):
                 # 设置list-widget
                 list_widget.setSpacing(2)  # 设置间隔
 
-
                 # 创建编辑按钮
                 button_layout = QGridLayout()
                 button_add = QPushButton("+")  # 设置增加按钮
