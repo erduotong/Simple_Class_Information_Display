@@ -214,7 +214,6 @@ class SettingsPage(QWidget, Ui_settings):
             adaptive_label_font_size(i, 50, 1)
         for i in self.program_config_show_area.findChildren(QLineEdit):
             adaptive_label_font_size(i, 50, 1)
-
             # 字体变化的时候更新program_config这个dict
 
     def update_program_config_dict(self, text, key, value_type):
@@ -245,7 +244,7 @@ class SettingsPage(QWidget, Ui_settings):
 
     def generate_daily_config_table(self):
         self.daily_config_tableWidget.setRowCount(0)  # 清空其中的内容
-        table_row_height = self.daily_config_tableWidget.height() // 18  # 设置单格的高度
+        table_row_height = self.daily_config_tableWidget.height() // 20  # 设置单格的高度
         self.daily_config_tableWidget.horizontalHeader().setFixedHeight(table_row_height)
         # 生成表格
         for i in self.daily_config_dict.get("lessons_list"):
@@ -489,7 +488,7 @@ class SettingsPage(QWidget, Ui_settings):
             adaptive_label_font_size(i, 100, 1)
             i.setSizePolicy(expanding_size_policy)  # 后自由防止出现一些奇奇怪怪的bug
         list_widget = tab.findChild(ListWidgetWithRowChanged)  # 找一下listWidget
-        height = tab.height() // 15
+        height = tab.height() // 20
         list_widget.setStyleSheet(f'''
             QListWidget::item {{height: {height}px;}}
             QListWidget::item:selected {{
@@ -581,6 +580,9 @@ class SettingsPage(QWidget, Ui_settings):
         self.tabWidget.setCurrentIndex(4)
         if not self.time_opened:
             # TODO 初始化time页
+            # 思路:判断time.json里面和实际lessons里面的max值是否相等，以及special里面是否都已经添加进去了。如果已经有那么就继承时间
+            # 如果没有的话，那么就新建一项
+            # 用tab widget来区分special和常规的
             self.time_opened = True
 
     # //////////////////
