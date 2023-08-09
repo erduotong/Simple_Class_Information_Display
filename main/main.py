@@ -549,6 +549,7 @@ class SettingsPage(QWidget, Ui_settings):
     def lessons_edit_row_changed(self, list_widget, key):
         # 遍历其中的item并且重新添加到key里面
         self.lessons_dict[key].clear()  # 先清空
+        self.time_opened = False
         for i in range(list_widget.count()):
             self.lessons_dict[key].append(list_widget.item(i).text())  # 获得并添加到末尾!
 
@@ -583,7 +584,38 @@ class SettingsPage(QWidget, Ui_settings):
             # 思路:判断time.json里面和实际lessons里面的max值是否相等，以及special里面是否都已经添加进去了。如果已经有那么就继承时间
             # 如果没有的话，那么就新建一项
             # 用tab widget来区分special和常规的
+            self.init_time_edit()
             self.time_opened = True
+
+    # 初始化/生成
+    def init_time_edit(self):
+        row_height = self.tabWidget.height() // 13
+        max_lessons_len = 0
+        self.time_edit_tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # ----------------
+        # 常规的tab_widget
+        self.time_edit_tableWidget.setRowCount(0)
+        for i in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']:
+            max_lessons_len = max(len(self.lessons_dict.get(i)), max_lessons_len)  # 获得最多的lessons数量
+        for i in range(1, max_lessons_len + 1):
+            row_position = self.time_edit_tableWidget.rowCount()
+            self.time_edit_tableWidget.insertRow(row_position)
+            self.time_edit_tableWidget.setRowHeight(row_position, row_height)
+            label = QLabel()
+            time_edit_start = StrictQTimeEdit()
+            time_edit_end = StrictQTimeEdit()
+            label.setText(f'l{i}')
+            lesson_n = self.time_dict.get(f'l{i}')
+            if lesson_n is not None:  # 判断是否有这个时间 没有的话就新建
+                time_edit_start.setTime(QTime.fromString(lesson_n['start'], 'hh:mm'))
+                time_edit_end.setTime(QTime.fromString(lesson_n['end'], 'hh:mm'))
+            else:
+                time_edit_start.setTime(QTime.fromString("00:00", 'hh:mm'))
+                time_edit_end.setTime(QTime.fromString("00:00", 'hh:mm'))
+            self.time_edit_tableWidget.setCellWidget(row_position, 0, label)
+            self.time_edit_tableWidget.setCellWidget(row_position, 1, time_edit_start)
+            self.time_edit_tableWidget.setCellWidget(row_position, 2, time_edit_end)
+            # todo 连接信号
 
     # //////////////////
     # 重置
