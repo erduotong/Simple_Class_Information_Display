@@ -111,6 +111,8 @@ class SettingsPage(QWidget, Ui_settings):
         self.to_resetting.clicked.connect(self.open_resetting)
         self.set_lessons_tabWidget.currentChanged.connect(self.on_lessons_edit_current_changed)
         self.set_time_tabWidget.currentChanged.connect(self.time_edit_adaptive_fonts)
+        self.time_edit_reorder_button.clicked.connect(self.time_edit_reorder)
+        self.time_edit_reorder_special_button.clicked.connect(self.time_edit_reorder_special)
         # ================
         self.daily_config_tab_widget.currentChanged.connect(self.daily_config_tab_changed)
 
@@ -592,6 +594,33 @@ class SettingsPage(QWidget, Ui_settings):
             self.time_opened = True
         QTimer.singleShot(0, lambda: self.time_edit_adaptive_fonts(self.set_time_tabWidget.currentIndex()))
 
+    # 按时间重新排序
+    def time_edit_reorder(self):
+        need_sort = []
+        for key in self.time_dict.keys():
+            if re.match(r'^l\d+$', key):
+                need_sort.append(self.time_dict[key])
+        need_sort.sort(key=lambda x: (x['start'], x['end']))
+        for i in range(1, len(need_sort) + 1):
+            self.time_dict[f'l{i}'] = need_sort[i - 1]
+        self.init_time_edit()  # 重载内容
+        self.time_edit_table_to_dict()
+        QTimer.singleShot(0, lambda: self.time_edit_adaptive_fonts(self.set_time_tabWidget.currentIndex()))
+
+    def time_edit_reorder_special(self):
+        # 重复上述逻辑但是可能需要映射？
+        need_sort = []
+        for key in list(self.time_dict.keys()):
+            if not re.match(r'^l\d+$', key):
+                need_sort.append({key: self.time_dict[key]})
+                del self.time_dict[key]
+        need_sort.sort(key=lambda x: (list(x.values())[0]['start'], list(x.values())[0]['end']))
+        for i in need_sort:
+            self.time_dict.update(i)
+        self.init_time_edit()  # 重载内容
+        self.time_edit_table_to_dict()
+        QTimer.singleShot(0, lambda: self.time_edit_adaptive_fonts(self.set_time_tabWidget.currentIndex()))
+
     # 初始化/生成
     def init_time_edit(self):
         row_height = self.tabWidget.height() // 13
@@ -629,7 +658,29 @@ class SettingsPage(QWidget, Ui_settings):
             self.time_edit_tableWidget.setCellWidget(row_position, 1, time_edit_start)
             self.time_edit_tableWidget.setCellWidget(row_position, 2, time_edit_end)
         # 特殊课程的生成
+        to_add = []  # 要按照字典中的顺序做出来所以特别丑。。。
         for i in self.lessons_dict.get("special"):
+            if self.time_dict.get(i) is None:
+                self.time_dict.update({
+                    i: {
+                        "start": "00:00",
+                        "end": "00:00"
+                    }
+                })
+            to_add.append({i: self.time_dict.get(i)})
+
+        def cmp(d):
+            for key in d:
+                return list(self.time_dict.keys()).index(key)
+
+        to_add.sort(key=cmp)
+
+        for i in to_add:
+            key: str = ''
+            value: dict = {}
+            for i1, j1 in i.items():
+                key = i1
+                value = j1
             row_position = self.time_edit_tableWidget_special.rowCount()
             self.time_edit_tableWidget_special.insertRow(row_position)
             self.time_edit_tableWidget_special.setRowHeight(row_position, row_height)
@@ -638,18 +689,13 @@ class SettingsPage(QWidget, Ui_settings):
             time_edit_end = StrictQTimeEdit()
             time_edit_start.setDisplayFormat("hh:mm")
             time_edit_end.setDisplayFormat("hh:mm")
-            label.setText(i)
-            lesson_n = self.time_dict.get(i)
-            if lesson_n is None:
-                time_edit_start.setTime(QTime.fromString("00:00", 'hh:mm'))
-                time_edit_end.setTime(QTime.fromString("00:00", 'hh:mm'))
-            else:
-                time_edit_start.setTime(QTime.fromString(lesson_n['start'], 'hh:mm'))
-                time_edit_end.setTime(QTime.fromString(lesson_n['end'], 'hh:mm'))
+            label.setText(key)
+            time_edit_start.setTime(QTime.fromString(value['start'], 'hh:mm'))
+            time_edit_end.setTime(QTime.fromString(value['end'], 'hh:mm'))
             time_edit_start.timeChanged.connect(
-                lambda time_, ln=i: self.time_edit_changed_special(time_, ln, False))  # false为start,true为end
+                lambda time_, ln=key: self.time_edit_changed_special(time_, ln, False))  # false为start,true为end
             time_edit_end.timeChanged.connect(
-                lambda time_, ln=i: self.time_edit_changed_special(time_, ln, True))
+                lambda time_, ln=key: self.time_edit_changed_special(time_, ln, True))
             self.time_edit_tableWidget_special.setCellWidget(row_position, 0, label)
             self.time_edit_tableWidget_special.setCellWidget(row_position, 1, time_edit_start)
             self.time_edit_tableWidget_special.setCellWidget(row_position, 2, time_edit_end)
@@ -692,7 +738,7 @@ class SettingsPage(QWidget, Ui_settings):
             i.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
             adaptive_label_font_size(i, 50, 1)
             i.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        for i in tab.findChildren(StrictQTimeEdit):
+        for i in tab.findChildren(StrictQTimeEdit):  # todo 这里无法完成
             adaptive_label_font_size(i, 50, 1)
 
     # //////////////////

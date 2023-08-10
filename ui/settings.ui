@@ -461,7 +461,7 @@
                 </font>
                </property>
                <property name="currentIndex">
-                <number>1</number>
+                <number>0</number>
                </property>
                <widget class="QWidget" name="tab">
                 <attribute name="title">
@@ -491,7 +491,7 @@
                   <widget class="QWidget" name="widget_7" native="true">
                    <layout class="QVBoxLayout" name="verticalLayout_9" stretch="1,3">
                     <item>
-                     <widget class="QPushButton" name="time_edit_reorder">
+                     <widget class="QPushButton" name="time_edit_reorder_button">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                         <horstretch>0</horstretch>
@@ -555,7 +555,7 @@
                   <widget class="QWidget" name="widget_8" native="true">
                    <layout class="QVBoxLayout" name="verticalLayout_10" stretch="1,3">
                     <item>
-                     <widget class="QPushButton" name="time_edit_reorder_special">
+                     <widget class="QPushButton" name="time_edit_reorder_special_button">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                         <horstretch>0</horstretch>
