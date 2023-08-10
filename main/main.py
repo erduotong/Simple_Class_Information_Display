@@ -764,7 +764,7 @@ class SettingsPage(QWidget, Ui_settings):
                    self.program_config_dict["backup_slots"]["daily_config"])
             write_file('../data/daily_config.json',
                        json.dumps(self.daily_config_dict, ensure_ascii=False, indent=4))
-        if self.time_dict != self.time_dict_mirror:
+        if list(self.time_dict.items()) != list(self.time_dict_mirror.items()):
             backup('../data/Curriculum/time.json', '../data/backup/time',
                    self.program_config_dict["backup_slots"]["time"])
             write_file('../data/Curriculum/time.json',
