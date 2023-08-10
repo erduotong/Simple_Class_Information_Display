@@ -555,6 +555,7 @@ class SettingsPage(QWidget, Ui_settings):
 
     # 内容发生变化
     def lessons_edit_content_changed(self, item, lessons_key, list_widget):
+        self.time_opened = False
         text = item.text().rstrip()  # 获得文本并丢掉末尾的空格
         item.setText(text)  # 覆盖，正则判断不是好文明!
         if text:  # 当里面非空的时候才处理
@@ -584,6 +585,7 @@ class SettingsPage(QWidget, Ui_settings):
             # 思路:判断time.json里面和实际lessons里面的max值是否相等，以及special里面是否都已经添加进去了。如果已经有那么就继承时间
             # 如果没有的话，那么就新建一项
             # 用tab widget来区分special和常规的
+            # 重排序操作:依次取出其中的时间然后添加到一个列表内 再装填回去 接着重新生成一次
             self.init_time_edit()
             self.time_opened = True
 
@@ -592,9 +594,11 @@ class SettingsPage(QWidget, Ui_settings):
         row_height = self.tabWidget.height() // 13
         max_lessons_len = 0
         self.time_edit_tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.time_edit_tableWidget_special.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.time_edit_tableWidget.setRowCount(0)  # 清空
+        self.time_edit_tableWidget_special.setRowCount(0)
         # ----------------
         # 常规的tab_widget
-        self.time_edit_tableWidget.setRowCount(0)
         for i in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']:
             max_lessons_len = max(len(self.lessons_dict.get(i)), max_lessons_len)  # 获得最多的lessons数量
         for i in range(1, max_lessons_len + 1):
@@ -612,10 +616,52 @@ class SettingsPage(QWidget, Ui_settings):
             else:
                 time_edit_start.setTime(QTime.fromString("00:00", 'hh:mm'))
                 time_edit_end.setTime(QTime.fromString("00:00", 'hh:mm'))
+            time_edit_start.timeChanged.connect(
+                lambda time_, ln=f'l{i}': self.time_edit_changed(time_, ln, False))  # false为start,true为end
+            time_edit_end.timeChanged.connect(
+                lambda time_, ln=f'l{i}': self.time_edit_changed(time_, ln, True))
             self.time_edit_tableWidget.setCellWidget(row_position, 0, label)
             self.time_edit_tableWidget.setCellWidget(row_position, 1, time_edit_start)
             self.time_edit_tableWidget.setCellWidget(row_position, 2, time_edit_end)
-            # todo 连接信号
+        # 特殊课程的生成
+        for i in self.lessons_dict.get("special"):
+            row_position = self.time_edit_tableWidget_special.rowCount()
+            self.time_edit_tableWidget_special.insertRow(row_position)
+            self.time_edit_tableWidget_special.setRowHeight(row_position, row_height)
+            label = QLabel()
+            time_edit_start = StrictQTimeEdit()
+            time_edit_end = StrictQTimeEdit()
+            label.setText(i)
+            lesson_n = self.time_dict.get(i)
+            if lesson_n is None:
+                time_edit_start.setTime(QTime.fromString("00:00", 'hh:mm'))
+                time_edit_end.setTime(QTime.fromString("00:00", 'hh:mm'))
+            else:
+                time_edit_start.setTime(QTime.fromString(lesson_n['start'], 'hh:mm'))
+                time_edit_end.setTime(QTime.fromString(lesson_n['end'], 'hh:mm'))
+            time_edit_start.timeChanged.connect(
+                lambda time_, ln=i: self.time_edit_changed_special(time_, ln, False))  # false为start,true为end
+            time_edit_end.timeChanged.connect(
+                lambda time_, ln=i: self.time_edit_changed_special(time_, ln, True))
+            self.time_edit_tableWidget_special.setCellWidget(row_position, 0, label)
+            self.time_edit_tableWidget_special.setCellWidget(row_position, 1, time_edit_start)
+            self.time_edit_tableWidget_special.setCellWidget(row_position, 2, time_edit_end)
+
+    def time_edit_changed(self, now_time: QTime, time_number: str, mode: bool):
+        time_str = now_time.toString('hh:mm')
+        if not mode:  # 如果为start
+            self.time_dict[time_number]["start"] = time_str
+        else:  # 为end
+            self.time_dict[time_number]["end"] = time_str
+        return
+
+    def time_edit_changed_special(self, now_time: QTime, to_change: str, mode: bool):
+        time_str = now_time.toString('hh:mm')
+        if not mode:  # 如果为start
+            self.time_dict[to_change]["start"] = time_str
+        else:  # 为end
+            self.time_dict[to_change]["end"] = time_str
+        return
 
     # //////////////////
     # 重置
