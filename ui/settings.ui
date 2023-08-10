@@ -162,8 +162,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>1550</width>
-                  <height>825</height>
+                  <width>98</width>
+                  <height>44</height>
                  </rect>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -453,7 +453,7 @@
             </attribute>
             <layout class="QHBoxLayout" name="horizontalLayout_6">
              <item>
-              <widget class="QTabWidget" name="tabWidget_2">
+              <widget class="QTabWidget" name="set_time_tabWidget">
                <property name="font">
                 <font>
                  <family>黑体</family>
@@ -461,7 +461,7 @@
                 </font>
                </property>
                <property name="currentIndex">
-                <number>0</number>
+                <number>1</number>
                </property>
                <widget class="QWidget" name="tab">
                 <attribute name="title">
