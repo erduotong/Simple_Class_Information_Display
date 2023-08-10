@@ -738,8 +738,8 @@ class SettingsPage(QWidget, Ui_settings):
             i.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
             adaptive_label_font_size(i, 50, 1)
             i.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        for i in tab.findChildren(StrictQTimeEdit):  # todo 这里无法完成
-            adaptive_label_font_size(i, 50, 1)
+        for e in tab.findChildren(QLineEdit):
+            adaptive_label_font_size(e, 50, 1)
 
     # //////////////////
     # 重置
