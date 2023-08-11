@@ -142,9 +142,9 @@ class SettingsPage(QWidget, Ui_settings):
         self.tabWidget.setCurrentIndex(0)
         if not self.program_config_opened:
             self.program_config_opened = True
-            self.initialize_program_config_widget()
+            self.init_program_config_widget()
 
-    def initialize_program_config_widget(self):
+    def init_program_config_widget(self):
         # 首先清空 然后计算出最大和最小高度 框死
         # 清空其中的所有widget保险
         for i in self.program_config_show_area.findChildren(QWidget):
@@ -245,7 +245,7 @@ class SettingsPage(QWidget, Ui_settings):
 
             self.daily_config_opened = True
 
-    def generate_daily_config_table(self):
+    def init_daily_config_table(self):
         self.daily_config_tableWidget.setRowCount(0)  # 清空其中的内容
         table_row_height = self.daily_config_tableWidget.height() // 20  # 设置单格的高度
         self.daily_config_tableWidget.horizontalHeader().setFixedHeight(table_row_height)
@@ -306,7 +306,7 @@ class SettingsPage(QWidget, Ui_settings):
                 self.daily_config_tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
                 self.daily_config_tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
                 self.daily_config_tableWidget.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)
-                self.generate_daily_config_table()  # 生成表格
+                self.init_daily_config_table()  # 生成表格
                 for i in self.widget_6.findChildren(QPushButton):
                     adaptive_label_font_size(i, 25, 1)
 
@@ -335,7 +335,7 @@ class SettingsPage(QWidget, Ui_settings):
             del self.daily_config_dict["lessons_list"][row_]  # 删除该项
             self.daily_config_dict["lessons_list"] = sorted(self.daily_config_dict["lessons_list"],
                                                             key=lambda x: x["start"])  # 对其中的数据按开始时间进行一次排序
-            self.generate_daily_config_table()  # 生成表格
+            self.init_daily_config_table()  # 生成表格
 
             # 字体自适应
             def adjust_table_widget_font_size():
@@ -403,7 +403,7 @@ class SettingsPage(QWidget, Ui_settings):
     def reorder_by_time(self):
         self.daily_config_dict["lessons_list"] = sorted(self.daily_config_dict["lessons_list"],
                                                         key=lambda x: x["start"])  # 对其中的数据按开始时间进行一次排序
-        self.generate_daily_config_table()  # 生成表格
+        self.init_daily_config_table()  # 生成表格
 
         # 字体自适应
         def adjust_table_widget_font_size():
