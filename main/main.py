@@ -747,6 +747,8 @@ class SettingsPage(QWidget, Ui_settings):
     def open_resetting(self):
         self.tabWidget.setCurrentIndex(5)
         # TODO 为resetting页面加UI
+        # 选择重置项->第一次重置询问->第二次重置询问->要求计算一个加法算式->删除文件->重新生成文件->重新读入文件->完成!
+        # 重启?拒绝
 
     # //////////////////
     # 保存并退出
@@ -1226,7 +1228,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def exit_settings_page(self):
         self.settings_is_open = False
         self.stackedWidget.setCurrentIndex(0)  # 切换到设置的堆叠布局
-        # TODO 刷新其他的数据
+        # 刷新其他的数据 (暂完成？有bug以后再修
         self.daily_config = json.loads(read_file('../data/daily_config.json'))
         # 刷新program_config
         self.program_config = json.loads(read_file('../data/program_config.json'))
