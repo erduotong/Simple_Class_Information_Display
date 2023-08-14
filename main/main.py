@@ -164,8 +164,8 @@ class SettingsPage(QWidget, Ui_settings):
             "minimum_font_size": "最小自适应字体大小",
             "maximum_font_size": "最大自适应字体大小",
             "time_font_size": "时间显示器字体大小",
-            "text_edit_refresh_time": "文本编辑后自动自适应间隔",
-            "the_window_changes_the_refresh_time": "窗口改变后自动自适应间隔",
+            "text_edit_refresh_time": "文本编辑后自动自适应时间间隔",
+            "the_window_changes_the_refresh_time": "窗口改变后自动自适应时间间隔",
             "now_indicator_text": "现在课程指示器显示文本",
             "next_indicator_text": "下节课程指示器显示文本"
         }
