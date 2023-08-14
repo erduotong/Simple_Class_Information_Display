@@ -523,7 +523,7 @@ class Ui_settings(object):
         self.to_daily_config.setText(_translate("settings", "今日配置文件更改"))
         self.to_lessons.setText(_translate("settings", "课表设置"))
         self.to_time.setText(_translate("settings", "课程时间设置"))
-        self.to_resetting.setText(_translate("settings", "重置相关"))
+        self.to_resetting.setText(_translate("settings", "重置配置"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.set_program_config), _translate("settings", "Tab 1"))
         self.add_dailyconfig_lessons.setText(_translate("settings", "新建项于末尾"))
         self.sort_by_time.setText(_translate("settings", "按时间排序"))

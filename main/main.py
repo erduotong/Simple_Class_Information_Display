@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import copy
+import os
+import random
 import sys
 import threading
 import datetime
@@ -113,6 +115,7 @@ class SettingsPage(QWidget, Ui_settings):
         self.set_time_tabWidget.currentChanged.connect(self.time_edit_adaptive_fonts)
         self.time_edit_reorder_button.clicked.connect(self.time_edit_reorder)
         self.time_edit_reorder_special_button.clicked.connect(self.time_edit_reorder_special)
+        self.start_reset.clicked.connect(self.start_the_reset)
         # ================
         self.daily_config_tab_widget.currentChanged.connect(self.daily_config_tab_changed)
 
@@ -746,9 +749,99 @@ class SettingsPage(QWidget, Ui_settings):
 
     def open_resetting(self):
         self.tabWidget.setCurrentIndex(5)
-        # TODO 为resetting页面加UI
-        # 选择重置项->第一次重置询问->第二次重置询问->要求计算一个加法算式->删除文件->重新生成文件->重新读入文件->完成!
-        # 重启?拒绝
+        tab = self.tabWidget.widget(5)
+        # 自适应字体
+        for i in tab.findChildren((QPushButton, QCheckBox)):
+            adaptive_label_font_size(i, 30, 1)
+        # 设置一下选择框的大小不然瞎眼
+        for i in tab.findChildren(QCheckBox):
+            siz = i.font().pointSize()
+            i.setStyleSheet(f"""
+                QCheckBox {{
+                    spacing: 5px;
+                }}
+                QCheckBox::indicator {{
+                    width: {siz}px;
+                    height: {siz}px;
+                }}
+                """)
+            adaptive_label_font_size(i, 30, 1)
+        # 选择要重置的项->用户点击触发->
+
+    def start_the_reset(self):
+        selected_files: list = []
+        # 判断哪些被选中了然后添加一下
+        if self.reset_program_config.isChecked():
+            selected_files.append("program_config")
+            self.reset_program_config.setChecked(False)
+        if self.reset_daily_config.isChecked():
+            selected_files.append("daily_config")
+            self.reset_daily_config.setChecked(False)
+        if self.reset_lessons.isChecked():
+            selected_files.append("lessons")
+            self.reset_lessons.setChecked(False)
+        if self.reset_time.isChecked():
+            selected_files.append("time")
+            self.reset_time.setChecked(False)
+        if len(selected_files) == 0:  # 啥也没选也想重置?
+            QtWidgets.QMessageBox.warning(self, "警告", "请至少选择一个配置文件进行重置!")
+            return
+        compare_dict: dict = {
+            "program_config": "程序基本设置",
+            "daily_config": "今日配置",
+            "lessons": "课表",
+            "time": "课程时间"
+        }
+        confirm_message = "确定要重置以下配置文件吗?\n" + "\n".join(
+            [f"{file}({compare_dict[file]})" for file in selected_files])
+        # 和用户确认确实要重置
+        reply = QMessageBox.question(self, "请进行确认", confirm_message,
+                                     QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No)
+        if reply == QtWidgets.QMessageBox.No:
+            QMessageBox.information(self, "提示", "重置操作已中止")
+            return
+        reply = QMessageBox.question(self, "请再次进行确认重置操作", confirm_message,
+                                     QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No)
+        if reply == QtWidgets.QMessageBox.No:
+            QMessageBox.information(self, "提示", "重置操作已中止")
+            return
+        # 进行一个简单的加法来保证安全
+        num1 = random.randint(1, 100)
+        num2 = random.randint(1, 100)
+        text, ok = QInputDialog.getText(self, "最后验证",
+                                        f"{confirm_message}\n这是最后一次取消的机会\n如果确定重置,请输入{num1}+{num2}的结果:")
+        if not ok or not text.isdigit() or int(text) != num1 + num2:  # 答案不对？那就爬
+            QMessageBox.information(self, "提示", "重置操作已中止")
+            return
+        # 重置 先备份(移动，也就算做删除了->生成->读进来->设置开启状态为非
+        if "program_config" in selected_files:
+            backup('../data/program_config.json', '../data/backup/program_config',
+                   self.program_config_dict["backup_slots"]["program_config"])
+            initialize_the_file(version)
+            self.program_config_dict = json.loads(read_file('../data/program_config.json'))
+            self.program_config_opened: bool = False
+        if "daily_config" in selected_files:
+            backup('../data/daily_config.json', '../data/backup/daily_config',
+                   self.program_config_dict["backup_slots"]["daily_config"])
+            initialize_the_file(version)
+            self.daily_config_dict = json.loads(read_file('../data/daily_config.json'))
+            self.daily_config_opened: bool = False
+            self.today_lessons_edit_opened: bool = False
+        if "lessons" in selected_files:
+            backup('../data/Curriculum/lessons.json', '../data/backup/lessons',
+                   self.program_config_dict["backup_slots"]["lessons"])
+            initialize_the_file(version)
+            self.lessons_opened: bool = False
+            self.lessons_dict = json.loads(read_file('../data/Curriculum/lessons.json'))
+        if "time" in selected_files:
+            backup('../data/Curriculum/time.json', '../data/backup/time',
+                   self.program_config_dict["backup_slots"]["time"])
+            initialize_the_file(version)
+            self.time_opened: bool = False
+            self.time_dict = json.loads(read_file('../data/Curriculum/time.json'))
+        confirm_message = "\n".join(
+            [f"{file}({compare_dict[file]})" for file in selected_files])
+        QMessageBox.information(self, "提示", f"重置操作已完成\n重置了以下文件:\n{confirm_message}")
 
     # //////////////////
     # 保存并退出
