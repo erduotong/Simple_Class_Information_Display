@@ -2,9 +2,21 @@
 # ////////////////////////////////
 # 这是更新模块!,相关的逻辑都写在这里啦
 # ////////////////////////////////
-import json
 
+import enum
+import json
 import requests
+
+
+class VersionStatus(enum.IntEnum):
+    # 无须更新
+    UpToDate = 0
+    # 有新版本
+    Lower= 1
+    # 比展示版本高？
+    Higher = 2
+    # error, with a str error message
+    Error = 3
 
 
 # 思路            (这里要判断网络是否连接 没连接就不试了
@@ -20,7 +32,7 @@ class ProgramUpdater(object):
         self.change_log = ""
         self.download_url = ""
 
-    def get_latest_version(self, mode: str, api_link: str) -> int:
+    def get_latest_version(self, mode: str, api_link: str) -> (VersionStatus, str | None):
         """
         获得最新的版本号,如果有就写入self中
         :param mode: 从哪个网站获取? 目前支持解析 github gitee 处获得的
@@ -30,11 +42,15 @@ class ProgramUpdater(object):
         # 从api link获得后再去匹配mode
         response = requests.get(api_link)  # 获得api数据
         if response.status_code != 200:  # 获取了不正常的数据
-            return response.status_code
+            return (VersionStatus.Error, f"错误的状态码: {response.status_code}")
+        
         response = json.loads(response.json())  # 得到相应的数据
+        
         if mode in ('github', 'gitee'):
+            
             if response.get("name") == self.now_version:  # 版本相等的情况
-                return 0
+                return (VersionStatus.UpToDate, None)
+            
             self.new_version = response.get("name")
             self.change_log = response.get("body")
             
@@ -42,5 +58,6 @@ class ProgramUpdater(object):
             assets = response.get("assets")
             if any(i.get("name") == self.version_type for i in assets):
                 self.download_url = response.get("download")
-                return 1
-            return 2
+                return (VersionStatus.UpToDate, None)
+            return (VersionStatus.Lower, None)
+        return (VersionStatus.Error, f"错误的 mode: {mode}")

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-import json
 import os
 import re
+import json
+import time
 import shutil
 from datetime import *
-import time
+
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont, QFontMetricsF, QFontMetrics
