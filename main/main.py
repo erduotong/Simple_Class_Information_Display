@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
-import copy
-import datetime
-import random
 import sys
+import copy
+import random
+import datetime
 import threading
+
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QRegExpValidator
 from PyQt5.QtWidgets import *
+
 from daily_initialization import *
 from main_window import Ui_MainWindow
 from rcs import Ui_Dialog
