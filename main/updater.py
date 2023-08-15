@@ -38,8 +38,7 @@ class ProgramUpdater(object):
             self.new_version = response.get("name")
             self.change_log = response.get("body")
             # 遍历assets以获得匹配版本类型的download_url
-            for i in response.get("assets"):
-                if i.get("name") == self.version_type:
-                    self.download_url = i.get("browser_download_url")
-                    return 1
+            if any(i.get("name") == self.version_type for i in response.get("assets")):
+                self.download_url = response.get("download")
+                return 1
             return 2
