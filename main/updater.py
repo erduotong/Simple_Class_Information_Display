@@ -12,9 +12,9 @@ class VersionStatus(enum.IntEnum):
     # 无须更新
     UpToDate = 0
     # 有新版本
-    Lower= 1
-    # 比展示版本高？
-    Higher = 2
+    Lower = 1
+    # 无下载链接
+    NoLink = 2
     # error, with a str error message
     Error = 3
 
@@ -41,11 +41,11 @@ class ProgramUpdater(object):
         """
         # 从api link获得后再去匹配mode
         response = requests.get(api_link)  # 获得api数据
+        
         if response.status_code != 200:  # 获取了不正常的数据
             return (VersionStatus.Error, f"错误的状态码: {response.status_code}")
         
         response = json.loads(response.json())  # 得到相应的数据
-        
         if mode in ('github', 'gitee'):
             
             if response.get("name") == self.now_version:  # 版本相等的情况
@@ -56,8 +56,12 @@ class ProgramUpdater(object):
             
             # 遍历assets以获得匹配版本类型的download_url
             assets = response.get("assets")
+            
             if any(i.get("name") == self.version_type for i in assets):
+                
                 self.download_url = response.get("download")
-                return (VersionStatus.UpToDate, None)
-            return (VersionStatus.Lower, None)
-        return (VersionStatus.Error, f"错误的 mode: {mode}")
+                return (VersionStatus.Lower, None)
+            
+            return (VersionStatus.NoLink, None)
+        
+        return (VersionStatus.Error, f"未知错误 {response=} {mode=} {api_link=}")
