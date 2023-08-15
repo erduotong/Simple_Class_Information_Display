@@ -32,7 +32,7 @@ class ProgramUpdater(object):
         self.change_log = ""
         self.download_url = ""
 
-    def get_latest_version(self, mode: str, api_link: str) -> (VersionStatus, str | None):
+    def get_latest_version(self, mode: str, api_link: str) -> tuple[VersionStatus, str | None]:
         """
         获得最新的版本号,如果有就写入self中
         :param mode: 从哪个网站获取? 目前支持解析 github gitee 处获得的
