@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 import copy
-import os
+import datetime
 import random
 import sys
 import threading
-import datetime
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QRegExpValidator
@@ -15,7 +14,6 @@ from rcs import Ui_Dialog
 from settings_page import Ui_settings
 
 
-# 使用了qdarkstyle
 class ReselectTheClassScheduleWindow(QDialog, Ui_Dialog):
     returnPressed = pyqtSignal(str)
 
