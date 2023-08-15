@@ -59,7 +59,7 @@ class ProgramUpdater(object):
             
             if any(i.get("name") == self.version_type for i in assets):
                 
-                self.download_url = response.get("download")
+                self.download_url = response.get("browser_download_url")
                 return (VersionStatus.Lower, None)
             
             return (VersionStatus.NoLink, None)
