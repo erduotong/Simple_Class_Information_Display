@@ -32,13 +32,15 @@ class ProgramUpdater(object):
         if response.status_code != 200:  # 获取了不正常的数据
             return response.status_code
         response = json.loads(response.json())  # 得到相应的数据
-        if mode == 'github' or mode == 'gitee':
+        if mode in ('github', 'gitee'):
             if response.get("name") == self.now_version:  # 版本相等的情况
                 return 0
             self.new_version = response.get("name")
             self.change_log = response.get("body")
+            
             # 遍历assets以获得匹配版本类型的download_url
-            if any(i.get("name") == self.version_type for i in response.get("assets")):
+            assets = response.get("assets")
+            if any(i.get("name") == self.version_type for i in assets):
                 self.download_url = response.get("download")
                 return 1
             return 2
