@@ -5,7 +5,9 @@
 
 import enum
 import json
+import os.path
 from concurrent.futures import ThreadPoolExecutor
+
 import requests
 
 
@@ -25,6 +27,71 @@ class DownloadStatus(enum.IntEnum):
 
 # 思路            (这里要判断网络是否连接 没连接就不试了
 # 获得更新检查权限->检查更新 如果有新版本就发射信号并且保存好可能会用的download url ->
+
+
+def download_file(destination, download_url) -> DownloadStatus:
+    """
+    下载新版本并在完成时改名为complete
+    :param download_url: 要下载的链接
+    :param destination:下载数据保存文件的路径(包括后缀名)
+    :return:状态
+    """
+
+    def download_chunk(url, file_obj, start):
+        # noinspection PyBroadException
+        try:
+            headers = {'Range': f'bytes={start}-{start + 1024 * 1024}'}
+            res = requests.get(url, headers=headers, stream=True)
+        except:
+            return DownloadStatus.ErrorDownload
+        # noinspection PyBroadException
+        try:
+            file_obj.seek(start)
+            file_obj.write(res.content)
+        except:
+            return DownloadStatus.ErrorWriteChunk
+        return DownloadStatus.Success
+
+    # noinspection PyBroadException
+    try:  # 获取文件大小
+        response = requests.get(download_url, stream=True)
+        file_size = int(response.headers.get('Content-Length', 0))  # 获得文件大小
+    except:  # 获取的时候出现错误了
+        return DownloadStatus.ErrorGetSize
+
+    # noinspection PyBroadException
+    try:  # 下载文件!
+        with open(destination, 'wb') as f, ThreadPoolExecutor(max_workers=10) as executor:  # 打开目标文件并创建一个线程池
+            futures = []
+            for chunk_start in range(0, file_size, 1024 * 1024):  # 遍历文件的每个1MB块
+                # 提交一个下载任务
+                futures.append(executor.submit(download_chunk, download_url, f, chunk_start))
+            for future in futures:
+                result = future.result()
+                if result != DownloadStatus.Success:
+                    return result
+    except:  # 没下成功
+        return DownloadStatus.ErrorDownload
+
+    return DownloadStatus.Success  # 成功结束!
+
+
+# 源代码会特殊处理
+def check_helper(mode: str) -> DownloadStatus:
+    """
+    检查是否有辅助程序
+    :param mode: 模式 分为source(从源代码安装的)和exe(正常安装打包的exe)
+    :return:
+    """
+    file_type = 'py' if mode == 'source' else 'exe'
+    file_path = f"../data/DownloadHelper/upgrade_helper.{file_type}"
+    if os.path.exists(file_path):
+        return DownloadStatus.Success
+
+    download_link = '???' if mode == 'source' else '???'  # TODO 填入下载链接
+    state = download_file(file_path, download_link)
+
+    return state
 
 
 class ProgramUpdater(object):
@@ -60,55 +127,3 @@ class ProgramUpdater(object):
                 return VersionStatus.Lower
             return VersionStatus.NoLink
         return VersionStatus.Error
-
-    def download_file(self, destination) -> DownloadStatus:
-        """
-        下载新版本并在完成时改名为complete
-        :param destination:下载数据保存文件的路径(包括后缀名)
-        :return:状态
-        """
-
-        def download_chunk(url, file_obj, start):
-            # noinspection PyBroadException
-            try:
-                headers = {'Range': f'bytes={start}-{start + 1024 * 1024}'}
-                res = requests.get(url, headers=headers, stream=True)
-            except:
-                return DownloadStatus.ErrorDownload
-            # noinspection PyBroadException
-            try:
-                file_obj.seek(start)
-                file_obj.write(res.content)
-            except:
-                return DownloadStatus.ErrorWriteChunk
-            return DownloadStatus.Success
-
-        # noinspection PyBroadException
-        try:  # 获取文件大小
-            response = requests.get(self.download_url, stream=True)
-            file_size = int(response.headers.get('Content-Length', 0))  # 获得文件大小
-        except:  # 获取的时候出现错误了
-            return DownloadStatus.ErrorGetSize
-
-        # noinspection PyBroadException
-        try:  # 下载文件!
-            with open(destination, 'wb') as f, ThreadPoolExecutor(max_workers=10) as executor:  # 打开目标文件并创建一个线程池
-                futures = []
-                for chunk_start in range(0, file_size, 1024 * 1024):  # 遍历文件的每个1MB块
-                    # 提交一个下载任务
-                    futures.append(executor.submit(download_chunk, self.download_url, f, chunk_start))
-                for future in futures:
-                    result = future.result()
-                    if result != DownloadStatus.Success:
-                        return result
-        except:  # 没下成功
-            return DownloadStatus.ErrorDownload
-
-        return DownloadStatus.Success  # 成功结束!
-
-    # 源代码会特殊处理
-    def check_helper(self, mode: str):
-        if mode == 'source':
-            pass
-        else:
-            pass

@@ -8,7 +8,7 @@ def daily_initialization(week_name):  # 每日的配置文件生成函数
     if not os.path.exists("../data/daily_config.json"):
         with open("../data/daily_config.json", "w"):
             pass
-    now_datetime = datetime.now()
+    now_datetime = datetime.datetime.now()
     try:
         data = json.loads(read_file("../data/daily_config.json"))
         if data["date_time"] == now_datetime.strftime("%Y_%m_%d") and data["lessons_list"]:
@@ -17,7 +17,7 @@ def daily_initialization(week_name):  # 每日的配置文件生成函数
         pass
     backup("../data/daily_config.json", "../data/backup/daily_config", config["backup_slots"]["daily_config"])
     daily_config = {
-        "date_time": datetime.now().strftime("%Y_%m_%d"),
+        "date_time": datetime.datetime.now().strftime("%Y_%m_%d"),
         "lessons_list": populate_the_timesheet(week_name),
         "backup": {
             "msg": "",

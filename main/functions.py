@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
+import datetime
 import json
 import os
 import re
 import shutil
-from datetime import *
 import time
+
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QFont, QFontMetricsF, QFontMetrics
-from PyQt5.QtWidgets import QLabel, QTimeEdit, QListWidget, QListWidgetItem
+from PyQt5.QtGui import QFont, QFontMetricsF
+from PyQt5.QtWidgets import QLabel, QTimeEdit, QListWidget
 
 
 # 备份 分别为:路径,目标路径,备份槽位,
@@ -171,7 +172,7 @@ def time_to_datetime(time_str, now):
     # 解析输入的时间字符串，获取小时和分钟
     hour, minute = map(int, time_str.split(":"))
     # 构造一个日期时间对象，将时分秒设置为输入的时间
-    dt = datetime(now.year, now.month, now.day, hour, minute)
+    dt = datetime.datetime(now.year, now.month, now.day, hour, minute)
     return dt
 
 

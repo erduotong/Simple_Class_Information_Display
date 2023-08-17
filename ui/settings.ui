@@ -124,6 +124,25 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QPushButton" name="to_update">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>黑体</family>
+             <pointsize>20</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>更新</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -145,7 +164,7 @@
             <enum>Qt::TabFocus</enum>
            </property>
            <property name="currentIndex">
-            <number>5</number>
+            <number>6</number>
            </property>
            <widget class="QWidget" name="set_program_config">
             <attribute name="title">
@@ -734,6 +753,11 @@
               </widget>
              </item>
             </layout>
+           </widget>
+           <widget class="QWidget" name="tab_3">
+            <attribute name="title">
+             <string>页</string>
+            </attribute>
            </widget>
           </widget>
          </item>

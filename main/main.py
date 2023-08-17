@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 import copy
-import datetime
 import random
 import sys
 import threading
+
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QRegExpValidator
 from PyQt5.QtWidgets import *
+
 from daily_initialization import *
 from main_window import Ui_MainWindow
 from rcs import Ui_Dialog
 from settings_page import Ui_settings
-
 
 
 class ReselectTheClassScheduleWindow(QDialog, Ui_Dialog):
@@ -1077,7 +1077,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def time_to_next_refresh(self) -> None:
         # 先判断时间 然后进行处理
         # 如果没有特殊变化那就不刷新 否则就进行一个刷新
-        now_time = datetime.now()
+        now_time = datetime.datetime.now()
         # 如果还没开始第一节课的情况 为0
         if now_time < time_to_datetime(self.daily_config["lessons_list"][0]["start"], now_time):
             if self.lessons_status != 0:
@@ -1126,7 +1126,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         :param mode:0:第一节课之前 1:放学后 2:正常 位于start和end之间
         :return: None
         """
-        now_time = datetime.now()
+        now_time = datetime.datetime.now()
         if mode == 0:
             if self.daily_config['lessons_list'][0]['name'] in self.lessons_with_slots:
                 # 指向lesson1(next)
@@ -1341,7 +1341,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 if __name__ == '__main__':
     version = '1.0.1'
-    now = datetime.now()
+    now = datetime.datetime.now()
     week_name = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][now.weekday()]
     compare_time = compareTime()
     # 初始化文件防止报错
