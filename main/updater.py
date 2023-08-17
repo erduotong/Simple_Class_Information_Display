@@ -27,7 +27,7 @@ class DownloadStatus(enum.IntEnum):
 
 # 思路            (这里要判断网络是否连接 没连接就不试了
 # 获得更新检查权限->检查更新 如果有新版本就发射信号并且保存好可能会用的download url ->
-
+# TODO 启动的时候要尝试删除will_delete文件夹
 
 def download_file(destination, download_url) -> DownloadStatus:
     """
