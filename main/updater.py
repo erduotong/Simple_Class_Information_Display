@@ -105,3 +105,10 @@ class ProgramUpdater(object):
             return DownloadStatus.ErrorDownload
 
         return DownloadStatus.Success  # 成功结束!
+
+    # 源代码会特殊处理
+    def check_helper(self, mode: str):
+        if mode == 'source':
+            pass
+        else:
+            pass
