@@ -5,9 +5,8 @@
 
 import enum
 import json
-import requests
-import os
 from concurrent.futures import ThreadPoolExecutor
+import requests
 
 
 class VersionStatus(enum.IntEnum):
@@ -62,7 +61,7 @@ class ProgramUpdater(object):
             return VersionStatus.NoLink
         return VersionStatus.Error
 
-    def download_new_version(self, destination) -> DownloadStatus:
+    def download_file(self, destination) -> DownloadStatus:
         """
         下载新版本并在完成时改名为complete
         :param destination:下载数据保存文件的路径(包括后缀名)
@@ -104,8 +103,5 @@ class ProgramUpdater(object):
                         return result
         except:  # 没下成功
             return DownloadStatus.ErrorDownload
-        # 改名为complete 程序只需要查看名字就可以知道是否可以继续了
-        base_name, ext = os.path.splitext(destination)
-        new_name = "complete" + ext
-        os.rename(destination, new_name)
-        return DownloadStatus.Success  # 结束!
+
+        return DownloadStatus.Success  # 成功结束!
