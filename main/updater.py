@@ -68,6 +68,22 @@ class ProgramUpdater(object):
         :param destination:下载数据保存文件的路径(包括后缀名)
         :return:状态
         """
+
+        def download_chunk(url, file_obj, start):
+            # noinspection PyBroadException
+            try:
+                headers = {'Range': f'bytes={start}-{start + 1024 * 1024}'}
+                res = requests.get(url, headers=headers, stream=True)
+            except:
+                return DownloadStatus.ErrorDownload
+            # noinspection PyBroadException
+            try:
+                file_obj.seek(start)
+                file_obj.write(res.content)
+            except:
+                return DownloadStatus.ErrorWriteChunk
+            return DownloadStatus.Success
+
         # noinspection PyBroadException
         try:  # 获取文件大小
             response = requests.get(self.download_url, stream=True)
@@ -77,6 +93,19 @@ class ProgramUpdater(object):
 
         # noinspection PyBroadException
         try:  # 下载文件!
-            pass #todo
+            with open(destination, 'wb') as f, ThreadPoolExecutor(max_workers=10) as executor:  # 打开目标文件并创建一个线程池
+                futures = []
+                for chunk_start in range(0, file_size, 1024 * 1024):  # 遍历文件的每个1MB块
+                    # 提交一个下载任务
+                    futures.append(executor.submit(download_chunk, self.download_url, f, chunk_start))
+                for future in futures:
+                    result = future.result()
+                    if result != DownloadStatus.Success:
+                        return result
         except:  # 没下成功
             return DownloadStatus.ErrorDownload
+        # 改名为complete 程序只需要查看名字就可以知道是否可以继续了
+        base_name, ext = os.path.splitext(destination)
+        new_name = "complete" + ext
+        os.rename(destination, new_name)
+        return DownloadStatus.Success  # 结束!
