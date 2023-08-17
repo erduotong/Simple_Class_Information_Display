@@ -585,7 +585,6 @@ class SettingsPage(QWidget, Ui_settings):
 
     def open_time(self):
         self.tabWidget.setCurrentIndex(4)
-        # TODO 完成两个重排序
         if not self.time_opened:
             # 思路:判断time.json里面和实际lessons里面的max值是否相等，以及special里面是否都已经添加进去了。如果已经有那么就继承时间
             # 如果没有的话，那么就新建一项
