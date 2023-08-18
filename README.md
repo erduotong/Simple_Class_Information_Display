@@ -46,8 +46,9 @@
 如果你**可以使用pip**安装库,请在拥有python解释器的情况下启动setup_lib.py
 #### 需求依赖
 
-* Python解释器(推荐3.11+,其余版本未测试)
+* Python解释器(3.8+)
 * PyQt5
+* requests
 * 如果下载了需求qdarkstyle的版本,请安装
 
 请在[Releases](https://github.com/erduotong/Simple_Class_Information_Display/releases/latest)下载  
