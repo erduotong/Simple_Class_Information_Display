@@ -26,7 +26,7 @@ class DownloadStatus(enum.IntEnum):
 
 # 思路            (这里要判断网络是否连接 没连接就不试了
 # 获得更新检查权限->检查更新 如果有新版本就发射信号并且保存好可能会用的download url ->
-# TODO 应用名是Simple Class Information Display 打包成zip的时候应该把整个文件夹打包
+# TODO 应用名是Simple Class Information Display 打包成zip的时候应该把整个文件夹打包 其中包含一个app文件
 # TODO 启动的时候要尝试删除will_delete文件夹
 
 def download_file(destination, download_url) -> DownloadStatus:
@@ -39,13 +39,13 @@ def download_file(destination, download_url) -> DownloadStatus:
     try:
         response = requests.get(download_url, stream=True, verify=False)
 
-    except Exception as e:
+    except Exception:
         return DownloadStatus.ErrorDownload
 
     try:
         with open(destination, 'wb') as f:
             f.write(response.content)
-    except Exception as e:
+    except Exception:
         return DownloadStatus.ErrorWriteChunk
     return DownloadStatus.Success
 
@@ -142,5 +142,10 @@ class ProgramUpdater(object):
         with zipfile.ZipFile('../data/DownloadHelper/temp.zip', 'r') as zip_ref:
             zip_ref.extractall('../data/DownloadHelper/')
         os.remove("../data/DownloadHelper/temp.zip")
+        # 转移app文件夹
+
+        if os.path.exists('../will_use'):  # 检查是否存在will_use并删除
+            shutil.rmtree('../will_use')
+        shutil.move('../data/DownloadHelper/app', '../will_use')
 
         return DownloadStatus.Success  # 顺利完成!
