@@ -81,9 +81,9 @@ def check_helper(mode: str) -> DownloadStatus:
     """
     检查是否有辅助程序
     :param mode: 模式 分为source(从源代码安装的)和exe(正常安装打包的exe)
-    :return:
+    :return:下载的状态 也就相当于检索的状态了
     """
-    file_type = 'py' if mode == 'source' else 'exe'
+    file_type = 'pyw' if mode == 'source' else 'exe'
     file_path = f"../data/DownloadHelper/upgrade_helper.{file_type}"
     if os.path.exists(file_path):
         return DownloadStatus.Success

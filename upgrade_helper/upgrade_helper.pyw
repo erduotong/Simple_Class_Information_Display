@@ -6,8 +6,8 @@ import shutil
 time.sleep(1)
 
 # 重命名目录
-shutil.move("../../app", "will_delete")
-shutil.move("../../will_use", "app")
+shutil.move("../../app", "../../will_delete")
+shutil.move("../../will_use", "../../app")
 
 # 更改工作目录
 os.chdir("../../app")
