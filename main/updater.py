@@ -27,11 +27,12 @@ class DownloadStatus(enum.IntEnum):
 
 # 思路            (这里要判断网络是否连接 没连接就不试了
 # 获得更新检查权限->检查更新 如果有新版本就发射信号并且保存好可能会用的download url ->
+# 应用名是Simple Class Information Display!
 # TODO 启动的时候要尝试删除will_delete文件夹
 
 def download_file(destination, download_url) -> DownloadStatus:
     """
-    下载新版本并在完成时改名为complete
+    下载新版本并在完成时改名为complete(因为没开安全认证所以会吐出来报错 不管就行了)
     :param download_url: 要下载的链接
     :param destination:下载数据保存文件的路径(包括后缀名)
     :return:状态
@@ -54,7 +55,7 @@ def download_file(destination, download_url) -> DownloadStatus:
 
     # noinspection PyBroadException
     try:  # 获取文件大小
-        response = requests.get(download_url, stream=True)
+        response = requests.get(download_url, stream=True, verify=False)
         file_size = int(response.headers.get('Content-Length', 0))  # 获得文件大小
     except:  # 获取的时候出现错误了
         return DownloadStatus.ErrorGetSize
@@ -77,9 +78,10 @@ def download_file(destination, download_url) -> DownloadStatus:
 
 
 # 源代码会特殊处理
-def check_helper(mode: str) -> DownloadStatus:
+def check_helper(mode: str, where: str) -> DownloadStatus:
     """
     检查是否有辅助程序
+    :param where: 从哪儿下?(github / gitee)
     :param mode: 模式 分为source(从源代码安装的)和exe(正常安装打包的exe)
     :return:下载的状态 也就相当于检索的状态了
     """
@@ -87,10 +89,18 @@ def check_helper(mode: str) -> DownloadStatus:
     file_path = f"../data/DownloadHelper/upgrade_helper.{file_type}"
     if os.path.exists(file_path):
         return DownloadStatus.Success
-
-    download_link = '???' if mode == 'source' else '???'  # TODO 填入下载链接
+    # TODO 填入下载链接
+    if where == 'gitee':
+        download_link = ('https://gitee.com/erduotong/Simple_Class_Information_Display/releases/download/v1.1'
+                         '-upgrade_helper/upgrade_helper.pyw') if mode == 'source' else \
+            ('https://gitee.com/erduotong/Simple_Class_Information_Display/releases/download/v1.1-upgrade_helper'
+             '/upgrade_helper.exe')  # gitee 源代码/exe
+    else:
+        download_link = ('https://github.com/erduotong/Simple_Class_Information_Display/releases/download/v1.1'
+                         '-upgrade_helper/upgrade_helper.pyw') if mode == 'source' else \
+            ('https://github.com/erduotong/Simple_Class_Information_Display/releases/download/v1.1-upgrade_helper'
+             '/upgrade_helper.exe')  # github 源代码/exe
     state = download_file(file_path, download_link)
-
     return state
 
 
@@ -99,9 +109,9 @@ class ProgramUpdater(object):
         # 需求变量
         self.version_type = version_type  # 版本类型一定要完全匹配!包括后缀名!
         self.now_version = now_version
-        self.new_version = ""
-        self.change_log = ""
-        self.download_url = ""
+        self.new_version = None
+        self.change_log = None
+        self.download_url = None
 
     def get_latest_version(self, mode: str, api_link: str) -> VersionStatus:
         """
@@ -127,3 +137,6 @@ class ProgramUpdater(object):
                 return VersionStatus.Lower
             return VersionStatus.NoLink
         return VersionStatus.Error
+
+    def download_update(self):
+        pass

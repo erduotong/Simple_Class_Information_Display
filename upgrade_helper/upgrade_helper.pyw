@@ -13,4 +13,4 @@ shutil.move("../../will_use", "../../app")
 os.chdir("../../app")
 
 # 执行程序
-os.system("./Simple Class Information Display.py")
+os.system("./Simple Class Information Display.pyw")
