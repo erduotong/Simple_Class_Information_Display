@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import copy
+import os
 import random
 import sys
 import threading
@@ -1339,7 +1340,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
 if __name__ == '__main__':
+    # 基本参数 快速调节位置
     version = '1.0.1'
+
+    # 设定工作目录 保证不会有小天才用cmd执行
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
     now = datetime.datetime.now()
     week_name = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][now.weekday()]
     compare_time = compareTime()
