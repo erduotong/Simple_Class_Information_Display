@@ -13,6 +13,7 @@ from daily_initialization import *
 from main_window import Ui_MainWindow
 from rcs import Ui_Dialog
 from settings_page import Ui_settings
+from updater import ProgramUpdater
 
 
 class ReselectTheClassScheduleWindow(QDialog, Ui_Dialog):
@@ -120,6 +121,8 @@ class SettingsPage(QWidget, Ui_settings):
         self.chose_update_source.currentIndexChanged.connect(self.change_update_source)
         # ================
         self.daily_config_tab_widget.currentChanged.connect(self.daily_config_tab_changed)
+        # updater
+        self.program_updater = ProgramUpdater(version, program_type, form)  # 实例化program_updater
 
     # 进入后载入一些设置啥的初始化
     def initialize_after_entering(self):
@@ -848,6 +851,10 @@ class SettingsPage(QWidget, Ui_settings):
     # 更新
 
     def open_update(self):
+        if self.program_config_dict["update_config"]["state"] in (2, 3):  # 正在下载或者更新
+            self.update_tabWidget.setCurrentIndex(1)
+        else:
+            self.update_tabWidget.setCurrentIndex(0)
         self.tabWidget.setCurrentIndex(6)
         self.chose_update_source.setCurrentIndex(self.program_config_dict["update_config"]["update_from"])
 
@@ -916,7 +923,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         # 其他页
-        self.settings_page = SettingsPage()  # 设置页面
+        self.settings_page = SettingsPage()  # 实例化设置页面
         self.stackedWidget.addWidget(self.settings_page)
         # 设置计时器
         self.refresh_edit_size = QtCore.QTimer()  # 设置一个计时器
@@ -1354,7 +1361,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 if __name__ == '__main__':
     # 基本参数 快速调节位置
-    version = '1.0.1'
+    version = '1.0.1'  # 当前版本
+    program_type = '?'  # 版本类型(下载安装包的名称 包括后缀)
+    form = 'source'  # 程序形式(source / exe)
 
     # 设定工作目录 保证不会有小天才用cmd执行
     os.chdir(os.path.dirname(os.path.abspath(__file__)))

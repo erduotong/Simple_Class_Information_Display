@@ -9,6 +9,7 @@ import shutil
 import zipfile
 
 import requests
+from PyQt5.QtCore import QThread, pyqtSignal
 
 
 class VersionStatus(enum.IntEnum):
@@ -27,7 +28,7 @@ class DownloadStatus(enum.IntEnum):
 # 思路            (这里要判断网络是否连接 没连接就不试了
 # 获得更新检查权限->检查更新 如果有新版本就发射信号并且保存好可能会用的download url ->
 # 启动下载 -> 等待下载完成(准备好就更改状态) -> 询问安装 -> os._exit(0)并且启动!
-# TODO 应用名是Simple Class Information Display 打包成zip的时候应该把整个文件夹打包 其中包含一个app文件
+# TODO 应用名是Simple Class Information Display 打包成zip的时候应该把整个文件夹打包 其中包含一个app文件夹
 
 def download_file(destination, download_url) -> DownloadStatus:
     """
@@ -77,8 +78,9 @@ def check_helper(mode: str, where: str) -> DownloadStatus:
     return state
 
 
-class ProgramUpdater(object):
+class ProgramUpdater(QThread):
     def __init__(self, now_version, version_type, program_form):
+        super().__init__()
         """
         :param now_version: 当前版本
         :param version_type: 版本类型(下载安装包的名称 包括后缀)
@@ -92,7 +94,12 @@ class ProgramUpdater(object):
         self.change_log = None
         self.download_url = None
 
-    def get_latest_version(self, mode: str) -> VersionStatus:
+    def run(self) -> None:
+        pass
+
+    get_latest_version_return = pyqtSignal(VersionStatus)  # 给下面的用于处理返回值 todo 绑定这个信号到那边的返回值处理
+
+    def get_latest_version(self, mode: str) -> None:
         """
         获得最新的版本号,如果有就写入self中
         :param mode: 从哪个网站获取? 目前支持解析 github gitee 处获得的
@@ -107,21 +114,26 @@ class ProgramUpdater(object):
         # 从api link获得后再去匹配mode
         response = requests.get(api_link, verify=False)  # 获得api数据
         if response.status_code != 200:  # 获取了不正常的数据
-            return VersionStatus.Error
+            self.get_latest_version_return.emit(VersionStatus.Error)
+            self.quit()  # return
         response = response.json()  # 得到相应的数据
 
         if mode in ('github', 'gitee'):
             if response.get("name") == self.now_version:  # 版本相等的情况
-                return VersionStatus.UpToDate
+                self.get_latest_version_return.emit(VersionStatus.UpToDate)
+                self.quit()  # return
             self.new_version = response.get("name")
             self.change_log = response.get("body")
             # 遍历assets以获得匹配版本类型的download_url
             assets = response.get("assets")
             if any(i.get("name") == self.version_type for i in assets):
                 self.download_url = response.get("browser_download_url")
-                return VersionStatus.Lower
-            return VersionStatus.NoLink
-        return VersionStatus.Error
+                self.get_latest_version_return.emit(VersionStatus.Lower)
+                self.quit()  # return
+            self.get_latest_version_return.emit(VersionStatus.NoLink)
+            self.quit()  # return
+        self.get_latest_version_return.emit(VersionStatus.Error)
+        self.quit()  # return
 
     def download_update(self, from_where: str) -> DownloadStatus:
         # 检查更新辅助程序
