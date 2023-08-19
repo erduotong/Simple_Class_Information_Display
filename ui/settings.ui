@@ -181,8 +181,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>55</width>
-                  <height>44</height>
+                  <width>1550</width>
+                  <height>825</height>
                  </rect>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -764,7 +764,7 @@
                <property name="font">
                 <font>
                  <family>黑体</family>
-                 <pointsize>5</pointsize>
+                 <pointsize>4</pointsize>
                 </font>
                </property>
                <property name="currentIndex">
@@ -865,7 +865,7 @@
                       <property name="font">
                        <font>
                         <family>黑体</family>
-                        <pointsize>17</pointsize>
+                        <pointsize>14</pointsize>
                        </font>
                       </property>
                       <property name="title">
@@ -880,7 +880,7 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="QComboBox" name="comboBox">
+                        <widget class="QComboBox" name="chose_update_source">
                          <property name="sizePolicy">
                           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                            <horstretch>0</horstretch>

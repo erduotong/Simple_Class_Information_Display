@@ -117,6 +117,7 @@ class SettingsPage(QWidget, Ui_settings):
         self.time_edit_reorder_special_button.clicked.connect(self.time_edit_reorder_special)
         self.start_reset.clicked.connect(self.start_the_reset)
         self.to_update.clicked.connect(self.open_update)
+        self.chose_update_source.currentIndexChanged.connect(self.change_update_source)
         # ================
         self.daily_config_tab_widget.currentChanged.connect(self.daily_config_tab_changed)
 
@@ -183,7 +184,7 @@ class SettingsPage(QWidget, Ui_settings):
                         add_widget(value, key)
                     continue
                 # version不显示
-                if key == "version":
+                if key in ("version", "update_config"):
                     continue
                 # 替换成单一字符串
                 if top_key is not None:
@@ -845,8 +846,14 @@ class SettingsPage(QWidget, Ui_settings):
 
     # //////////////////
     # 更新
+
     def open_update(self):
         self.tabWidget.setCurrentIndex(6)
+        self.chose_update_source.setCurrentIndex(self.program_config_dict["update_config"]["update_from"])
+
+    # 同步更改后的源
+    def change_update_source(self, i):
+        self.program_config_dict["update_config"]["update_from"] = i
 
     # //////////////////
     # 保存并退出
@@ -1351,11 +1358,12 @@ if __name__ == '__main__':
 
     # 设定工作目录 保证不会有小天才用cmd执行
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-
     now = datetime.datetime.now()
     week_name = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][now.weekday()]
     compare_time = compareTime()
-    # 初始化文件防止报错
+    # 删除will_delete文件夹
+    if os.path.exists("../will_delete"):
+        shutil.rmtree("../will_delete")
     # 初始化文件夹
     os.makedirs('../data/backup/daily_config', exist_ok=True)
     os.makedirs('../data/backup/program_config', exist_ok=True)

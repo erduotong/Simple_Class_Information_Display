@@ -28,7 +28,6 @@ class DownloadStatus(enum.IntEnum):
 # 获得更新检查权限->检查更新 如果有新版本就发射信号并且保存好可能会用的download url ->
 # 启动下载 -> 等待下载完成(准备好就更改状态) -> 询问安装 -> os._exit(0)并且启动!
 # TODO 应用名是Simple Class Information Display 打包成zip的时候应该把整个文件夹打包 其中包含一个app文件
-# TODO 启动的时候要尝试删除will_delete文件夹
 
 def download_file(destination, download_url) -> DownloadStatus:
     """

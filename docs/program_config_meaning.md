@@ -15,3 +15,7 @@
 * the_window_changes_the_refresh_time：窗口大小改变后刷新字体的时间
 * now_indicator_text: 现在的课程指示器的显示的文本 如<Now
 * next_indicator_text: 下一节课的课程指示器的显示的文本 如<Next
+* update: 更新相关的选项
+  * state: 当前处于的状态 0表示啥事没有 1表示等待用户下载 2表示正在下载 3表示等待安装
+  * update_from : 更新源位于列表中的索引(0:github :gitee)
+  * check_update_when_star: 是否在启动程序的时候进行一次更新检测？

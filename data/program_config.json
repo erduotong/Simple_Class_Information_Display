@@ -14,5 +14,10 @@
     "text_edit_refresh_time": 10,
     "the_window_changes_the_refresh_time": 0.7,
     "now_indicator_text": "<Now",
-    "next_indicator_text": "<Next"
+    "next_indicator_text": "<Next",
+    "update_config": {
+        "state": 0,
+        "update_from": 0,
+        "check_update_when_start": true
+    }
 }
