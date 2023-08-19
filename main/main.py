@@ -97,6 +97,7 @@ class SettingsPage(QWidget, Ui_settings):
         self.lessons_opened: bool = False
         self.about_opened: bool = False
         self.time_opened: bool = False
+        self.update_config = json.loads(read_file('../data/DownloadHelper/update_config.json'))
         # ==========daily config
         self.today_lessons_edit_opened: bool = False
         self.add_dailyconfig_lessons.clicked.connect(self.add_daily_config_lessons)
@@ -849,18 +850,18 @@ class SettingsPage(QWidget, Ui_settings):
 
     # //////////////////
     # 更新
-
+    # 当update_config被更改的时候一定要记得立刻保存！
     def open_update(self):
-        if self.program_config_dict["update_config"]["state"] in (2, 3):  # 正在下载或者更新
+        if self.update_config["state"] in (2, 3):  # 正在下载或者更新
             self.update_tabWidget.setCurrentIndex(1)
         else:
             self.update_tabWidget.setCurrentIndex(0)
         self.tabWidget.setCurrentIndex(6)
-        self.chose_update_source.setCurrentIndex(self.program_config_dict["update_config"]["update_from"])
+        self.chose_update_source.setCurrentIndex(self.update_config["update_from"])
 
     # 同步更改后的源
     def change_update_source(self, i):
-        self.program_config_dict["update_config"]["update_from"] = i
+        self.update_config["update_from"] = i
 
     # //////////////////
     # 保存并退出

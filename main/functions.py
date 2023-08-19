@@ -297,13 +297,13 @@ def initialize_the_file(version: str) -> None:
             "text_edit_refresh_time": 5,
             "the_window_changes_the_refresh_time": 0.7,
             "now_indicator_text": "<Now",
-            "next_indicator_text": "<Next",
-            "update_config": {
-                "state": 0,
-                "update_from": 1,
-                "check_update_when_start": True
-            }
+            "next_indicator_text": "<Next"
 
+        },
+        "../data/DownloadHelper/update_config.json": {
+            "state": 0,
+            "update_from": 1,
+            "check_update_when_start": True
         }
     }
     for filepath, content in path.items():
