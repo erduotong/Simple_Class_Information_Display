@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import copy
-import os
 import random
 import sys
 import threading
@@ -82,6 +81,7 @@ class SettingsPage(QWidget, Ui_settings):
         super().__init__()
         self.setupUi(self)  # 加载UI
         self.tabWidget.findChild(QTabBar).hide()
+        self.update_tabWidget.findChild(QTabBar).hide()
         # 初始化变量
         self.program_config_dict = None
         self.daily_config_dict = None
@@ -116,6 +116,7 @@ class SettingsPage(QWidget, Ui_settings):
         self.time_edit_reorder_button.clicked.connect(self.time_edit_reorder)
         self.time_edit_reorder_special_button.clicked.connect(self.time_edit_reorder_special)
         self.start_reset.clicked.connect(self.start_the_reset)
+        self.to_update.clicked.connect(self.open_update)
         # ================
         self.daily_config_tab_widget.currentChanged.connect(self.daily_config_tab_changed)
 
@@ -841,6 +842,11 @@ class SettingsPage(QWidget, Ui_settings):
         confirm_message = "\n".join(
             [f"{file}({compare_dict[file]})" for file in selected_files])
         QMessageBox.information(self, "提示", f"重置操作已完成\n重置了以下文件:\n{confirm_message}")
+
+    # //////////////////
+    # 更新
+    def open_update(self):
+        self.tabWidget.setCurrentIndex(6)
 
     # //////////////////
     # 保存并退出

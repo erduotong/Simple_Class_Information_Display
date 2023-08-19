@@ -181,8 +181,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>1550</width>
-                  <height>825</height>
+                  <width>55</width>
+                  <height>44</height>
                  </rect>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -760,7 +760,7 @@
             </attribute>
             <layout class="QHBoxLayout" name="horizontalLayout_11">
              <item>
-              <widget class="QTabWidget" name="tabWidget_2">
+              <widget class="QTabWidget" name="update_tabWidget">
                <property name="font">
                 <font>
                  <family>黑体</family>
@@ -769,6 +769,9 @@
                </property>
                <property name="currentIndex">
                 <number>0</number>
+               </property>
+               <property name="tabBarAutoHide">
+                <bool>false</bool>
                </property>
                <widget class="QWidget" name="tab_4">
                 <attribute name="title">
@@ -868,7 +871,14 @@
                       <property name="title">
                        <string>更新源</string>
                       </property>
-                      <layout class="QHBoxLayout" name="horizontalLayout_12">
+                      <layout class="QVBoxLayout" name="verticalLayout_14">
+                       <item>
+                        <widget class="QLabel" name="label_6">
+                         <property name="text">
+                          <string>如果无法获得/下载更新可以尝试切换源</string>
+                         </property>
+                        </widget>
+                       </item>
                        <item>
                         <widget class="QComboBox" name="comboBox">
                          <property name="sizePolicy">

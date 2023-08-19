@@ -94,7 +94,8 @@ def populate_the_timesheet(weekday: str):
 def compareTime():
     try:
         data = json.loads(read_file("../data/daily_config.json"))
-        if data["date_time"] == datetime.now().strftime("%Y_%m_%d"):
+
+        if data["date_time"] == datetime.datetime.now().strftime("%Y_%m_%d"):
             return True  # 文件中的日期等于当前日期，返回
         else:
             return False
