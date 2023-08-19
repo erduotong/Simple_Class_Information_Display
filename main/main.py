@@ -850,7 +850,7 @@ class SettingsPage(QWidget, Ui_settings):
 
     # //////////////////
     # 更新
-    # 当update_config被更改的时候一定要记得立刻保存！
+    # todo 当update_config被更改的时候一定要记得立刻保存！
     def open_update(self):
         if self.update_config["state"] in (2, 3):  # 正在下载或者更新
             self.update_tabWidget.setCurrentIndex(1)
@@ -862,6 +862,8 @@ class SettingsPage(QWidget, Ui_settings):
     # 同步更改后的源
     def change_update_source(self, i):
         self.update_config["update_from"] = i
+        write_file('../data/DownloadHelper/update_config.json',
+                   json.dumps(self.update_config, ensure_ascii=False, indent=4))
 
     # //////////////////
     # 保存并退出
