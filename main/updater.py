@@ -79,7 +79,9 @@ def check_helper(mode: str, where: str) -> DownloadStatus:
 
 
 class ProgramUpdater(QThread):
-    def __init__(self, now_version, version_type, program_form):
+    get_latest_version_return = pyqtSignal(VersionStatus)  # 给下面的用于处理返回值 todo 绑定这个信号到那边的返回值处理
+
+    def __init__(self, now_version: str, version_type: str, program_form: str):
         super().__init__()
         """
         :param now_version: 当前版本
@@ -97,8 +99,6 @@ class ProgramUpdater(QThread):
     def run(self) -> None:
         pass
 
-    get_latest_version_return = pyqtSignal(VersionStatus)  # 给下面的用于处理返回值 todo 绑定这个信号到那边的返回值处理
-
     def get_latest_version(self, mode: str) -> None:
         """
         获得最新的版本号,如果有就写入self中
@@ -106,7 +106,7 @@ class ProgramUpdater(QThread):
         :return:0为无新版本 1为有新版本且一切正常 2为没有找到可用的新版下载链接 否则表明获得api的时候出错了
         """
         # 这里是判断api_link要在哪里的地方
-        api_link = ''
+        api_link: str = ''
         if mode == 'github':
             api_link = 'https://api.github.com/repos/erduotong/Simple_Class_Information_Display/releases/latest'
         elif mode == 'gitee':

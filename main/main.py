@@ -124,6 +124,10 @@ class SettingsPage(QWidget, Ui_settings):
         self.daily_config_tab_widget.currentChanged.connect(self.daily_config_tab_changed)
         # updater
         self.program_updater = ProgramUpdater(version, program_type, form)  # 实例化program_updater
+        self.start_check_update.clicked.connect(self.check_update)
+        if self.update_config["state"] == 1:
+            self.update_config["state"] = 0
+            self.change_update_config()
 
     # 进入后载入一些设置啥的初始化
     def initialize_after_entering(self):
@@ -859,11 +863,24 @@ class SettingsPage(QWidget, Ui_settings):
         self.tabWidget.setCurrentIndex(6)
         self.chose_update_source.setCurrentIndex(self.update_config["update_from"])
 
+    def change_update_config(self):
+        write_file('../data/DownloadHelper/update_config.json',
+                   json.dumps(self.update_config, ensure_ascii=False, indent=4))
+
     # 同步更改后的源
     def change_update_source(self, i):
         self.update_config["update_from"] = i
-        write_file('../data/DownloadHelper/update_config.json',
-                   json.dumps(self.update_config, ensure_ascii=False, indent=4))
+        self.change_update_config()
+
+    def check_update(self):
+        if self.update_config["state"] == 0:
+            self.update_config["state"] = 1
+            self.change_update_config()
+            self.start_check_update.setEnabled(False)
+            update_source = self.chose_update_source.itemText(self.chose_update_source.currentIndex())
+            self.program_updater.start()
+            self.program_updater.get_latest_version(update_source)
+            print(update_source)
 
     # //////////////////
     # 保存并退出
