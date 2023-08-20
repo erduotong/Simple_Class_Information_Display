@@ -123,7 +123,14 @@ class SettingsPage(QWidget, Ui_settings):
         # ================
         self.daily_config_tab_widget.currentChanged.connect(self.daily_config_tab_changed)
         # updater
-        self.program_updater = ProgramUpdater(version, program_type, form)  # 实例化program_updater
+        self.update_parameters = {
+            "new_version": None,
+            "change_log": None,
+            "download_url": None,
+            "now_version": version,
+            "program_form": form,
+            "version_type": program_type
+        }
         self.start_check_update.clicked.connect(self.check_update)
         if self.update_config["state"] == 1:
             self.update_config["state"] = 0

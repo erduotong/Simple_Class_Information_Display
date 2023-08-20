@@ -495,6 +495,7 @@ class Ui_settings(object):
         font.setFamily("黑体")
         font.setPointSize(18)
         self.label_2.setFont(font)
+        self.label_2.setText("")
         self.label_2.setObjectName("label_2")
         self.verticalLayout_12.addWidget(self.label_2)
         self.textBrowser = QtWidgets.QTextBrowser(self.widget_12)
@@ -759,7 +760,6 @@ class Ui_settings(object):
         self.reset_time.setText(_translate("settings", "课程时间"))
         self.start_reset.setText(_translate("settings", "重置所选"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.resetting), _translate("settings", "页"))
-        self.label_2.setText(_translate("settings", "发现新版本! 新版本:version 1.0.1"))
         self.textBrowser.setHtml(_translate("settings", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -767,9 +767,9 @@ class Ui_settings(object):
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
         self.start_check_update.setText(_translate("settings", "检查更新"))
         self.groupBox.setTitle(_translate("settings", "更新源"))
-        self.label_6.setText(_translate("settings", "如果无法获得/下载更新可以尝试切换源"))
-        self.chose_update_source.setItemText(0, _translate("settings", "github"))
-        self.chose_update_source.setItemText(1, _translate("settings", "gitee"))
+        self.label_6.setText(_translate("settings", "如果无法获得/下载更新可以尝试切换源 "))
+        self.chose_update_source.setItemText(0, _translate("settings", "gitee"))
+        self.chose_update_source.setItemText(1, _translate("settings", "github"))
         self.checkBox.setText(_translate("settings", "启动时检查更新"))
         self.PushButton_2.setText(_translate("settings", "下载更新"))
         self.update_tabWidget.setTabText(self.update_tabWidget.indexOf(self.tab_4), _translate("settings", "Tab 1"))

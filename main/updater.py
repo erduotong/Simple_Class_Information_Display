@@ -17,6 +17,7 @@ class VersionStatus(enum.IntEnum):
     Lower = 1  # 有新版本
     NoLink = 2  # 无下载链接
     Error = 3  # error
+    GithubToFast = 4 # github api访问过快
 
 
 class DownloadStatus(enum.IntEnum):
@@ -78,6 +79,50 @@ def check_helper(mode: str, where: str) -> DownloadStatus:
     return state
 
 
+class GetLatestVersion(QThread):
+    get_latest_version_return = pyqtSignal(VersionStatus)
+
+    def __init__(self, update_source: str, update_parameters):
+        """
+        获取最新的版本号，如果有就写入update_parameters 信号return
+        :param update_source: 更新源
+        :param update_parameters: 外部dict的引用
+        """
+        super().__init__()
+        self.update_parameters = update_parameters
+        self.mode = update_source
+
+    def run(self):
+        api_link_dict = {
+            "github": 'https://api.github.com/repos/erduotong/Simple_Class_Information_Display/releases/latest',
+            "gitee": 'https://gitee.com/api/v5/repos/erduotong/Simple_Class_Information_Display/releases/latest'}
+        api_link: str = api_link_dict[self.mode]  # 这里是判断api_link要在哪里的地方
+        response = requests.get(api_link, verify=False)  # 获得api数据
+        if response.status_code != 200:
+            self.get_latest_version_return.emit(VersionStatus.Error)
+            return
+        response = response.json()  # 得到相应的数据
+        if "documentation_url" in response: # github的访问过快
+            self.get_latest_version_return.emit(VersionStatus.GithubToFast)
+            return
+        if self.mode in ("github", "gitee"):
+            if response.get("name") == self.update_parameters["now_version"]:
+                self.get_latest_version_return.emit(VersionStatus.UpToDate)
+                return
+            self.update_parameters["new_version"] = response.get("name")
+            self.update_parameters["change_log"] = response.get("body")
+            # 遍历assets以获得匹配版本类型的download_url
+            assets = response.get("assets")
+            if any(i.get("name") == self.update_parameters["version_type"] for i in assets):
+                self.update_parameters["download_url"] = response.get("browser_download_url")
+                self.get_latest_version_return.emit(VersionStatus.Lower)
+                return
+            self.get_latest_version_return.emit(VersionStatus.NoLink)
+            return
+        self.get_latest_version_return.emit(VersionStatus.Error)
+        return
+
+
 class ProgramUpdater(QThread):
     get_latest_version_return = pyqtSignal(VersionStatus)  # 给下面的用于处理返回值 todo 绑定这个信号到那边的返回值处理
 
@@ -99,41 +144,7 @@ class ProgramUpdater(QThread):
     def run(self) -> None:
         pass
 
-    def get_latest_version(self, mode: str) -> None:
-        """
-        获得最新的版本号,如果有就写入self中
-        :param mode: 从哪个网站获取? 目前支持解析 github gitee 处获得的
-        :return:0为无新版本 1为有新版本且一切正常 2为没有找到可用的新版下载链接 否则表明获得api的时候出错了
-        """
-        # 这里是判断api_link要在哪里的地方
-        api_link: str = ''
-        if mode == 'github':
-            api_link = 'https://api.github.com/repos/erduotong/Simple_Class_Information_Display/releases/latest'
-        elif mode == 'gitee':
-            api_link = 'https://gitee.com/api/v5/repos/erduotong/Simple_Class_Information_Display/releases/latest'
-        # 从api link获得后再去匹配mode
-        response = requests.get(api_link, verify=False)  # 获得api数据
-        if response.status_code != 200:  # 获取了不正常的数据
-            self.get_latest_version_return.emit(VersionStatus.Error)
-            self.quit()  # return
-        response = response.json()  # 得到相应的数据
 
-        if mode in ('github', 'gitee'):
-            if response.get("name") == self.now_version:  # 版本相等的情况
-                self.get_latest_version_return.emit(VersionStatus.UpToDate)
-                self.quit()  # return
-            self.new_version = response.get("name")
-            self.change_log = response.get("body")
-            # 遍历assets以获得匹配版本类型的download_url
-            assets = response.get("assets")
-            if any(i.get("name") == self.version_type for i in assets):
-                self.download_url = response.get("browser_download_url")
-                self.get_latest_version_return.emit(VersionStatus.Lower)
-                self.quit()  # return
-            self.get_latest_version_return.emit(VersionStatus.NoLink)
-            self.quit()  # return
-        self.get_latest_version_return.emit(VersionStatus.Error)
-        self.quit()  # return
 
     def download_update(self, from_where: str) -> DownloadStatus:
         # 检查更新辅助程序

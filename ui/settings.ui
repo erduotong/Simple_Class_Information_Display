@@ -790,7 +790,7 @@
                        </font>
                       </property>
                       <property name="text">
-                       <string>发现新版本! 新版本:version 1.0.1</string>
+                       <string/>
                       </property>
                      </widget>
                     </item>
@@ -889,7 +889,7 @@ p, li { white-space: pre-wrap; }
                        <item>
                         <widget class="QLabel" name="label_6">
                          <property name="text">
-                          <string>如果无法获得/下载更新可以尝试切换源</string>
+                          <string>如果无法获得/下载更新可以尝试切换源 </string>
                          </property>
                         </widget>
                        </item>
@@ -909,12 +909,12 @@ p, li { white-space: pre-wrap; }
                          </property>
                          <item>
                           <property name="text">
-                           <string>github</string>
+                           <string>gitee</string>
                           </property>
                          </item>
                          <item>
                           <property name="text">
-                           <string>gitee</string>
+                           <string>github</string>
                           </property>
                          </item>
                         </widget>
