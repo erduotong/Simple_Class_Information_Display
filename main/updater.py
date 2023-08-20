@@ -4,9 +4,9 @@
 # ////////////////////////////////
 
 import enum
-import os.path
 import shutil
 import zipfile
+from pathlib import Path
 
 import requests
 from PyQt5.QtCore import QThread, pyqtSignal
@@ -61,7 +61,7 @@ def check_helper(mode: str, where: str) -> DownloadStatus:
     """
     file_type = 'pyw' if mode == 'source' else 'exe'
     file_path = f"../data/DownloadHelper/upgrade_helper.{file_type}"
-    if os.path.exists(file_path):
+    if Path(file_path).exists():
         return DownloadStatus.Success
 
     if where == 'gitee':
@@ -143,20 +143,22 @@ class ProgramUpdater(QThread):
         if status != DownloadStatus.Success:
             return status  # 出现错误
         # 下载文件
-        if os.path.exists("../data/DownloadHelper/temp.zip"):
-            os.remove("../data/DownloadHelper/temp.zip")
-        if os.path.exists("../data/DownloadHelper/app"):
+        temp_path = Path('../data/DownloadHelper/temp.zip')
+        temp_path.unlink(missing_ok=True)
+
+        if Path("../data/DownloadHelper/app").exists():
             shutil.rmtree("../data/DownloadHelper/app")
+
         status = download_file('../data/DownloadHelper/temp.zip', self.download_url)
         if status != DownloadStatus.Success:
             return status
         # 解压
         with zipfile.ZipFile('../data/DownloadHelper/temp.zip', 'r') as zip_ref:
             zip_ref.extractall('../data/DownloadHelper/')
-        os.remove("../data/DownloadHelper/temp.zip")
+        Path("../data/DownloadHelper/temp.zip").unlink(missing_ok=True)
         # 转移app文件夹
 
-        if os.path.exists('../will_use'):  # 检查是否存在will_use并删除
+        if Path('../will_use').exists():  # 检查是否存在will_use并删除
             shutil.rmtree('../will_use')
         shutil.move('../data/DownloadHelper/app', '../will_use')
 
