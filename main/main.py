@@ -13,7 +13,7 @@ from daily_initialization import *
 from main_window import Ui_MainWindow
 from rcs import Ui_Dialog
 from settings_page import Ui_settings
-from updater import ProgramUpdater
+from updater import *
 
 
 class ReselectTheClassScheduleWindow(QDialog, Ui_Dialog):
@@ -84,6 +84,7 @@ class SettingsPage(QWidget, Ui_settings):
         self.tabWidget.findChild(QTabBar).hide()
         self.update_tabWidget.findChild(QTabBar).hide()
         # 初始化变量
+        self.update_thread = None
         self.program_config_dict = None
         self.daily_config_dict = None
         self.lessons_dict = None
@@ -885,9 +886,16 @@ class SettingsPage(QWidget, Ui_settings):
             self.change_update_config()
             self.start_check_update.setEnabled(False)
             update_source = self.chose_update_source.itemText(self.chose_update_source.currentIndex())
-            self.program_updater.start()
-            self.program_updater.get_latest_version(update_source)
-            print(update_source)
+            # 实例化线程
+            self.update_thread = GetLatestVersion(update_source, self.update_parameters)
+            self.update_thread.get_latest_version_return.connect(self.after_check_update)  # 连接信号与槽
+            # todo 进度条
+            self.update_thread.start()  # 开始获得
+
+    def after_check_update(self, status):
+        print(self.update_parameters["download_url"], status)
+        self.update_thread.get_latest_version_return.disconnect()
+        self.update_thread.deleteLater()
 
     # //////////////////
     # 保存并退出
@@ -1389,7 +1397,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 if __name__ == '__main__':
     # 基本参数 快速调节位置
     version = '1.0.1'  # 当前版本
-    program_type = '?'  # 版本类型(下载安装包的名称 包括后缀)
+    program_type = 'exe_without_qdarkstyle.zip'  # 版本类型(下载安装包的名称 包括后缀)
     form = 'source'  # 程序形式(source / exe)
 
     # 设定工作目录 保证不会有小天才用cmd执行

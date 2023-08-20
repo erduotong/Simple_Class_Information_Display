@@ -99,13 +99,19 @@ class GetLatestVersion(QThread):
             "gitee": 'https://gitee.com/api/v5/repos/erduotong/Simple_Class_Information_Display/releases/latest'}
         api_link: str = api_link_dict[self.mode]  # 这里是判断api_link要在哪里的地方
         response = requests.get(api_link, verify=False)  # 获得api数据
+        # 处理一下github api访问过快的问题
+        try:
+            if ("documentation_url" in response.json()) and response.status_code == 403:
+                self.get_latest_version_return.emit(VersionStatus.GithubToFast)
+                return
+        except:
+            pass
         if response.status_code != 200:
+            print(response.status_code)
             self.get_latest_version_return.emit(VersionStatus.Error)
             return
         response = response.json()  # 得到相应的数据
-        if "documentation_url" in response:  # github的访问过快
-            self.get_latest_version_return.emit(VersionStatus.GithubToFast)
-            return
+
         if self.mode in ("github", "gitee"):
             if response.get("name") == self.update_parameters["now_version"]:
                 self.get_latest_version_return.emit(VersionStatus.UpToDate)
@@ -114,10 +120,11 @@ class GetLatestVersion(QThread):
             self.update_parameters["change_log"] = response.get("body")
             # 遍历assets以获得匹配版本类型的download_url
             assets = response.get("assets")
-            if any(i.get("name") == self.update_parameters["version_type"] for i in assets):
-                self.update_parameters["download_url"] = response.get("browser_download_url")
-                self.get_latest_version_return.emit(VersionStatus.Lower)
-                return
+            for i in assets:
+                if i.get("name") == self.update_parameters["version_type"]:
+                    self.update_parameters["download_url"] = i.get("browser_download_url")
+                    self.get_latest_version_return.emit(VersionStatus.Lower)
+                    return
             self.get_latest_version_return.emit(VersionStatus.NoLink)
             return
         self.get_latest_version_return.emit(VersionStatus.Error)
@@ -163,5 +170,3 @@ class DownloadUpdate(QThread):
         shutil.move('../data/DownloadHelper/app', '../will_use')
         self.download_update_return.emit(DownloadStatus.Success)
         return
-
-
