@@ -17,7 +17,7 @@ class VersionStatus(enum.IntEnum):
     Lower = 1  # 有新版本
     NoLink = 2  # 无下载链接
     Error = 3  # error
-    GithubToFast = 4 # github api访问过快
+    GithubToFast = 4  # github api访问过快
 
 
 class DownloadStatus(enum.IntEnum):
@@ -30,6 +30,7 @@ class DownloadStatus(enum.IntEnum):
 # 获得更新检查权限->检查更新 如果有新版本就发射信号并且保存好可能会用的download url ->
 # 启动下载 -> 等待下载完成(准备好就更改状态) -> 询问安装 -> os._exit(0)并且启动!
 # TODO 应用名是Simple Class Information Display 打包成zip的时候应该把整个文件夹打包 其中包含一个app文件夹
+# TODO 类要记得deletelater并且disconnect
 
 def download_file(destination, download_url) -> DownloadStatus:
     """
@@ -102,7 +103,7 @@ class GetLatestVersion(QThread):
             self.get_latest_version_return.emit(VersionStatus.Error)
             return
         response = response.json()  # 得到相应的数据
-        if "documentation_url" in response: # github的访问过快
+        if "documentation_url" in response:  # github的访问过快
             self.get_latest_version_return.emit(VersionStatus.GithubToFast)
             return
         if self.mode in ("github", "gitee"):
@@ -123,54 +124,44 @@ class GetLatestVersion(QThread):
         return
 
 
-class ProgramUpdater(QThread):
-    get_latest_version_return = pyqtSignal(VersionStatus)  # 给下面的用于处理返回值 todo 绑定这个信号到那边的返回值处理
+class DownloadUpdate(QThread):
+    download_update_return = pyqtSignal(DownloadStatus)
 
-    def __init__(self, now_version: str, version_type: str, program_form: str):
+    def __init__(self, update_source: str, update_parameters):
+        """
+        下载更新
+        :param update_source: 更新源
+        :param update_parameters: 外部dict的引用
+        """
         super().__init__()
-        """
-        :param now_version: 当前版本
-        :param version_type: 版本类型(下载安装包的名称 包括后缀)
-        :param program_form: 程序形式(source / exe)
-        """
-        # 需求变量
-        self.version_type = version_type  # 版本类型一定要完全匹配!包括后缀名!
-        self.program_form = program_form
-        self.now_version = now_version
-        self.new_version = None
-        self.change_log = None
-        self.download_url = None
+        self.update_parameters = update_parameters
+        self.from_where = update_source
 
-    def run(self) -> None:
-        pass
-
-
-
-    def download_update(self, from_where: str) -> DownloadStatus:
+    def run(self):
         # 检查更新辅助程序
-
-        status = check_helper(from_where, self.program_form)
-
+        status = check_helper(self.from_where, self.update_parameters["program_form"])
         if status != DownloadStatus.Success:
-            return status  # 出现错误
+            self.download_update_return.emit(status)  # 出现错误
+            return
         # 下载文件
         temp_path = Path('../data/DownloadHelper/temp.zip')
         temp_path.unlink(missing_ok=True)
-
         if Path("../data/DownloadHelper/app").exists():
             shutil.rmtree("../data/DownloadHelper/app")
 
-        status = download_file('../data/DownloadHelper/temp.zip', self.download_url)
+        status = download_file('../data/DownloadHelper/temp.zip', self.update_parameters["download_url"])
         if status != DownloadStatus.Success:
-            return status
+            self.download_update_return.emit(status)  # 出现错误
+            return
         # 解压
         with zipfile.ZipFile('../data/DownloadHelper/temp.zip', 'r') as zip_ref:
             zip_ref.extractall('../data/DownloadHelper/')
         Path("../data/DownloadHelper/temp.zip").unlink(missing_ok=True)
         # 转移app文件夹
-
         if Path('../will_use').exists():  # 检查是否存在will_use并删除
             shutil.rmtree('../will_use')
         shutil.move('../data/DownloadHelper/app', '../will_use')
+        self.download_update_return.emit(DownloadStatus.Success)
+        return
 
-        return DownloadStatus.Success  # 顺利完成!
+
