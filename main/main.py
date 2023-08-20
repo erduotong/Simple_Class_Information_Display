@@ -852,7 +852,7 @@ class SettingsPage(QWidget, Ui_settings):
     # 更新
     # todo 当update_config被更改的时候一定要记得立刻保存！
     def open_update(self):
-        if self.update_config["state"] in (2, 3):  # 正在下载或者更新
+        if self.update_config["state"] in (3, 4):  # 正在下载或者更新
             self.update_tabWidget.setCurrentIndex(1)
         else:
             self.update_tabWidget.setCurrentIndex(0)
