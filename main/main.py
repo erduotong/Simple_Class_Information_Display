@@ -1521,10 +1521,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
 if __name__ == '__main__':
+    # try:
     # 基本参数 快速调节位置
-    version = '1.0.1'  # 当前版本
+    version = '1.0.9'  # 当前版本
     program_type = 'exe_without_qdarkstyle.zip'  # 版本类型(下载安装包的名称 包括后缀)
-    form = 'source'  # 程序形式(source / exe)
+    form = 'exe'  # 程序形式(source / exe)
 
     # 设定工作目录 保证不会有小天才用cmd执行
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -1573,6 +1574,8 @@ if __name__ == '__main__':
 
     # 进入主窗口
     sys.exit(app.exec_())
-# TODO 应用名是Simple Class Information Display  其中包含一个app文件夹以及其他 最外面的名称为Simple Class Information Display文件夹
+    # except Exception as e:
+    #     print(e)
+
 # todo 可以调整颜色的作业/消息
 # todo 值日模块

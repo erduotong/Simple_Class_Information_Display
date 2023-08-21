@@ -1,6 +1,7 @@
-import os
+import subprocess
 import time
 import shutil
+import os
 
 # 等待1秒防止出问题
 time.sleep(1)
@@ -13,4 +14,4 @@ shutil.move("../../will_use", "../../app")
 os.chdir("../../app")
 
 # 执行程序
-os.system("./Simple Class Information Display.pyw")
+subprocess.Popen(['pythonw', './Simple Class Information Display.pyw'])
