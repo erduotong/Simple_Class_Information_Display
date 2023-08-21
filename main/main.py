@@ -164,6 +164,8 @@ class SettingsPage(QWidget, Ui_settings):
             else:
                 self.update_config["state"] = 0
                 self.change_update_config()
+        if self.update_config["state"] == 0 and self.update_config["check_update_when_start"] is True:  # 满足自动检查更新条件
+            self.check_update()
 
     # 进入后载入一些设置啥的初始化
     def initialize_after_entering(self):
@@ -1571,5 +1573,6 @@ if __name__ == '__main__':
 
     # 进入主窗口
     sys.exit(app.exec_())
-#  todo 可以调整颜色的作业/消息
-#  todo 值日模块
+# TODO 应用名是Simple Class Information Display  其中包含一个app文件夹以及其他 最外面的名称为Simple Class Information Display文件夹
+# todo 可以调整颜色的作业/消息
+# todo 值日模块

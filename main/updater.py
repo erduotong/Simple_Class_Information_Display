@@ -26,9 +26,6 @@ class DownloadStatus(enum.IntEnum):
     ErrorWriteChunk = 2  # 写入文件块时出错
 
 
-# TODO 应用名是Simple Class Information Display  其中包含一个app文件夹以及其他 最外面的名称为Simple Class Information Display文件夹
-
-
 def download_file(destination, download_url) -> DownloadStatus:
     """
     下载文件(单线程) 多线程不会写啊啊啊啊啊啊啊
