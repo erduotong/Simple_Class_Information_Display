@@ -768,7 +768,7 @@
                 </font>
                </property>
                <property name="currentIndex">
-                <number>0</number>
+                <number>1</number>
                </property>
                <property name="tabBarAutoHide">
                 <bool>false</bool>
@@ -782,7 +782,7 @@
                   <widget class="QWidget" name="widget_12" native="true">
                    <layout class="QVBoxLayout" name="verticalLayout_12" stretch="1,5">
                     <item>
-                     <widget class="QLabel" name="label_2">
+                     <widget class="QLabel" name="update_staus_display">
                       <property name="font">
                        <font>
                         <family>黑体</family>
@@ -795,7 +795,7 @@
                      </widget>
                     </item>
                     <item>
-                     <widget class="QTextBrowser" name="textBrowser">
+                     <widget class="QTextBrowser" name="change_log_display">
                       <property name="font">
                        <font>
                         <family>黑体</family>
@@ -923,7 +923,7 @@ p, li { white-space: pre-wrap; }
                      </widget>
                     </item>
                     <item>
-                     <widget class="QCheckBox" name="checkBox">
+                     <widget class="QCheckBox" name="chose_check_update_when_start">
                       <property name="font">
                        <font>
                         <family>黑体</family>
@@ -939,7 +939,7 @@ p, li { white-space: pre-wrap; }
                      <widget class="QWidget" name="widget_15" native="true">
                       <layout class="QGridLayout" name="gridLayout_5">
                        <item row="1" column="0">
-                        <widget class="QPushButton" name="PushButton_2">
+                        <widget class="QPushButton" name="download_update">
                          <property name="sizePolicy">
                           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                            <horstretch>0</horstretch>
@@ -997,11 +997,11 @@ p, li { white-space: pre-wrap; }
                 </attribute>
                 <layout class="QVBoxLayout" name="verticalLayout" stretch="2,3">
                  <item>
-                  <widget class="QLabel" name="label_5">
+                  <widget class="QLabel" name="download_status_display">
                    <property name="font">
                     <font>
                      <family>黑体</family>
-                     <pointsize>15</pointsize>
+                     <pointsize>25</pointsize>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -1016,7 +1016,7 @@ p, li { white-space: pre-wrap; }
                   <widget class="QWidget" name="widget_11" native="true">
                    <layout class="QGridLayout" name="gridLayout_3">
                     <item row="1" column="1">
-                     <widget class="QPushButton" name="pushButton">
+                     <widget class="QPushButton" name="install_update">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                         <horstretch>0</horstretch>
@@ -1026,7 +1026,7 @@ p, li { white-space: pre-wrap; }
                       <property name="font">
                        <font>
                         <family>黑体</family>
-                        <pointsize>12</pointsize>
+                        <pointsize>20</pointsize>
                        </font>
                       </property>
                       <property name="text">

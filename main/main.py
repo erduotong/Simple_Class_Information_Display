@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import copy
 import random
+import subprocess
 import sys
-import threading
 
+import urllib3
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QRegExpValidator
@@ -123,6 +124,7 @@ class SettingsPage(QWidget, Ui_settings):
         self.chose_update_source.currentIndexChanged.connect(self.change_update_source)
         # ================
         self.daily_config_tab_widget.currentChanged.connect(self.daily_config_tab_changed)
+        self.load_animation_thread = None
         # updater
         self.update_parameters = {
             "new_version": None,
@@ -132,10 +134,36 @@ class SettingsPage(QWidget, Ui_settings):
             "program_form": form,
             "version_type": program_type
         }
+        self.download_update.setEnabled(False)
+        self.install_update.setEnabled(False)
+        self.install_update.clicked.connect(self.start_install_update)
+        self.download_update.clicked.connect(self.start_download_update)
         self.start_check_update.clicked.connect(self.check_update)
+        self.chose_check_update_when_start.setChecked(self.update_config["check_update_when_start"])
+        self.chose_check_update_when_start.stateChanged.connect(self.change_check_update_when_start)
         if self.update_config["state"] == 1:
             self.update_config["state"] = 0
             self.change_update_config()
+        elif self.update_config["state"] in (2, 3):
+            reply = QMessageBox.question(self, '询问', '已经有新版本可以继续下载,是否继续下载?',
+                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            self.download_update.setEnabled(True)
+            if reply == QMessageBox.Yes:
+                self.update_parameters["download_url"] = self.update_config["last_download_url"]
+                self.change_update_config()
+                self.start_download_update()
+            else:
+                self.update_config["state"] = 0
+                self.change_update_config()
+        elif self.update_config["state"] == 4:
+            reply = QMessageBox.question(self, '询问', '新版本已就绪,是否要现在安装?\n否则将需重新下载',
+                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            self.download_update.setEnabled(True)
+            if reply == QMessageBox.Yes:
+                self.start_install_update()
+            else:
+                self.update_config["state"] = 0
+                self.change_update_config()
 
     # 进入后载入一些设置啥的初始化
     def initialize_after_entering(self):
@@ -862,7 +890,6 @@ class SettingsPage(QWidget, Ui_settings):
 
     # //////////////////
     # 更新
-    # todo 当update_config被更改的时候一定要记得立刻保存！
     def open_update(self):
         if self.update_config["state"] in (3, 4):  # 正在下载或者更新
             self.update_tabWidget.setCurrentIndex(1)
@@ -880,6 +907,10 @@ class SettingsPage(QWidget, Ui_settings):
         self.update_config["update_from"] = i
         self.change_update_config()
 
+    def change_check_update_when_start(self):
+        self.update_config["check_update_when_start"] = self.chose_check_update_when_start.isChecked()
+        self.change_update_config()
+
     def check_update(self):
         if self.update_config["state"] == 0:
             self.update_config["state"] = 1
@@ -889,13 +920,106 @@ class SettingsPage(QWidget, Ui_settings):
             # 实例化线程
             self.update_thread = GetLatestVersion(update_source, self.update_parameters)
             self.update_thread.get_latest_version_return.connect(self.after_check_update)  # 连接信号与槽
-            # todo 进度条
+            self.load_animation_thread = ShowUserLoading(self.update_staus_display, "正在获取更新")  # 创建一个加载中的动画
+            self.load_animation_thread.start()
             self.update_thread.start()  # 开始获得
 
     def after_check_update(self, status):
-        print(self.update_parameters["download_url"], status)
+        # 关闭加载动画并做一些清理工作
+        self.load_animation_thread.stop_thread()
+        self.load_animation_thread.join()
         self.update_thread.get_latest_version_return.disconnect()
         self.update_thread.deleteLater()
+        self.start_check_update.setEnabled(True)
+        # 判断状态
+        if status == VersionStatus.UpToDate:
+            self.update_staus_display.setText("当前已是最新版")
+            self.update_config["state"] = 0
+            self.change_update_config()
+        elif status == VersionStatus.GithubToFast:
+            self.update_staus_display.setText("GithubApi访问速度过快,请切换更新源或稍后重试")
+            self.update_config["state"] = 0
+            self.change_update_config()
+        elif status == VersionStatus.Error:
+            self.update_staus_display.setText("获取时出现错误,请重试或切换更新源后重试")
+            self.update_config["state"] = 0
+            self.change_update_config()
+        elif status == VersionStatus.NoLink:
+            self.update_staus_display.setText("未找到下载链接,请重试或切换更新源,如问题仍存在请反馈")
+            self.update_config["state"] = 0
+            self.change_update_config()
+        elif status == VersionStatus.Lower:
+            self.update_staus_display.setText(f"发现新版本!版本号:{self.update_parameters['new_version']}")
+            self.change_log_display.setMarkdown(f"## 更新日志\n{self.update_parameters['change_log']}")
+            self.update_config["state"] = 2
+            self.change_update_config()
+            self.download_update.setEnabled(True)
+            self.update_config["last_download_url"] = self.update_parameters['download_url']
+            self.change_update_config()
+            msgBox = QMessageBox(QMessageBox.Question, "更新",
+                                 f"发现新版本!是否现在更新{self.update_parameters['new_version']}?\n更新日志请前往设置->更新查看",
+                                 QMessageBox.Yes | QMessageBox.No)
+            chose = msgBox.exec()
+            if chose == QMessageBox.Yes:
+                self.start_download_update()  # 执行更新
+
+    def start_download_update(self):
+        self.download_update.setEnabled(False)
+        self.install_update.setEnabled(False)
+        self.update_tabWidget.setCurrentIndex(1)
+        self.update_config["state"] = 3
+        update_source = self.chose_update_source.itemText(self.chose_update_source.currentIndex())
+        self.change_update_config()
+        self.load_animation_thread = ShowUserLoading(self.download_status_display, "正在下载更新,请稍后")  # 创建一个加载中的动画
+        self.load_animation_thread.start()
+        self.update_thread = DownloadUpdate(update_source, self.update_parameters)
+        self.update_thread.download_update_return.connect(self.after_download_update)
+        self.update_thread.start()
+
+    def after_download_update(self, status):
+        self.load_animation_thread.stop_thread()
+        self.load_animation_thread.join()
+        self.update_thread.download_update_return.disconnect()
+        self.update_thread.deleteLater()
+        self.download_update.setEnabled(True)
+        if status == DownloadStatus.ErrorDownload:
+            self.update_tabWidget.setCurrentIndex(0)
+            self.update_config["state"] = 2
+            self.change_update_config()
+            self.update_staus_display.setText("下载失败,请重试或切换下载源后重试")
+        elif status == DownloadStatus.ErrorWriteChunk:
+            self.update_tabWidget.setCurrentIndex(0)
+            self.update_config["state"] = 2
+            self.change_update_config()
+            self.update_staus_display.setText("文件写入失败,请重试下载")
+        elif status == DownloadStatus.Success:  # 成功
+            self.update_config["state"] = 4
+            self.change_update_config()
+            self.install_update.setEnabled(True)
+            self.download_status_display.setText("下载完毕!请点击下方按钮进行安装")
+            reply = QMessageBox.question(self, '安装确认',
+                                         '更新下载完毕,是否现在进行安装?\n你可以稍后在设置->更新中进行安装',
+                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if reply == QMessageBox.Yes:
+                self.start_install_update()
+
+    def start_install_update(self):
+        self.update_config["state"] = 0
+        self.change_update_config()
+        path = "../data/DownloadHelper/upgrade_helper.pyw" if self.update_parameters[
+                                                                  "program_form"] == 'source' else (
+            "../data/DownloadHelper"
+            "/upgrade_helper.exe")
+        if not os.path.isfile(path):
+            QMessageBox.warning(self, '警告', '更新需求文件不足,请重新下载并安装')
+            return
+
+        os.chdir('../data/DownloadHelper')
+        if self.update_parameters["program_form"] == 'source':
+            subprocess.Popen(['pythonw', './upgrade_helper.pyw'])
+        else:
+            subprocess.Popen(['./upgrade_helper.exe'])
+        os._exit(0)
 
     # //////////////////
     # 保存并退出
@@ -1408,6 +1532,10 @@ if __name__ == '__main__':
     # 删除will_delete文件夹
     if os.path.exists("../will_delete"):
         shutil.rmtree("../will_delete")
+    if os.path.exists("../will_use"):
+        shutil.rmtree("../will_use")
+    # 禁止InsecureRequestWarning
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     # 初始化文件夹
     os.makedirs('../data/backup/daily_config', exist_ok=True)
     os.makedirs('../data/backup/program_config', exist_ok=True)
@@ -1436,13 +1564,12 @@ if __name__ == '__main__':
     scheduled_task_thread = threading.Thread(target=run_schedule,
                                              args=(int(config["refresh_time"]), main_window,))
     scheduled_task_thread.start()
-    # 进入主窗口
-
     # 使用qdarkstyle
     import qdarkstyle
 
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss
 
+    # 进入主窗口
     sys.exit(app.exec_())
-# TODO 可以调整颜色的作业/消息
-# TODO 值日模块
+#  todo 可以调整颜色的作业/消息
+#  todo 值日模块

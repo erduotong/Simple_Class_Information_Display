@@ -26,11 +26,8 @@ class DownloadStatus(enum.IntEnum):
     ErrorWriteChunk = 2  # 写入文件块时出错
 
 
-# 思路            (这里要判断网络是否连接 没连接就不试了
-# 获得更新检查权限->检查更新 如果有新版本就发射信号并且保存好可能会用的download url ->
-# 启动下载 -> 等待下载完成(准备好就更改状态) -> 询问安装 -> os._exit(0)并且启动!
-# TODO 应用名是Simple Class Information Display 打包成zip的时候应该把整个文件夹打包 其中包含一个app文件夹
-# TODO 类要记得deletelater并且disconnect
+# TODO 应用名是Simple Class Information Display  其中包含一个app文件夹以及其他 最外面的名称为Simple Class Information Display文件夹
+
 
 def download_file(destination, download_url) -> DownloadStatus:
     """
@@ -146,7 +143,7 @@ class DownloadUpdate(QThread):
 
     def run(self):
         # 检查更新辅助程序
-        status = check_helper(self.from_where, self.update_parameters["program_form"])
+        status = check_helper(self.update_parameters["program_form"], self.from_where)
         if status != DownloadStatus.Success:
             self.download_update_return.emit(status)  # 出现错误
             return
@@ -167,6 +164,7 @@ class DownloadUpdate(QThread):
         # 转移app文件夹
         if Path('../will_use').exists():  # 检查是否存在will_use并删除
             shutil.rmtree('../will_use')
-        shutil.move('../data/DownloadHelper/app', '../will_use')
+        shutil.move('../data/DownloadHelper/Simple Class Information Display/app', '../will_use')
+        shutil.rmtree("../data/DownloadHelper/Simple Class Information Display")  # 删掉文件夹
         self.download_update_return.emit(DownloadStatus.Success)
         return

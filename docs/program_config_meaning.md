@@ -17,5 +17,5 @@
 * next_indicator_text: 下一节课的课程指示器的显示的文本 如<Next
 * update: 更新相关的选项
   * state: 当前处于的状态 0表示啥事没有 1表示正在检测更新 2表示等待用户下载 3表示正在下载 4表示等待安装 
-  * update_from : 更新源位于列表中的索引(0:github :gitee)
+  * update_from : 更新源位于列表中的索引(0:github 1:gitee)
   * check_update_when_star: 是否在启动程序的时候进行一次更新检测？

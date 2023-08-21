@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+import ctypes
 import datetime
 import json
 import os
 import re
 import shutil
+import threading
 import time
 
 from PyQt5 import QtGui
@@ -303,7 +305,8 @@ def initialize_the_file(version: str) -> None:
         "../data/DownloadHelper/update_config.json": {
             "state": 0,
             "update_from": 1,
-            "check_update_when_start": True
+            "check_update_when_start": True,
+            "last_download_url": None
         }
     }
     for filepath, content in path.items():
@@ -421,6 +424,41 @@ def adaptive_item_font_size(item, max_size: int, min_size: int, widget) -> None:
     font.setPointSize(max_size)
     item.setFont(font)
     return
+
+
+class ShowUserLoading(threading.Thread):
+    def __init__(self, to_set_label, text: str):
+        threading.Thread.__init__(self)
+        self.to_set_label = to_set_label
+        self.text = text
+
+    def run(self):
+        try:
+            sleep_time = 0.2
+            while True:
+                self.to_set_label.setText(f"{self.text} |")
+                time.sleep(sleep_time)
+                self.to_set_label.setText(f"{self.text} /")
+                time.sleep(sleep_time)
+                self.to_set_label.setText(f"{self.text} -")
+                time.sleep(sleep_time)
+                self.to_set_label.setText(f"{self.text} \\")
+                time.sleep(sleep_time)
+        finally:
+            return
+
+    def get_id(self):
+        # returns id of the respective thread
+        if hasattr(self, '_thread_id'):
+            return self._thread_id
+        for id, thread in threading._active.items():
+            if thread is self:
+                return id
+
+    def stop_thread(self):
+        thread_id = self.get_id()
+        ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id,
+                                                   ctypes.py_object(SystemExit))
 
 
 # 重写QTimeEdit 更严格的QTimeEdit 用户不可以用滚轮修改
