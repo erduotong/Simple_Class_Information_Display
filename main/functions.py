@@ -160,7 +160,7 @@ def adjust_the_text_edit_font_size(text_edits, min_size: int, max_size: int) -> 
 
 # 设置字体大小 传入对象以及要设置的字体大小
 def adjust_font_size(obj, font_size: int) -> None:
-    font = QtGui.QFont()
+    font = QtGui.QFont("黑体")
     font.setPointSize(font_size)
     obj.setFont(font)
 

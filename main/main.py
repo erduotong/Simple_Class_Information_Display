@@ -1083,9 +1083,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     run_adaptive_text_edit_manually = pyqtSignal()  # 自适应homework和message的字体大小和比例 手动触发
     update_the_course_indicator_signal = pyqtSignal(int)  # 刷新课程指示器用的信号
 
-    def __init__(self, program_config):
+    def __init__(self):
         super().__init__()
         self.setupUi(self)
+        program_config = json.loads(read_file("../data/program_config.json"))
         # 其他页
         self.settings_page = SettingsPage()  # 实例化设置页面
         self.stackedWidget.addWidget(self.settings_page)
@@ -1120,7 +1121,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowTitle("Simple Class Information Display")
         rect = QDesktopWidget().availableGeometry()  # 初始化大小
         self.resize(rect.width(), rect.height())
-        adjust_font_size(self.nowtime, config["time_font_size"])  # 设置时间显示的字体大小
+        adjust_font_size(self.nowtime, program_config["time_font_size"])  # 设置时间显示的字体大小
         # 绑定要用到信号和槽
         self.homework.setPlainText(self.daily_config['backup']['homework'])  # 加载之前的文本
         self.message.setPlainText(self.daily_config['backup']['msg'])
@@ -1283,7 +1284,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 正常 正在上课的情况 为2
         else:
             for index, lesson in enumerate(self.daily_config["lessons_list"]):
-                if time_to_datetime(lesson["start"], now_time) <= now_time < time_to_datetime(lesson["end"], now):
+                if time_to_datetime(lesson["start"], now_time) <= now_time < time_to_datetime(lesson["end"], now_time):
                     if self.next_lesson != index + 1:
                         self.next_lesson = index + 1
                         self.update_the_course_indicator_signal.emit(2)
@@ -1341,7 +1342,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         lesson_index = 0
         lesson_now: dict = {}
         for index, lesson in enumerate(self.daily_config["lessons_list"]):
-            if time_to_datetime(lesson["start"], now_time) <= now_time < time_to_datetime(lesson["end"], now):
+            if time_to_datetime(lesson["start"], now_time) <= now_time < time_to_datetime(lesson["end"], now_time):
                 lesson_now = lesson
                 lesson_index = index
                 break
@@ -1513,6 +1514,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.laa = int(program_config["layout_adjustment_accuracy"])
         self.min_font_size = int(program_config["minimum_font_size"])
         self.max_font_size = int(program_config["maximum_font_size"])
+        adjust_font_size(self.nowtime, program_config["time_font_size"])  # 设置时间显示的字体大小
         self.resize_timer.setInterval(int(program_config['the_window_changes_the_refresh_time'] * 1000))
         self.findChild(QLabel, "next_lesson_indicator").setText(program_config['next_indicator_text'])
         self.findChild(QLabel, "now_lesson_indicator").setText(program_config['now_indicator_text'])
@@ -1524,25 +1526,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.after_init()
 
 
-if __name__ == '__main__':
-
-    # 基本参数 快速调节位置
-    version = '1.1.0 pre1'  # 当前版本
-    program_type = 'exe_with_qdarkstyle.zip'  # 版本类型(下载安装包的名称 包括后缀)
-    form = 'exe'  # 程序形式(source / exe)
-
-    # 设定工作目录 保证不会有小天才用cmd执行
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    now = datetime.datetime.now()
-    week_name = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][now.weekday()]
-    compare_time = compareTime()
+def init_need_files_and_folders():
     # 删除will_delete文件夹
     if os.path.exists("../will_delete"):
         shutil.rmtree("../will_delete")
     if os.path.exists("../will_use"):
         shutil.rmtree("../will_use")
-    # 禁止InsecureRequestWarning
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     # 初始化文件夹
     os.makedirs('../data/backup/daily_config', exist_ok=True)
     os.makedirs('../data/backup/program_config', exist_ok=True)
@@ -1552,26 +1541,48 @@ if __name__ == '__main__':
     os.makedirs("../data/DownloadHelper", exist_ok=True)
     # 初始化文件并且兼容升级 具体更改在函数内
     initialize_the_file(version)
-    # 如果是周六日并且文件没有在今天被创建过的话就问一下
-    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)  # 高DPI自适应
-    lessons_dict = json.loads(read_file('../data/Curriculum/lessons.json'))
+
+
+def init_daily_config():
+    now = datetime.datetime.now()
+    week_name = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][now.weekday()]
+    compare_time = compareTime()
     # 询问课表 如果是没东西的话那么就询问要替换哪个课表
+    lessons_dict = json.loads(read_file('../data/Curriculum/lessons.json'))
     if (lessons_dict[week_name][0] == 'None') and compare_time is False:
-        app = QApplication(sys.argv)
-        ReselectTheClassScheduleWindow = ReselectTheClassScheduleWindow(lessons_dict)
+        reselect_the_class_schedule_window = ReselectTheClassScheduleWindow(lessons_dict)
         app.exec()
-        week_name = ReselectTheClassScheduleWindow.result
-    else:  # 防止app忘记创建
-        app = QApplication(sys.argv)
-    config = json.loads(read_file("../data/program_config.json"))  # 把program_config读了
+        week_name = reselect_the_class_schedule_window.result
     daily_initialization(week_name)  # 初始化daily_config文件
+
+
+def init_program_settings():
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  # 禁止InsecureRequestWarning
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)  # 高DPI自适应
+
+
+if __name__ == '__main__':
+    # 基本参数 快速调节位置
+    version = '1.1.0 pre'  # 当前版本
+    program_type = 'exe_with_qdarkstyle.zip'  # 版本类型(下载安装包的名称 包括后缀)
+    form = 'exe'  # 程序形式(source / exe)
+
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))  # 设定工作目录 保证不会有小天才用cmd执行
+    app = QApplication(sys.argv)  # 创建app
+
+    init_need_files_and_folders()  # 初始化所需文件和文件夹(如果需要
+    init_program_settings()
+    init_daily_config()  # 初始化daily_config
+
     # 创建主窗口
-    main_window = MainWindow(config)
-    # 创建进程开始定时执行任务,传入刷新的秒数
+    main_window = MainWindow()
+    # 创建一个用于刷新时间的线程执行任务,传入刷新的秒数
     scheduled_task_thread = threading.Thread(target=run_schedule,
-                                             args=(int(config["refresh_time"]), main_window,))
+                                             args=(int(json.loads(
+                                                 read_file("../data/program_config.json")
+                                             )["refresh_time"]), main_window,))
     scheduled_task_thread.start()
-    # 使用qdarkstyle
+    # qdarkstyle
     import qdarkstyle
 
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss
