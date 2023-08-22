@@ -23,7 +23,7 @@ int main() {
 		perror("Error changing directory to '../../app'");
 	}
 
-	ShellExecute(NULL, "open", "Simple Class Information Display.exe", NULL, NULL, SW_HIDE);
+	ShellExecute(NULL, "open", "Simple Class Information Display.exe", NULL, NULL, SW_SHOW);
 	return 0;
 }
 
