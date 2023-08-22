@@ -1568,10 +1568,10 @@ if __name__ == '__main__':
     form = 'exe'  # 程序形式(source / exe)
 
     os.chdir(os.path.dirname(os.path.abspath(__file__)))  # 设定工作目录 保证不会有小天才用cmd执行
-    app = QApplication(sys.argv)  # 创建app
 
-    init_need_files_and_folders()  # 初始化所需文件和文件夹(如果需要
     init_program_settings()  # 初始化一些设置
+    app = QApplication(sys.argv)  # 创建app
+    init_need_files_and_folders()  # 初始化所需文件和文件夹(如果需要
     init_daily_config()  # 初始化daily_config
 
     # 创建主窗口
