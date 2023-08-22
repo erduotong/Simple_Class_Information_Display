@@ -2,4 +2,5 @@
 ./main/__pycache__/
 ./data/backup/
 ./data/Curriculum/
-/data/daily_config.json
+./data/daily_config.json
+./data/program_config.json

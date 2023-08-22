@@ -1563,7 +1563,7 @@ def init_program_settings():
 
 if __name__ == '__main__':
     # 基本参数 快速调节位置
-    version = '1.1.0 pre'  # 当前版本
+    version = '1.1.0 pre '  # 当前版本
     program_type = 'exe_with_qdarkstyle.zip'  # 版本类型(下载安装包的名称 包括后缀)
     form = 'exe'  # 程序形式(source / exe)
 
