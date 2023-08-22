@@ -97,11 +97,14 @@ class GetLatestVersion(QThread):
             "github": 'https://api.github.com/repos/erduotong/Simple_Class_Information_Display/releases/latest',
             "gitee": 'https://gitee.com/api/v5/repos/erduotong/Simple_Class_Information_Display/releases/latest'}
         api_link: str = api_link_dict[self.mode]  # 这里是判断api_link要在哪里的地方
+        print("start")
         try:
             response = requests.get(api_link, verify=False)  # 获得api数据
         except Exception as e:
+            print("VersionStatus Error -1")
             self.get_latest_version_return.emit(VersionStatus.Error)
             return
+        print("after_get_api")
         # 处理一下github api访问过快的问题
         try:
             if ("documentation_url" in response.json()) and response.status_code == 403:
@@ -109,11 +112,14 @@ class GetLatestVersion(QThread):
                 return
         except:
             pass
+        print("处理完github api过快")
         if response.status_code != 200:
+            print("非200返回值 返回")
             self.get_latest_version_return.emit(VersionStatus.Error)
             return
+        print("处理完非200的返回值")
         response = response.json()  # 得到相应的数据
-
+        print("得到数据")
         if self.mode in ("github", "gitee"):
             if response.get("name") == self.update_parameters["now_version"]:
                 self.get_latest_version_return.emit(VersionStatus.UpToDate)

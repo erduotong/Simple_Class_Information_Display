@@ -3,6 +3,7 @@ import copy
 import random
 import subprocess
 import sys
+import threading
 
 import urllib3
 from PyQt5 import QtCore, QtWidgets
@@ -931,11 +932,18 @@ class SettingsPage(QWidget, Ui_settings):
 
     def after_check_update(self, status):
         # 关闭加载动画并做一些清理工作
+        print("开始")
         self.load_animation_thread.stop_thread()
+        print("加载动画线程停止")
         self.load_animation_thread.join()
+        print("after_join")
         self.update_thread.get_latest_version_return.disconnect()
+        print("断开连接")
         self.update_thread.deleteLater()
+        print("删除")
         self.start_check_update.setEnabled(True)
+        print("设置为可行")
+        print(status)
         # 判断状态
         if status == VersionStatus.UpToDate:
             self.update_staus_display.setText("当前已是最新版")
@@ -946,8 +954,11 @@ class SettingsPage(QWidget, Ui_settings):
             self.update_config["state"] = 0
             self.change_update_config()
         elif status == VersionStatus.Error:
+            print("to-error")
             self.update_staus_display.setText("获取时出现错误,请检查你的网络后重试或切换更新源后重试")
+            print("2")
             self.update_config["state"] = 0
+            print("3")
             self.change_update_config()
         elif status == VersionStatus.NoLink:
             self.update_staus_display.setText("未找到下载链接,请重试或切换更新源,如问题仍存在请反馈")
