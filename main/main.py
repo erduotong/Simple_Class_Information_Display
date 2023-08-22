@@ -53,7 +53,7 @@ class ReselectTheClassScheduleWindow(QDialog, Ui_Dialog):
 
     def on_push_button_2_clicked(self):
         self.result = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][
-            datetime.now().weekday()]
+            datetime.datetime.now().weekday()]
         self.signal1 = 'clicked'
         self.close()
         self.returnPressed.emit(self.result)

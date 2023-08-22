@@ -106,7 +106,6 @@ class GetLatestVersion(QThread):
         except:
             pass
         if response.status_code != 200:
-            print(response.status_code)
             self.get_latest_version_return.emit(VersionStatus.Error)
             return
         response = response.json()  # 得到相应的数据
