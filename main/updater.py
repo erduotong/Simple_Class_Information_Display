@@ -4,6 +4,7 @@
 # ////////////////////////////////
 
 import enum
+import os
 import shutil
 import zipfile
 from pathlib import Path
@@ -70,8 +71,12 @@ def check_helper(mode: str, where: str) -> DownloadStatus:
                          '-upgrade_helper/upgrade_helper.pyw') if mode == 'source' else \
             ('https://github.com/erduotong/Simple_Class_Information_Display/releases/download/v1.1-upgrade_helper'
              '/upgrade_helper.exe')  # github 源代码/exe
-    state = download_file(file_path, download_link)
-    return state
+    # 先下载到一个tmp文件再转换
+    state = download_file("../data/DownloadHelper/upgrade_helper.tmp", download_link)
+    if state != DownloadStatus.Success:
+        return state
+    os.rename("../data/DownloadHelper/upgrade_helper.tmp", file_path)
+    return DownloadStatus.Success
 
 
 class GetLatestVersion(QThread):
