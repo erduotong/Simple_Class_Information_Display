@@ -434,16 +434,13 @@ class ShowUserLoading(threading.Thread):
 
     def run(self):
         try:
+            symbols = ['|', '/', '-', '\\']
             sleep_time = 0.2
+            i = 0
             while True:
-                self.to_set_label.setText(f"{self.text} |")
+                self.to_set_label.setText(f"{self.text} {symbols[i]}")
                 time.sleep(sleep_time)
-                self.to_set_label.setText(f"{self.text} /")
-                time.sleep(sleep_time)
-                self.to_set_label.setText(f"{self.text} -")
-                time.sleep(sleep_time)
-                self.to_set_label.setText(f"{self.text} \\")
-                time.sleep(sleep_time)
+                i = (i + 1) % len(symbols)
         finally:
             return
 
