@@ -4,3 +4,6 @@
 ./data/Curriculum/
 ./data/daily_config.json
 ./data/program_config.json
+
+build/
+venv/
