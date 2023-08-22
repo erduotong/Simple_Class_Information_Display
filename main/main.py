@@ -1571,17 +1571,19 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)  # 创建app
 
     init_need_files_and_folders()  # 初始化所需文件和文件夹(如果需要
-    init_program_settings()
+    init_program_settings()  # 初始化一些设置
     init_daily_config()  # 初始化daily_config
 
     # 创建主窗口
     main_window = MainWindow()
+
     # 创建一个用于刷新时间的线程执行任务,传入刷新的秒数
     scheduled_task_thread = threading.Thread(target=run_schedule,
                                              args=(int(json.loads(
                                                  read_file("../data/program_config.json")
                                              )["refresh_time"]), main_window,))
     scheduled_task_thread.start()
+
     # qdarkstyle
     import qdarkstyle
 
