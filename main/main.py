@@ -144,7 +144,9 @@ class SettingsPage(QWidget, Ui_settings):
         if self.update_config["state"] == 1:
             self.update_config["state"] = 0
             self.change_update_config()
-        elif self.update_config["state"] in (2, 3):
+
+    def update_inquire(self):
+        if self.update_config["state"] in (2, 3):
             reply = QMessageBox.question(self, '询问', '已经有新版本可以继续下载,是否继续下载?',
                                          QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
             self.download_update.setEnabled(True)
@@ -1140,6 +1142,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.show()  # 显示
         # 开始套娃 执行要渲染窗口完毕后的操作
         QtCore.QTimer.singleShot(0, self.after_init)
+        QTimer.singleShot(100, self.settings_page.update_inquire)
 
     # 需要渲染窗口完毕后执行的函数
     def after_init(self):
@@ -1153,6 +1156,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             adjust_the_text_edit_font_size([self.findChild(QTextBrowser, i)], self.min_font_size, self.max_font_size)
         QtCore.QTimer.singleShot(0, self.adjust_msg_hw_size)
         QtCore.QTimer.singleShot(0, self.refresh_time)  # 强制刷新时间
+
 
     # 刷新时间
     def refresh_time(self):
@@ -1521,61 +1525,61 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
 if __name__ == '__main__':
-    # try:
-    # 基本参数 快速调节位置
-    version = '1.0.9'  # 当前版本
-    program_type = 'exe_without_qdarkstyle.zip'  # 版本类型(下载安装包的名称 包括后缀)
-    form = 'exe'  # 程序形式(source / exe)
+    try:
+        # 基本参数 快速调节位置
+        version = '1.1.0 pre'  # 当前版本
+        program_type = 'exe_with_qdarkstyle.zip'  # 版本类型(下载安装包的名称 包括后缀)
+        form = 'exe'  # 程序形式(source / exe)
 
-    # 设定工作目录 保证不会有小天才用cmd执行
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    now = datetime.datetime.now()
-    week_name = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][now.weekday()]
-    compare_time = compareTime()
-    # 删除will_delete文件夹
-    if os.path.exists("../will_delete"):
-        shutil.rmtree("../will_delete")
-    if os.path.exists("../will_use"):
-        shutil.rmtree("../will_use")
-    # 禁止InsecureRequestWarning
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-    # 初始化文件夹
-    os.makedirs('../data/backup/daily_config', exist_ok=True)
-    os.makedirs('../data/backup/program_config', exist_ok=True)
-    os.makedirs('../data/backup/time', exist_ok=True)
-    os.makedirs('../data/backup/lessons', exist_ok=True)
-    os.makedirs('../data/Curriculum', exist_ok=True)
-    os.makedirs("../data/DownloadHelper", exist_ok=True)
-    # 初始化文件并且兼容升级 具体更改在函数内
-    initialize_the_file(version)
-    # 如果是周六日并且文件没有在今天被创建过的话就问一下
-    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)  # 高DPI自适应
-    lessons_dict = json.loads(read_file('../data/Curriculum/lessons.json'))
-    # 询问课表 如果是没东西的话那么就询问要替换哪个课表
-    if (lessons_dict[week_name][0] == 'None') and compare_time is False:
-        app = QApplication(sys.argv)
-        ReselectTheClassScheduleWindow = ReselectTheClassScheduleWindow(lessons_dict)
-        app.exec()
-        week_name = ReselectTheClassScheduleWindow.result
-    else:  # 防止app忘记创建
-        app = QApplication(sys.argv)
-    config = json.loads(read_file("../data/program_config.json"))  # 把program_config读了
-    daily_initialization(week_name)  # 初始化daily_config文件
-    # 创建主窗口
-    main_window = MainWindow(config)
-    # 创建进程开始定时执行任务,传入刷新的秒数
-    scheduled_task_thread = threading.Thread(target=run_schedule,
-                                             args=(int(config["refresh_time"]), main_window,))
-    scheduled_task_thread.start()
-    # 使用qdarkstyle
-    import qdarkstyle
+        # 设定工作目录 保证不会有小天才用cmd执行
+        os.chdir(os.path.dirname(os.path.abspath(__file__)))
+        now = datetime.datetime.now()
+        week_name = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][now.weekday()]
+        compare_time = compareTime()
+        # 删除will_delete文件夹
+        if os.path.exists("../will_delete"):
+            shutil.rmtree("../will_delete")
+        if os.path.exists("../will_use"):
+            shutil.rmtree("../will_use")
+        # 禁止InsecureRequestWarning
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        # 初始化文件夹
+        os.makedirs('../data/backup/daily_config', exist_ok=True)
+        os.makedirs('../data/backup/program_config', exist_ok=True)
+        os.makedirs('../data/backup/time', exist_ok=True)
+        os.makedirs('../data/backup/lessons', exist_ok=True)
+        os.makedirs('../data/Curriculum', exist_ok=True)
+        os.makedirs("../data/DownloadHelper", exist_ok=True)
+        # 初始化文件并且兼容升级 具体更改在函数内
+        initialize_the_file(version)
+        # 如果是周六日并且文件没有在今天被创建过的话就问一下
+        QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)  # 高DPI自适应
+        lessons_dict = json.loads(read_file('../data/Curriculum/lessons.json'))
+        # 询问课表 如果是没东西的话那么就询问要替换哪个课表
+        if (lessons_dict[week_name][0] == 'None') and compare_time is False:
+            app = QApplication(sys.argv)
+            ReselectTheClassScheduleWindow = ReselectTheClassScheduleWindow(lessons_dict)
+            app.exec()
+            week_name = ReselectTheClassScheduleWindow.result
+        else:  # 防止app忘记创建
+            app = QApplication(sys.argv)
+        config = json.loads(read_file("../data/program_config.json"))  # 把program_config读了
+        daily_initialization(week_name)  # 初始化daily_config文件
+        # 创建主窗口
+        main_window = MainWindow(config)
+        # 创建进程开始定时执行任务,传入刷新的秒数
+        scheduled_task_thread = threading.Thread(target=run_schedule,
+                                                 args=(int(config["refresh_time"]), main_window,))
+        scheduled_task_thread.start()
+        # 使用qdarkstyle
+        import qdarkstyle
 
-    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss
+        app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss
 
-    # 进入主窗口
-    sys.exit(app.exec_())
-    # except Exception as e:
-    #     print(e)
+        # 进入主窗口
+        sys.exit(app.exec_())
+    except Exception as e:
+        print(e)
 
 # todo 可以调整颜色的作业/消息
 # todo 值日模块

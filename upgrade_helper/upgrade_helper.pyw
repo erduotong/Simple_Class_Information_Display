@@ -1,7 +1,7 @@
+import os
+import shutil
 import subprocess
 import time
-import shutil
-import os
 
 # 等待1秒防止出问题
 time.sleep(1)

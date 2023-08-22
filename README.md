@@ -30,6 +30,7 @@
 
 **推荐的方式**  
 相比从源码启动，会占用较多的空间(容纳了运行库) 但是不需要python解释器和PyQt等 已经打包  
+不推荐非windows系统的人使用 使用了windows API(C++中的ShellExecute)  
 如果你需要**qdarkstyle**美化,请选择**exe_with_qdarkstyle**下载  
 如果不需要**qdarkstyle**,请选择**exe_without_qdarkstyle**下载  
 请在[Releases](https://github.com/erduotong/Simple_Class_Information_Display/releases/latest)下载  
@@ -38,6 +39,7 @@
 ### 从源码启动
 
 > 不推荐，除非你知道你在做什么 推荐[从exe启动](#从exe启动)
+
 
 如果你已经拥有**Python环境**并且可以使用**pip安装需要的依赖库** 你可以尝试从源码启动  
 你可以在[这里](https://www.python.org/)安装python
