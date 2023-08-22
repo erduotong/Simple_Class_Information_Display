@@ -946,7 +946,7 @@ class SettingsPage(QWidget, Ui_settings):
             self.update_config["state"] = 0
             self.change_update_config()
         elif status == VersionStatus.Error:
-            self.update_staus_display.setText("获取时出现错误,请重试或切换更新源后重试")
+            self.update_staus_display.setText("获取时出现错误,请检查你的网络后重试或切换更新源后重试")
             self.update_config["state"] = 0
             self.change_update_config()
         elif status == VersionStatus.NoLink:
