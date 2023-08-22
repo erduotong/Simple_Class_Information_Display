@@ -146,6 +146,7 @@ class SettingsPage(QWidget, Ui_settings):
             self.change_update_config()
 
     def update_inquire(self):
+
         if self.update_config["state"] in (2, 3):
             reply = QMessageBox.question(self, '询问', '已经有新版本可以继续下载,是否继续下载?',
                                          QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
@@ -166,7 +167,7 @@ class SettingsPage(QWidget, Ui_settings):
             else:
                 self.update_config["state"] = 0
                 self.change_update_config()
-        if self.update_config["state"] == 0 and self.update_config["check_update_when_start"] is True:  # 满足自动检查更新条件
+        elif self.update_config["state"] == 0 and self.update_config["check_update_when_start"] is True:  # 满足自动检查更新条件
             self.check_update()
 
     # 进入后载入一些设置啥的初始化
@@ -1142,7 +1143,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.show()  # 显示
         # 开始套娃 执行要渲染窗口完毕后的操作
         QtCore.QTimer.singleShot(0, self.after_init)
-        QTimer.singleShot(100, self.settings_page.update_inquire)
+        QTimer.singleShot(1000, self.settings_page.update_inquire)
 
     # 需要渲染窗口完毕后执行的函数
     def after_init(self):
@@ -1156,7 +1157,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             adjust_the_text_edit_font_size([self.findChild(QTextBrowser, i)], self.min_font_size, self.max_font_size)
         QtCore.QTimer.singleShot(0, self.adjust_msg_hw_size)
         QtCore.QTimer.singleShot(0, self.refresh_time)  # 强制刷新时间
-
 
     # 刷新时间
     def refresh_time(self):
@@ -1578,7 +1578,6 @@ if __name__ == '__main__':
 
     # 进入主窗口
     sys.exit(app.exec_())
-
 
 # todo 可以调整颜色的作业/消息
 # todo 值日模块
