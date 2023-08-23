@@ -3,7 +3,6 @@ import copy
 import random
 import subprocess
 import sys
-import threading
 
 import urllib3
 from PyQt5 import QtCore, QtWidgets
@@ -158,6 +157,7 @@ class SettingsPage(QWidget, Ui_settings):
                 self.start_download_update()
             else:
                 self.update_config["state"] = 0
+                self.download_update.setEnabled(False)
                 self.change_update_config()
         elif self.update_config["state"] == 4:
             reply = QMessageBox.question(self, '询问', '新版本已就绪,是否要现在安装?\n否则将需重新下载',
@@ -166,6 +166,7 @@ class SettingsPage(QWidget, Ui_settings):
             if reply == QMessageBox.Yes:
                 self.start_install_update()
             else:
+                self.download_update.setEnabled(False)
                 self.update_config["state"] = 0
                 self.change_update_config()
         elif self.update_config["state"] == 0 and self.update_config["check_update_when_start"] is True:  # 满足自动检查更新条件
@@ -939,9 +940,11 @@ class SettingsPage(QWidget, Ui_settings):
         print("after_join")
         self.update_thread.get_latest_version_return.disconnect()
         print("断开连接")
+        self.update_thread.wait()
+        print("等待get线程结束")
         self.update_thread.deleteLater()
         print("删除")
-        self.start_check_update.setEnabled(True)
+        QTimer.singleShot(1000, lambda: self.start_check_update.setEnabled(True))
         print("设置为可行")
         print(status)
         # 判断状态
@@ -949,8 +952,8 @@ class SettingsPage(QWidget, Ui_settings):
             self.update_staus_display.setText("当前已是最新版")
             self.update_config["state"] = 0
             self.change_update_config()
-        elif status == VersionStatus.GithubToFast:
-            self.update_staus_display.setText("GithubApi访问速度过快,请切换更新源或稍后重试")
+        elif status == VersionStatus.ToFast:
+            self.update_staus_display.setText("访问API速度过快!请切换更新源或者稍后再试")
             self.update_config["state"] = 0
             self.change_update_config()
         elif status == VersionStatus.Error:
@@ -996,6 +999,7 @@ class SettingsPage(QWidget, Ui_settings):
         self.load_animation_thread.stop_thread()
         self.load_animation_thread.join()
         self.update_thread.download_update_return.disconnect()
+        self.update_thread.wait()
         self.update_thread.deleteLater()
         self.download_update.setEnabled(True)
         if status == DownloadStatus.ErrorDownload:

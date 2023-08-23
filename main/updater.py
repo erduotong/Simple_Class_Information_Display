@@ -18,7 +18,7 @@ class VersionStatus(enum.IntEnum):
     Lower = 1  # 有新版本
     NoLink = 2  # 无下载链接
     Error = 3  # error
-    GithubToFast = 4  # github api访问过快
+    ToFast = 4  # 403 过快
 
 
 class DownloadStatus(enum.IntEnum):
@@ -99,26 +99,33 @@ class GetLatestVersion(QThread):
         api_link: str = api_link_dict[self.mode]  # 这里是判断api_link要在哪里的地方
         print("start")
         try:
+            print("will-get")
             response = requests.get(api_link, verify=False)  # 获得api数据
-        except Exception as e:
+            print("get_finish")
+        except requests.RequestException as e:
+            print(e)
             print("VersionStatus Error -1")
             self.get_latest_version_return.emit(VersionStatus.Error)
             return
-        print("after_get_api")
-        # 处理一下github api访问过快的问题
-        try:
-            if ("documentation_url" in response.json()) and response.status_code == 403:
-                self.get_latest_version_return.emit(VersionStatus.GithubToFast)
-                return
-        except:
-            pass
+        print("after")
+        print(response.status_code, response)
+        # 处理一下api访问过快的问题
+        if response.status_code == 403:
+            print("tofast")
+            self.get_latest_version_return.emit(VersionStatus.ToFast)
+            return
         print("处理完github api过快")
         if response.status_code != 200:
             print("非200返回值 返回")
             self.get_latest_version_return.emit(VersionStatus.Error)
             return
         print("处理完非200的返回值")
-        response = response.json()  # 得到相应的数据
+        try:
+            response = response.json()  # 得到相应的数据
+        except requests.JSONDecodeError:
+            print("json解压错误")
+            self.get_latest_version_return.emit(VersionStatus.Error)
+            return
         print("得到数据")
         if self.mode in ("github", "gitee"):
             if response.get("name") == self.update_parameters["now_version"]:
