@@ -933,20 +933,12 @@ class SettingsPage(QWidget, Ui_settings):
 
     def after_check_update(self, status):
         # 关闭加载动画并做一些清理工作
-        print("开始")
         self.load_animation_thread.stop_thread()
-        print("加载动画线程停止")
         self.load_animation_thread.join()
-        print("after_join")
         self.update_thread.get_latest_version_return.disconnect()
-        print("断开连接")
         self.update_thread.wait()
-        print("等待get线程结束")
         self.update_thread.deleteLater()
-        print("删除")
         QTimer.singleShot(1000, lambda: self.start_check_update.setEnabled(True))
-        print("设置为可行")
-        print(status)
         # 判断状态
         if status == VersionStatus.UpToDate:
             self.update_staus_display.setText("当前已是最新版")
@@ -957,11 +949,8 @@ class SettingsPage(QWidget, Ui_settings):
             self.update_config["state"] = 0
             self.change_update_config()
         elif status == VersionStatus.Error:
-            print("to-error")
             self.update_staus_display.setText("获取时出现错误,请检查你的网络后重试或切换更新源后重试")
-            print("2")
             self.update_config["state"] = 0
-            print("3")
             self.change_update_config()
         elif status == VersionStatus.NoLink:
             self.update_staus_display.setText("未找到下载链接,请重试或切换更新源,如问题仍存在请反馈")
@@ -1154,7 +1143,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             initialize_label_indicator("next_lesson_indicator", program_config['next_indicator_text']))
         self.layout().addWidget(
             initialize_label_indicator("now_lesson_indicator", program_config['now_indicator_text']))
-        # print(self.__dict__)  # 调试用
         self.stackedWidget.setCurrentIndex(0)  # 切换到page0
         self.show()  # 显示
         # 开始套娃 执行要渲染窗口完毕后的操作
@@ -1578,9 +1566,9 @@ def init_program_settings():
 
 if __name__ == '__main__':
     # 基本参数 快速调节位置
-    version = '1.1.0 pre '  # 当前版本
-    program_type = 'exe_with_qdarkstyle.zip'  # 版本类型(下载安装包的名称 包括后缀)
-    form = 'exe'  # 程序形式(source / exe)
+    version = '1.1.0'  # 当前版本
+    program_type = 'source_without_qdarkstyle.zip'  # 版本类型(下载安装包的名称 包括后缀)
+    form = 'source'  # 程序形式(source / exe)
 
     os.chdir(os.path.dirname(os.path.abspath(__file__)))  # 设定工作目录 保证不会有小天才用cmd执行
 
