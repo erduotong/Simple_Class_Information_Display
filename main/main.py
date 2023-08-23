@@ -875,7 +875,7 @@ class SettingsPage(QWidget, Ui_settings):
         if "daily_config" in selected_files:
             backup('../data/daily_config.json', '../data/backup/daily_config',
                    self.program_config_dict["backup_slots"]["daily_config"])
-            initialize_the_file(version)
+            daily_initialization(week_name)
             self.daily_config_dict = json.loads(read_file('../data/daily_config.json'))
             self.daily_config_opened: bool = False
             self.today_lessons_edit_opened: bool = False
@@ -1461,7 +1461,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     # 重写resizeEvent 实现自动重新自适应字体大小
     def resizeEvent(self, event):
-        self.resize_timer.start()  # 重置窗口大小时启动计时器
+        self.resize_timer.start()  # 窗口大小时启动计时器
         super().resizeEvent(event)
 
     # 自适应字体大小 窗口调整超时后
@@ -1548,6 +1548,7 @@ def init_need_files_and_folders():
 
 def init_daily_config():
     now = datetime.datetime.now()
+    global week_name
     week_name = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][now.weekday()]
     compare_time = compareTime()
     # 询问课表 如果是没东西的话那么就询问要替换哪个课表
@@ -1575,6 +1576,7 @@ if __name__ == '__main__':
     init_program_settings()  # 初始化一些设置
     app = QApplication(sys.argv)  # 创建app
     init_need_files_and_folders()  # 初始化所需文件和文件夹(如果需要
+    week_name = None
     init_daily_config()  # 初始化daily_config
 
     # 创建主窗口
