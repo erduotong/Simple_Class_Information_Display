@@ -17,9 +17,9 @@
 
 ### 选择qdarkstyle
 
-<div>
-    <span style="float: left;">左对齐的文字</span>
-    <span style="float: right;">右对齐的文字</span>
-</div>
+
+<span style="float: left;">左对齐的文字</span>
+<span style="float: right;">右对齐的文字</span>
+
 
 ![](./images/with_and_without_qdarkstyle.png)
