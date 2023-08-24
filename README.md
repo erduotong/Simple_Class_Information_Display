@@ -39,8 +39,6 @@
 
 ![](./images/with_and_without_qdarkstyle.png)
 
----
-
 ### 安装形式
 
 * [从安装包安装](#从安装包安装) **(推荐)** 请优先选择
