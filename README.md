@@ -20,8 +20,7 @@
 如果选择需要qdarkstyle(右图), 请在下载时选择带有with_qdarkstyle的(例如exe_with_qdarkstyle)  
 如果选不需要qdarkstyle(左图), 请在下载时选择带有without_qdarkstyle的(例如source_without_qdarkstyle)
 
-<div style="text-align:left">左:有qdarkstyle</div> 
-<div style="text-align:right">Right</div>
-
+<p align="left">诶嘿</p>
+<p align="right">诶嘿</p>
 
 ![](./images/with_and_without_qdarkstyle.png)
