@@ -16,11 +16,22 @@
 ## 下载
 
 ### 选择qdarkstyle
-程序有两种形式:有qdarkstyle和无qdarkstyle 请参见下图  
-如果选择需要qdarkstyle(右图), 请在下载时选择带有with_qdarkstyle的(例如exe_with_qdarkstyle)  
-如果选不需要qdarkstyle(左图), 请在下载时选择带有without_qdarkstyle的(例如source_without_qdarkstyle)
 
-<p align="left">诶嘿</p>
-<p align="right">诶嘿</p>
+程序有两种形式:有qdarkstyle和无qdarkstyle 请参见下图  
+如果选择需要qdarkstyle(右图), 请在下载时选择带有 with_qdarkstyle 的(例如exe_with_qdarkstyle)  
+如果选不需要qdarkstyle(左图), 请在下载时选择带有 without_qdarkstyle 的(例如source_without_qdarkstyle)
+
+<p align="left">↓左侧: 无qdarkstyle</p>
+<p align="right">右侧: 有qdarkstyle↓</p>
 
 ![](./images/with_and_without_qdarkstyle.png)
+
+---
+
+### 安装形式
+
+* [从安装包安装](#从安装包安装) **(推荐)** 请优先选择
+* [从程序压缩包安装]()
+* [从源代码启动]()
+
+#### 从安装包安装
