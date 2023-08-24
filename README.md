@@ -16,10 +16,12 @@
 ## 下载
 
 ### 选择qdarkstyle
+程序有两种形式:有qdarkstyle和无qdarkstyle 请参见下图  
+如果选择需要qdarkstyle(右图), 请在下载时选择带有with_qdarkstyle的(例如exe_with_qdarkstyle)  
+如果选不需要qdarkstyle(左图), 请在下载时选择带有without_qdarkstyle的(例如source_without_qdarkstyle)
 
-
-<span style="float: left;">左对齐的文字</span>
-<span style="float: right;">右对齐的文字</span>
+<div style="text-align:left">左:有qdarkstyle</div> 
+<div style="text-align:right">Right</div>
 
 
 ![](./images/with_and_without_qdarkstyle.png)
