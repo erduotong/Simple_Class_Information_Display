@@ -47,7 +47,7 @@
 * [从程序压缩包安装](#从程序压缩包安装)
 * [从源代码安装]()
 
-#### 从安装包安装
+##### 从安装包安装
 
 该方式会下载一个安装程序, 安装程序将会根据要求帮助安装 不需要解释器等运行环境 程序安装包内已经包含所需    
 不推荐**非Windows**系统的用户使用 使用了Windows API(ShellExecute)于更新程序中 除非您确定它可以正常运作  
@@ -57,7 +57,7 @@ Github用户请在Github的 ->[Releases](https://github.com/erduotong/Simple_Cla
 进行下载  
 Gitee用户请在Gitee的 ->[Releases](https://github.com/erduotong/Simple_Class_Information_Display/releases/latest)<- 进行下载
 
-#### 从程序压缩包安装
+##### 从程序压缩包安装
 
 该方式会下载程序的打包后的文件 不需要解释器等运行环境 程序打包后以已经包含所需
 不推荐**非Windows**系统的用户使用 使用了Windows API(ShellExecute)于更新程序中 除非您确定它可以正常运作
@@ -68,7 +68,7 @@ Github用户请在Github的 ->[Releases](https://github.com/erduotong/Simple_Cla
 进行下载  
 Gitee用户请在Gitee的 ->[Releases](https://github.com/erduotong/Simple_Class_Information_Display/releases/latest)<- 进行下载
 
-#### 从源码安装
+##### 从源码安装
 
 该方式会下载程序的源代码 需要Python解释器和一些库 下列是详细要求
 
@@ -91,16 +91,16 @@ Gitee用户请在Gitee的 ->[Releases](https://github.com/erduotong/Simple_Class
 
 > 后续的使用方法请查看[使用/功能教程](./docs/how_to_use.md)
 
-### 从安装包启动
+##### 从安装包启动
 
 如果勾选了安装包创建快捷方式, 直接启动即可  
 如果没有快捷方式, 请打开安装目录的文件夹中的app文件夹, 并运行其中的Simple Class Information Display.exe
 
-### 从程序压缩包启动
+##### 从程序压缩包启动
 
 打开解压后的文件夹中的app文件夹 并运行其中的Simple Class Information Display.exe
 
-### 从源码启动
+##### 从源码启动
 
 先运行setup_lib.py使用pip安装所需运行库(或者自行安装)  
 随后运行安装文件夹中的app文件夹中的Simple Class Information Display.pyw
