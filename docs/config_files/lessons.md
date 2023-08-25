@@ -1,4 +1,4 @@
-# lessons.json
+_# lessons.json
 
 [回到README](../../README.md)
 
@@ -44,4 +44,4 @@
 special内存储的是特殊课程，这种课程不会拥有独立的课程槽位，需要共有一个槽位 并且**每天都会生成** 基本上可以看作是无序的 最后程序会按时间给daily_config排序的 
 > 注意 special内的课程一定要在[time.json](./time.md)里面写有时间设置 否则会导致程序无法启动
 
-with_homework内存储的是拥有作业的课程，会交给函数自动生成今天的作业放在作业的textBrowser内
+with_homework内存储的是拥有作业的课程，会交给函数自动生成今天的作业放在作业的textBrowser内_

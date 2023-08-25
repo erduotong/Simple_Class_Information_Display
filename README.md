@@ -12,23 +12,26 @@
 <details>
   <summary>点击展开</summary>
 
+<!-- TOC -->
 * [Simple Class Information Display](#simple-class-information-display)
-    * [快捷跳转目录](#快捷跳转目录)
-    * [概述](#概述)
-    * [下载](#下载)
-        * [选择qdarkstyle](#选择qdarkstyle)
-        * [安装形式](#安装形式)
-            * [从安装包安装](#从安装包安装)
-            * [从程序压缩包安装](#从程序压缩包安装)
-            * [从源码安装](#从源码安装)
-    * [首次使用](#首次使用)
+  * [快捷跳转目录](#快捷跳转目录)
+  * [概述](#概述)
+  * [下载](#下载)
+    * [选择qdarkstyle](#选择qdarkstyle)
+    * [安装形式](#安装形式)
+        * [从安装包安装](#从安装包安装)
+        * [从程序压缩包安装](#从程序压缩包安装)
+        * [从源码安装](#从源码安装)
+  * [首次使用](#首次使用)
         * [从安装包启动](#从安装包启动)
         * [从程序压缩包启动](#从程序压缩包启动)
         * [从源码启动](#从源码启动)
-    * [文档](#文档)
-    * [更新计划](#更新计划)
-    * [分享协议](#分享协议)
-        * [署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0)](#署名-非商业性使用-相同方式共享-40-国际-cc-by-nc-sa-40)
+  * [文档](#文档)
+  * [更新计划](#更新计划)
+  * [支持Simple Class Information Display](#支持simple-class-information-display)
+  * [分享协议](#分享协议)
+      * [署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0)](#署名-非商业性使用-相同方式共享-40-国际-cc-by-nc-sa-40)
+<!-- TOC -->
 
 </details>
 
@@ -128,6 +131,7 @@ Gitee用户请在Gitee的 ->[Releases](https://github.com/erduotong/Simple_Class
 * [每日配置文件(daily_config.json)](./docs/config_files/daily_config.md)
 * [时间生成配置文件(time.json)](./docs/config_files/time.md)
 * [课程生成配置文件(lessons.json)](./docs/config_files/lessons.md)
+* [下载配置文件(update_config.json)](./docs/config_files/upgrade_helper.md)
 
 </details>
 
