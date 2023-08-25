@@ -135,9 +135,14 @@ Gitee用户请在Gitee的 ->[Releases](https://github.com/erduotong/Simple_Class
 
 ## 更新计划
 
-- [ ]  重写README
+- [ ] 使用方法README
 
 ---
+
+## 支持Simple Class Information Display
+如果你认为Simple Class Information Display很好用, 可以帮助您的话  
+可以考虑一下支持我更好的开发?  
+[去爱发电看看!](https://afdian.net/a/erduotong)
 
 ## 分享协议
 
