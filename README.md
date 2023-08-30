@@ -42,7 +42,7 @@
 ---
 
 ## 下载
-
+> 可以参考[下载教程](https://www.bilibili.com/video/BV1rp4y1j7k7/)视频
 ### 选择qdarkstyle
 
 程序有两种形式:有qdarkstyle和无qdarkstyle 请参见下图  
@@ -134,6 +134,8 @@ Gitee用户请在Gitee的 ->[Releases](https://github.com/erduotong/Simple_Class
 * [下载配置文件(update_config.json)](./docs/config_files/upgrade_helper.md)
 
 </details>
+
+* [视频记录](./docs/videos.md)
 
 ---
 
