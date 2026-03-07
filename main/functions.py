@@ -5,6 +5,7 @@ import json
 import os
 import re
 import shutil
+import tempfile
 import threading
 import time
 
@@ -16,15 +17,17 @@ from PyQt5.QtWidgets import QLabel, QTimeEdit, QListWidget
 
 # 备份 分别为:路径,目标路径,备份槽位,
 def backup(path: str, destination_path: str, backup_slot: int) -> None:
+    if not os.path.exists(path):
+        return
     # 备份文件名中的时间戳
     timestamp = time.strftime('%Y%m%d-%H%M%S')
     # 获取备份文件的原文件名和扩展名
     file_name, file_ext = os.path.splitext(os.path.basename(path))
     # 生成备份文件名
     backup_name = f"{timestamp}_{file_name}{file_ext}"
-    # 移动文件到目标目录
+    # 复制旧文件到目标目录，避免保存失败时正式文件消失
     backup_path = os.path.join(destination_path, backup_name)
-    shutil.move(path, backup_path)
+    shutil.copy2(path, backup_path)
     # 列出目标文件夹中的所有备份文件，并按修改时间进行排序
     backups = os.listdir(destination_path)
     backups = [os.path.join(destination_path, f) for f in backups]
@@ -41,10 +44,20 @@ def read_file(path: str):
         return f.read()
 
 
-# 写入文件函数
+# 写入文件函数（原子写入）
 def write_file(path: str, text: str) -> None:
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(text)
+    directory = os.path.dirname(path) or "."
+    fd, temp_path = tempfile.mkstemp(dir=directory, prefix=".tmp_", suffix=".writing")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.write(text)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(temp_path, path)
+    except Exception:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+        raise
 
 
 # 输入:星期几,全小写 周六日会返回一个空的列表
