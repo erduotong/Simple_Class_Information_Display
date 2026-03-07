@@ -293,7 +293,7 @@ def initialize_the_file(version: str) -> None:
             },
             "refresh_time": 1,
             "layout_adjustment_accuracy": 100,
-            "minimum_font_size": 20,
+            "minimum_font_size": 2,
             "maximum_font_size": 200,
             "time_font_size": 51,
             "text_edit_refresh_time": 5,
