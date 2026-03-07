@@ -1495,7 +1495,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # 正常 正在上课的情况 为2
             else:
                 for index, lesson in enumerate(active_config["lessons_list"]):
-                    if time_to_datetime(lesson["start"], now_time) <= now_time < time_to_datetime(lesson["end"], now_time):
+                    if time_to_datetime(lesson["start"], now_time) <= now_time < time_to_datetime(lesson["end"],
+                                                                                                  now_time):
                         if self.next_lesson != index + 1:
                             self.next_lesson = index + 1
                             self.update_the_course_indicator_signal.emit(2)
@@ -1780,9 +1781,9 @@ def init_program_settings():
 
 if __name__ == '__main__':
     # 基本参数 快速调节位置
-    version = '1.1.0'  # 当前版本
-    program_type = 'source_without_qdarkstyle.zip'  # 版本类型(下载安装包的名称 包括后缀)
-    form = 'source'  # 程序形式(source / exe)
+    version = '1.2.0'  # 当前版本
+    program_type = 'exe_without_qdarkstyle.zip'  # 版本类型(下载安装包的名称 包括后缀)
+    form = 'exe'  # 程序形式(source / exe)
 
     os.chdir(os.path.dirname(os.path.abspath(__file__)))  # 设定工作目录 保证不会有小天才用cmd执行
 
@@ -1804,9 +1805,9 @@ if __name__ == '__main__':
     scheduled_task_thread.start()
 
     # qdarkstyle
-    import qdarkstyle
-
-    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss
+    # import qdarkstyle
+    #
+    # app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss
     # 进入主窗口
     sys.exit(app.exec_())
 
