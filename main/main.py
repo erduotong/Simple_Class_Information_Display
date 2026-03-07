@@ -1384,40 +1384,48 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 如果没有特殊变化那就不刷新 否则就进行一个刷新
         now_time = datetime.datetime.now()
         active_config = self.display_daily_config
-        # 如果还没开始第一节课的情况 为0
-        if now_time < time_to_datetime(active_config["lessons_list"][0]["start"], now_time):
-            if self.lessons_status != 0:
-                self.lessons_status = 0
-                self.update_the_course_indicator_signal.emit(0)
-            # 更新一下课程表的指示器
-            self.time_to_next.setPlainText(
-                f"距离{active_config['lessons_list'][0]['name']}还有{format_timedelta(time_to_datetime(active_config['lessons_list'][0]['start'], now_time) - now_time)}"
-            )
-        # 上完最后一节课的情况 为1
-        elif now_time > time_to_datetime(active_config["lessons_list"][-1]["end"], now_time):
-            if self.lessons_status != 1:
-                self.lessons_status = 1
-                self.update_the_course_indicator_signal.emit(1)
-            self.time_to_next.setPlainText(
-                f"已放学{format_timedelta(now_time - time_to_datetime(active_config['lessons_list'][-1]['end'], now_time))}"
-            )
-        # 正常 正在上课的情况 为2
+        # 预览第二天课表
+        if self.is_previewing_tomorrow:
+            self.time_to_next.setPlainText("明天的课表")
+            self.now_lesson_indicator = 'hide'
+            self.next_lesson_indicator = 'hide'
+            self.refresh_the_course_indicator_position()
         else:
-            for index, lesson in enumerate(active_config["lessons_list"]):
-                if time_to_datetime(lesson["start"], now_time) <= now_time < time_to_datetime(lesson["end"], now_time):
-                    if self.next_lesson != index + 1:
-                        self.next_lesson = index + 1
-                        self.update_the_course_indicator_signal.emit(2)
-                    break
-            if self.next_lesson is None:
-                return
-            if self.next_lesson == len(active_config["lessons_list"]):  # 超过列表最大长度了
+            # 正常情况
+            # 如果还没开始第一节课的情况 为0
+            if now_time < time_to_datetime(active_config["lessons_list"][0]["start"], now_time):
+                if self.lessons_status != 0:
+                    self.lessons_status = 0
+                    self.update_the_course_indicator_signal.emit(0)
+                # 更新一下课程表的指示器
                 self.time_to_next.setPlainText(
-                    f"距离放学还有{format_timedelta(time_to_datetime(active_config['lessons_list'][self.next_lesson - 1]['end'], now_time) - now_time)}")
-            else:
-                self.time_to_next.setPlainText(
-                    f"距离{active_config['lessons_list'][self.next_lesson]['name']}还有{format_timedelta(time_to_datetime(active_config['lessons_list'][self.next_lesson]['start'], now_time) - now_time)}"
+                    f"距离{active_config['lessons_list'][0]['name']}还有{format_timedelta(time_to_datetime(active_config['lessons_list'][0]['start'], now_time) - now_time)}"
                 )
+            # 上完最后一节课的情况 为1
+            elif now_time > time_to_datetime(active_config["lessons_list"][-1]["end"], now_time):
+                if self.lessons_status != 1:
+                    self.lessons_status = 1
+                    self.update_the_course_indicator_signal.emit(1)
+                self.time_to_next.setPlainText(
+                    f"已放学{format_timedelta(now_time - time_to_datetime(active_config['lessons_list'][-1]['end'], now_time))}"
+                )
+            # 正常 正在上课的情况 为2
+            else:
+                for index, lesson in enumerate(active_config["lessons_list"]):
+                    if time_to_datetime(lesson["start"], now_time) <= now_time < time_to_datetime(lesson["end"], now_time):
+                        if self.next_lesson != index + 1:
+                            self.next_lesson = index + 1
+                            self.update_the_course_indicator_signal.emit(2)
+                        break
+                if self.next_lesson is None:
+                    return
+                if self.next_lesson == len(active_config["lessons_list"]):  # 超过列表最大长度了
+                    self.time_to_next.setPlainText(
+                        f"距离放学还有{format_timedelta(time_to_datetime(active_config['lessons_list'][self.next_lesson - 1]['end'], now_time) - now_time)}")
+                else:
+                    self.time_to_next.setPlainText(
+                        f"距离{active_config['lessons_list'][self.next_lesson]['name']}还有{format_timedelta(time_to_datetime(active_config['lessons_list'][self.next_lesson]['start'], now_time) - now_time)}"
+                    )
 
         # 设置对齐方式
         self.time_to_next.setAlignment(Qt.AlignCenter)
