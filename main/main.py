@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import copy
+import os
 import random
 import subprocess
 import sys
+import threading
+import traceback
 
 import urllib3
 from PyQt5 import QtCore, QtWidgets
@@ -15,6 +18,80 @@ from main_window import Ui_MainWindow
 from rcs import Ui_Dialog
 from settings_page import Ui_settings
 from updater import *
+
+_crash_dialog_lock = threading.Lock()
+_crash_dialog_shown = False
+_crash_reporter = None
+
+
+class CrashReporter(QObject):
+    show_crash_signal = pyqtSignal(str)
+
+    def __init__(self):
+        super().__init__()
+        self.show_crash_signal.connect(self.show_crash_dialog)
+
+    def show_crash_dialog(self, crash_text: str):
+        message_box = QMessageBox(QMessageBox.Critical, "程序发生错误",
+                                  "程序遇到了未处理的错误，即将退出。\n"
+                                  "你可以展开“Show Details...”查看完整日志，或点击“复制日志”。",
+                                  QMessageBox.Close)
+        message_box.setDetailedText(crash_text)
+        copy_button = message_box.addButton("复制日志", QMessageBox.ActionRole)
+        message_box.exec()
+        if message_box.clickedButton() == copy_button:
+            QApplication.clipboard().setText(crash_text)
+            QMessageBox.information(None, "已复制", "错误日志已复制到剪贴板。", QMessageBox.Ok)
+        os._exit(1)
+
+
+def build_crash_text(exc_type, exc_value, exc_traceback, thread_name: str) -> str:
+    timestamp = QDateTime.currentDateTime().toString("yyyy-MM-dd HH:mm:ss")
+    traceback_text = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+    return (f"时间: {timestamp}\n"
+            f"线程: {thread_name}\n"
+            f"异常类型: {exc_type.__name__}\n"
+            f"异常信息: {exc_value}\n\n"
+            f"{traceback_text}")
+
+
+def dispatch_crash_dialog(crash_text: str) -> None:
+    global _crash_dialog_shown
+    with _crash_dialog_lock:
+        if _crash_dialog_shown:
+            return
+        _crash_dialog_shown = True
+    app_instance = QApplication.instance()
+    if app_instance is None or _crash_reporter is None:
+        sys.__stderr__.write(crash_text)
+        os._exit(1)
+    if threading.current_thread() is threading.main_thread():
+        _crash_reporter.show_crash_dialog(crash_text)
+    else:
+        _crash_reporter.show_crash_signal.emit(crash_text)
+
+
+def handle_uncaught_exception(exc_type, exc_value, exc_traceback) -> None:
+    if issubclass(exc_type, KeyboardInterrupt):
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+    crash_text = build_crash_text(exc_type, exc_value, exc_traceback, threading.current_thread().name)
+    dispatch_crash_dialog(crash_text)
+
+
+def handle_thread_exception(args) -> None:
+    if issubclass(args.exc_type, KeyboardInterrupt):
+        return
+    crash_text = build_crash_text(args.exc_type, args.exc_value, args.exc_traceback, args.thread.name)
+    dispatch_crash_dialog(crash_text)
+
+
+def install_crash_handlers() -> None:
+    global _crash_reporter
+    _crash_reporter = CrashReporter()
+    sys.excepthook = handle_uncaught_exception
+    if hasattr(threading, "excepthook"):
+        threading.excepthook = handle_thread_exception
 
 
 class ReselectTheClassScheduleWindow(QDialog, Ui_Dialog):
@@ -1711,6 +1788,7 @@ if __name__ == '__main__':
 
     init_program_settings()  # 初始化一些设置
     app = QApplication(sys.argv)  # 创建app
+    install_crash_handlers()
     init_need_files_and_folders()  # 初始化所需文件和文件夹(如果需要
     week_name = None
     init_daily_config()  # 初始化daily_config
@@ -1729,7 +1807,6 @@ if __name__ == '__main__':
     import qdarkstyle
 
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())  # 设置qss 使用qdarkstyle qss
-
     # 进入主窗口
     sys.exit(app.exec_())
 
