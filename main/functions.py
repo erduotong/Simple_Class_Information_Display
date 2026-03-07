@@ -49,13 +49,11 @@ def write_file(path: str, text: str) -> None:
 
 # 输入:星期几,全小写 周六日会返回一个空的列表
 def populate_the_timesheet(weekday: str):
-    if weekday == "saturday" or weekday == "sunday":  # 可以自定义
-        # 返回空~
-        return [{'name': 'None', 'start': '00:01', 'end': '23:59'}]
     time_dict = json.loads(read_file("../data/Curriculum/time.json"))
     lessons_list_a = json.loads(read_file("../data/Curriculum/lessons.json"))
     lessons_list = lessons_list_a[weekday]
-
+    if lessons_list == ["None"] or not lessons_list:
+        return [{'name': 'None', 'start': '00:01', 'end': '23:59'}]
     # 创建一个空列表 start_end_times，用于存储各节课程的开始和结束时间
     start_end_times = []
     # 读取每个课程的时间信息并将其添加到 start_end_times 中
