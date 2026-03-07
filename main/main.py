@@ -249,7 +249,6 @@ class SettingsPage(QWidget, Ui_settings):
         preview_layout.addWidget(preview_time)
         preview_widget.setLayout(preview_layout)
 
-
         # 递归的函数
         def add_widget(a: dict, top_key):
 
@@ -1234,6 +1233,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             "backup": copy.deepcopy(self.daily_config.get("backup", {"msg": "", "homework": ""}))
         }
 
+    # 缓存
+    def get_or_build_preview_daily_config(self, now_time=None):
+        if now_time is None:
+            now_time = datetime.datetime.now()
+        tomorrow_str = (now_time.date() + datetime.timedelta(days=1)).strftime("%Y_%m_%d")
+        if self.preview_daily_config and self.preview_daily_config["date_time"] == tomorrow_str:
+            return self.preview_daily_config
+        self.preview_daily_config = self.build_preview_daily_config(now_time)
+        return self.preview_daily_config
+
     def reset_schedule_runtime_state(self):
         self.lessons_status = None
         self.next_lesson = None
@@ -1252,11 +1261,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         switch_time = self.get_preview_switch_time()
         if disk_date == today_str:
             if now_time.time() >= switch_time:
-                return self.build_preview_daily_config(now_time), True
+                return self.get_or_build_preview_daily_config(now_time), True
             return self.daily_config, False
         if displayed_date == today_str:
             if now_time.time() >= switch_time:
-                return self.build_preview_daily_config(now_time), True
+                return self.get_or_build_preview_daily_config(now_time), True
             return self.display_daily_config, False
         return self.daily_config, False
 
@@ -1400,6 +1409,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         self.next_lesson = index + 1
                         self.update_the_course_indicator_signal.emit(2)
                     break
+            if self.next_lesson is None:
+                return
             if self.next_lesson == len(active_config["lessons_list"]):  # 超过列表最大长度了
                 self.time_to_next.setPlainText(
                     f"距离放学还有{format_timedelta(time_to_datetime(active_config['lessons_list'][self.next_lesson - 1]['end'], now_time) - now_time)}")
