@@ -1,0 +1,13 @@
+[project]
+name = "simple-class-information-display"
+version = "0.1.0"
+description = ""
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pyqt5==5.15.11",
+    "pyqt5-qt5==5.15.2",
+    "qdarkstyle>=3.2.3",
+    "requests>=2.32.5",
+    "urllib3>=2.6.3",
+]
