@@ -223,6 +223,33 @@ class SettingsPage(QWidget, Ui_settings):
             "next_indicator_text": "下节课程指示器显示文本"
         }
 
+        preview_widget = QWidget()
+        preview_widget.setFixedHeight(self.program_config_scrollarea.height() // 11)
+        preview_layout = QHBoxLayout()
+        preview_label = QLabel("预览第二天课表")
+        preview_label.setFont(QFont("黑体"))
+        preview_label.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
+        preview_layout.addWidget(preview_label)
+
+        preview_enabled = QCheckBox("启用")
+        preview_enabled.setFont(QFont("黑体"))
+        preview_enabled.setChecked(self.program_config_dict.get("preview_tomorrow_enabled", False))
+        preview_enabled.stateChanged.connect(self.update_preview_tomorrow_enabled)
+        preview_layout.addWidget(preview_enabled)
+
+        preview_time = QTimeEdit()
+        preview_time.setFont(QFont("黑体"))
+        preview_time.setDisplayFormat("hh:mm")
+        preview_time.setTime(
+            QTime.fromString(self.program_config_dict.get("preview_tomorrow_switch_time", "20:00"), "hh:mm")
+        )
+        if not preview_time.time().isValid():
+            preview_time.setTime(QTime(20, 0))
+        preview_time.timeChanged.connect(self.update_preview_tomorrow_switch_time)
+        preview_layout.addWidget(preview_time)
+        preview_widget.setLayout(preview_layout)
+
+
         # 递归的函数
         def add_widget(a: dict, top_key):
 
@@ -235,7 +262,7 @@ class SettingsPage(QWidget, Ui_settings):
                         add_widget(value, key)
                     continue
                 # version不显示
-                if key in ("version", "update_config"):
+                if key in ("version", "update_config", "preview_tomorrow_enabled", "preview_tomorrow_switch_time"):
                     continue
                 # 替换成单一字符串
                 if top_key is not None:
@@ -274,6 +301,16 @@ class SettingsPage(QWidget, Ui_settings):
         for i in self.program_config_show_area.findChildren(QLineEdit):
             adaptive_label_font_size(i, 50, 1)
             # 字体变化的时候更新program_config这个dict
+        adaptive_label_font_size(preview_label, 50, 1)
+        adaptive_label_font_size(preview_enabled, 50, 1)
+        adaptive_label_font_size(preview_time, 50, 1)
+        self.program_config_show_area.layout().addWidget(preview_widget)
+
+    def update_preview_tomorrow_enabled(self, state):
+        self.program_config_dict["preview_tomorrow_enabled"] = state == Qt.Checked
+
+    def update_preview_tomorrow_switch_time(self, time_):
+        self.program_config_dict["preview_tomorrow_switch_time"] = time_.toString("hh:mm")
 
     def update_program_config_dict(self, text, key, value_type):
         if text == '':
@@ -1082,6 +1119,10 @@ class SettingsPage(QWidget, Ui_settings):
         self.program_config_show_area.setMaximumSize(maxsize, maxsize)
 
 
+def get_week_name_by_date(target_date):
+    return ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][target_date.weekday()]
+
+
 class MainWindow(QMainWindow, Ui_MainWindow):
     refresh_time_signal = pyqtSignal()  # 更新时间
     run_adaptive_text_edit_manually = pyqtSignal()  # 自适应homework和message的字体大小和比例 手动触发
@@ -1111,6 +1152,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.screen_width = None
         self.lessons_status = None
         self.daily_config = json.loads(read_file("../data/daily_config.json"))
+        self.display_daily_config = copy.deepcopy(self.daily_config)
+        self.preview_daily_config = None
+        self.is_previewing_tomorrow = False
         self.lessons_with_slots = []
         self.next_lesson = None  # 存储的是lessons_list的下标
         self.time_to_next_len = None
@@ -1151,7 +1195,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     # 需要渲染窗口完毕后执行的函数
     def after_init(self):
-        self.initialize_the_class_schedule()
+        self.update_display_schedule(force=True)
         QtCore.QTimer.singleShot(0, self.after_after_init)
 
     # 真的是醉了......
@@ -1164,11 +1208,74 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     # 刷新时间
     def refresh_time(self):
+        self.update_display_schedule()
         self.nowtime.setText(time.strftime("%Y/%m/%d %H:%M:%S ", time.localtime()) +
                              ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"][
                                  time.localtime().tm_wday])
         self.time_to_next_refresh()
         self.nowtime.repaint()
+
+    def get_preview_switch_time(self):
+        try:
+            return datetime.datetime.strptime(
+                self.program_config.get("preview_tomorrow_switch_time", "20:00"), "%H:%M"
+            ).time()
+        except ValueError:
+            return datetime.time(20, 0)
+
+    def build_preview_daily_config(self, now_time=None):
+        if now_time is None:
+            now_time = datetime.datetime.now()
+        target_date = now_time.date() + datetime.timedelta(days=1)
+        target_week_name = get_week_name_by_date(target_date)
+        return {
+            "date_time": target_date.strftime("%Y_%m_%d"),
+            "lessons_list": populate_the_timesheet(target_week_name),
+            "backup": copy.deepcopy(self.daily_config.get("backup", {"msg": "", "homework": ""}))
+        }
+
+    def reset_schedule_runtime_state(self):
+        self.lessons_status = None
+        self.next_lesson = None
+        self.time_to_next_len = None
+        self.now_lesson_indicator = 'hide'
+        self.next_lesson_indicator = 'hide'
+
+    def select_display_schedule(self, now_time=None):
+        if now_time is None:
+            now_time = datetime.datetime.now()
+        if not self.program_config.get("preview_tomorrow_enabled", False):
+            return self.daily_config, False
+        today_str = now_time.date().strftime("%Y_%m_%d")
+        disk_date = self.daily_config["date_time"]
+        displayed_date = self.display_daily_config["date_time"] if self.display_daily_config else disk_date
+        switch_time = self.get_preview_switch_time()
+        if disk_date == today_str:
+            if now_time.time() >= switch_time:
+                return self.build_preview_daily_config(now_time), True
+            return self.daily_config, False
+        if displayed_date == today_str:
+            if now_time.time() >= switch_time:
+                return self.build_preview_daily_config(now_time), True
+            return self.display_daily_config, False
+        return self.daily_config, False
+
+    def update_display_schedule(self, force=False):
+        next_display_config, previewing = self.select_display_schedule()
+        next_date = next_display_config["date_time"]
+        current_date = self.display_daily_config["date_time"] if self.display_daily_config else None
+        if not force and previewing == self.is_previewing_tomorrow and current_date == next_date:
+            return
+        self.is_previewing_tomorrow = previewing
+        self.preview_daily_config = next_display_config if previewing else None
+        self.display_daily_config = copy.deepcopy(next_display_config)
+        self.reset_schedule_runtime_state()
+        if hasattr(self, "lessons_list"):
+            self.initialize_the_class_schedule()
+            for slot_name in self.lessons_slots:
+                adjust_the_text_edit_font_size([self.findChild(QTextBrowser, slot_name)],
+                                               self.min_font_size, self.max_font_size)
+            self.refresh_the_course_indicator_position()
 
     # 更新msg和hw两个的拉伸和字体大小
     def adjust_msg_hw_size(self):
@@ -1235,8 +1342,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 先把要加入的数量判断出来
         self.lessons_with_slots = []  # 初始化一下
         lessons = json.loads(read_file("../data/Curriculum/lessons.json"))  # 读一下lessons后面判断
-        self.daily_config = json.loads(read_file("../data/daily_config.json"))  # 读入daily_config
-        for i in self.daily_config["lessons_list"]:
+        active_config = self.display_daily_config
+        for i in active_config["lessons_list"]:
             if i["name"] in lessons["special"] or i["name"] == '课间':  # 特殊课程和课间不能入内
                 continue
             self.lessons_with_slots.append(i["name"])  # 加!
@@ -1267,37 +1374,38 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 先判断时间 然后进行处理
         # 如果没有特殊变化那就不刷新 否则就进行一个刷新
         now_time = datetime.datetime.now()
+        active_config = self.display_daily_config
         # 如果还没开始第一节课的情况 为0
-        if now_time < time_to_datetime(self.daily_config["lessons_list"][0]["start"], now_time):
+        if now_time < time_to_datetime(active_config["lessons_list"][0]["start"], now_time):
             if self.lessons_status != 0:
                 self.lessons_status = 0
                 self.update_the_course_indicator_signal.emit(0)
             # 更新一下课程表的指示器
             self.time_to_next.setPlainText(
-                f"距离{self.daily_config['lessons_list'][0]['name']}还有{format_timedelta(time_to_datetime(self.daily_config['lessons_list'][0]['start'], now_time) - now_time)}"
+                f"距离{active_config['lessons_list'][0]['name']}还有{format_timedelta(time_to_datetime(active_config['lessons_list'][0]['start'], now_time) - now_time)}"
             )
         # 上完最后一节课的情况 为1
-        elif now_time > time_to_datetime(self.daily_config["lessons_list"][-1]["end"], now_time):
+        elif now_time > time_to_datetime(active_config["lessons_list"][-1]["end"], now_time):
             if self.lessons_status != 1:
                 self.lessons_status = 1
                 self.update_the_course_indicator_signal.emit(1)
             self.time_to_next.setPlainText(
-                f"已放学{format_timedelta(now_time - time_to_datetime(self.daily_config['lessons_list'][-1]['end'], now_time))}"
+                f"已放学{format_timedelta(now_time - time_to_datetime(active_config['lessons_list'][-1]['end'], now_time))}"
             )
         # 正常 正在上课的情况 为2
         else:
-            for index, lesson in enumerate(self.daily_config["lessons_list"]):
+            for index, lesson in enumerate(active_config["lessons_list"]):
                 if time_to_datetime(lesson["start"], now_time) <= now_time < time_to_datetime(lesson["end"], now_time):
                     if self.next_lesson != index + 1:
                         self.next_lesson = index + 1
                         self.update_the_course_indicator_signal.emit(2)
                     break
-            if self.next_lesson == len(self.daily_config["lessons_list"]):  # 超过列表最大长度了
+            if self.next_lesson == len(active_config["lessons_list"]):  # 超过列表最大长度了
                 self.time_to_next.setPlainText(
-                    f"距离放学还有{format_timedelta(time_to_datetime(self.daily_config['lessons_list'][self.next_lesson - 1]['end'], now_time) - now_time)}")
+                    f"距离放学还有{format_timedelta(time_to_datetime(active_config['lessons_list'][self.next_lesson - 1]['end'], now_time) - now_time)}")
             else:
                 self.time_to_next.setPlainText(
-                    f"距离{self.daily_config['lessons_list'][self.next_lesson]['name']}还有{format_timedelta(time_to_datetime(self.daily_config['lessons_list'][self.next_lesson]['start'], now_time) - now_time)}"
+                    f"距离{active_config['lessons_list'][self.next_lesson]['name']}还有{format_timedelta(time_to_datetime(active_config['lessons_list'][self.next_lesson]['start'], now_time) - now_time)}"
                 )
 
         # 设置对齐方式
@@ -1316,15 +1424,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         :return: None
         """
         now_time = datetime.datetime.now()
+        active_config = self.display_daily_config
         if mode == 0:
-            if self.daily_config['lessons_list'][0]['name'] in self.lessons_with_slots:
+            if active_config['lessons_list'][0]['name'] in self.lessons_with_slots:
                 # 指向lesson1(next)
                 self.now_lesson_indicator = 'hide'
                 self.next_lesson_indicator = self.findChild(QTextBrowser, 'lesson1')
                 self.refresh_the_course_indicator_position()
             else:
                 text_browser = self.findChild(QTextBrowser, "common_course_slots")
-                text_browser.setPlainText(self.daily_config['lessons_list'][0]['name'])
+                text_browser.setPlainText(active_config['lessons_list'][0]['name'])
                 text_browser.setAlignment(Qt.AlignHCenter)
                 adjust_the_text_edit_font_size([text_browser], self.min_font_size, self.max_font_size)
                 # 指向common_course_slots(next)
@@ -1344,7 +1453,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return
         lesson_index = 0
         lesson_now: dict = {}
-        for index, lesson in enumerate(self.daily_config["lessons_list"]):
+        for index, lesson in enumerate(active_config["lessons_list"]):
             if time_to_datetime(lesson["start"], now_time) <= now_time < time_to_datetime(lesson["end"], now_time):
                 lesson_now = lesson
                 lesson_index = index
@@ -1356,8 +1465,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             adjust_the_text_edit_font_size([text_browser], self.min_font_size, self.max_font_size)
             # 首先来判断lesson_index+1是否存在
             # 下一节课是放学或者要用槽 现在又要用到槽位 所以不显示下一节课
-            if lesson_index + 1 >= len(self.daily_config['lessons_list']) or \
-                    self.daily_config['lessons_list'][lesson_index + 1][
+            if lesson_index + 1 >= len(active_config['lessons_list']) or \
+                    active_config['lessons_list'][lesson_index + 1][
                         'name'] not in self.lessons_with_slots:
                 # 指向common(now)
                 self.now_lesson_indicator = self.findChild(QTextBrowser, 'common_course_slots')
@@ -1365,10 +1474,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.refresh_the_course_indicator_position()
                 return
             # 下一节课不用槽位的情况 搜索下一节课是哪个
-            tot = search_now_lessons(self.daily_config, self.daily_config["lessons_list"][lesson_index + 1])
+            tot = search_now_lessons(active_config, active_config["lessons_list"][lesson_index + 1])
             index: int = 0
             for index, i in enumerate(self.lessons_with_slots):
-                if i == self.daily_config["lessons_list"][lesson_index + 1]['name']:
+                if i == active_config["lessons_list"][lesson_index + 1]['name']:
                     tot -= 1
                 if tot == 0:
                     break
@@ -1380,15 +1489,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 现在不用槽位的情况
         else:
             # 先搜索现在的在什么地方
-            tot = search_now_lessons(self.daily_config, self.daily_config["lessons_list"][lesson_index])
+            tot = search_now_lessons(active_config, active_config["lessons_list"][lesson_index])
             index: int = 0
             for index, i in enumerate(self.lessons_with_slots):
-                if i == self.daily_config["lessons_list"][lesson_index]['name']:
+                if i == active_config["lessons_list"][lesson_index]['name']:
                     tot -= 1
                 if tot == 0:
                     break
             # 下一节课是放学
-            if lesson_index + 1 >= len(self.daily_config['lessons_list']):
+            if lesson_index + 1 >= len(active_config['lessons_list']):
                 text_browser = self.findChild(QTextBrowser, "common_course_slots")
                 text_browser.setPlainText('放学')
                 text_browser.setAlignment(Qt.AlignHCenter)
@@ -1399,9 +1508,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.refresh_the_course_indicator_position()
                 return
             # 下一节课是课间/special等
-            elif self.daily_config['lessons_list'][lesson_index + 1]['name'] not in self.lessons_with_slots:
+            elif active_config['lessons_list'][lesson_index + 1]['name'] not in self.lessons_with_slots:
                 text_browser = self.findChild(QTextBrowser, "common_course_slots")
-                text_browser.setPlainText(self.daily_config["lessons_list"][lesson_index + 1]['name'])
+                text_browser.setPlainText(active_config["lessons_list"][lesson_index + 1]['name'])
                 text_browser.setAlignment(Qt.AlignHCenter)
                 adjust_the_text_edit_font_size([text_browser], self.min_font_size, self.max_font_size)
                 # self.lessons_slots[index+1](now) 指向common(next)
@@ -1511,6 +1620,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(0)  # 切换到设置的堆叠布局
         # 刷新其他的数据 (暂完成？有bug以后再修
         self.daily_config = json.loads(read_file('../data/daily_config.json'))
+        self.display_daily_config = copy.deepcopy(self.daily_config)
+        self.preview_daily_config = None
         # 刷新program_config
         self.program_config = json.loads(read_file('../data/program_config.json'))
         program_config = self.program_config

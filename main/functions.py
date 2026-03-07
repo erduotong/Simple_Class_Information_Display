@@ -299,7 +299,9 @@ def initialize_the_file(version: str) -> None:
             "text_edit_refresh_time": 5,
             "the_window_changes_the_refresh_time": 0.7,
             "now_indicator_text": "<Now",
-            "next_indicator_text": "<Next"
+            "next_indicator_text": "<Next",
+            "preview_tomorrow_enabled": False,
+            "preview_tomorrow_switch_time": "20:00"
 
         },
         "../data/DownloadHelper/update_config.json": {

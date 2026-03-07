@@ -27,3 +27,5 @@
 * the_window_changes_the_refresh_time：窗口大小改变后刷新字体的时间
 * now_indicator_text: 现在的课程指示器的显示的文本 如<Now
 * next_indicator_text: 下一节课的课程指示器的显示的文本 如<Next
+* preview_tomorrow_enabled: 是否启用明天课表预览
+* preview_tomorrow_switch_time: 明天课表预览的切换时间，格式为 `HH:MM`
