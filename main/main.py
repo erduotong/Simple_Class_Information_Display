@@ -206,6 +206,10 @@ class SettingsPage(QWidget, Ui_settings):
         for i in self.program_config_show_area.findChildren(QWidget):
             i.deleteLater()
             pass
+        program_config_font_px = 30
+        program_config_label_min_height = 42
+        program_config_control_min_height = 42
+        program_config_row_height = 72
         # 用于翻译对照
         compare_dict = {
             "backup_slots<--daily_config": "今日配置文件备份槽位数",
@@ -224,21 +228,27 @@ class SettingsPage(QWidget, Ui_settings):
         }
 
         preview_widget = QWidget()
-        preview_widget.setFixedHeight(self.program_config_scrollarea.height() // 11)
+        preview_widget.setFixedHeight(program_config_row_height)
         preview_layout = QHBoxLayout()
         preview_label = QLabel("预览第二天课表")
         preview_label.setFont(QFont("黑体"))
+        preview_label.setStyleSheet(f"font-size: {program_config_font_px}px;")
+        preview_label.setMinimumHeight(program_config_label_min_height)
         preview_label.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
         preview_layout.addWidget(preview_label)
 
         preview_enabled = QCheckBox("启用")
         preview_enabled.setFont(QFont("黑体"))
+        preview_enabled.setStyleSheet(f"font-size: {program_config_font_px}px;")
+        preview_enabled.setMinimumHeight(program_config_control_min_height)
         preview_enabled.setChecked(self.program_config_dict.get("preview_tomorrow_enabled", False))
         preview_enabled.stateChanged.connect(self.update_preview_tomorrow_enabled)
         preview_layout.addWidget(preview_enabled)
 
         preview_time = QTimeEdit()
         preview_time.setFont(QFont("黑体"))
+        preview_time.setStyleSheet(f"font-size: {program_config_font_px}px;")
+        preview_time.setMinimumHeight(program_config_control_min_height)
         preview_time.setDisplayFormat("hh:mm")
         preview_time.setTime(
             QTime.fromString(self.program_config_dict.get("preview_tomorrow_switch_time", "20:00"), "hh:mm")
@@ -268,16 +278,21 @@ class SettingsPage(QWidget, Ui_settings):
                     key = f"{top_key}<--{key}"
                 # 根据value和key生成widget
                 widget = QWidget()
-                widget.setFixedHeight(self.program_config_scrollarea.height() // 11)
+                widget.setFixedHeight(program_config_row_height)
                 # 为widget内添加label
                 layout = QHBoxLayout()  # 设置水平布局
                 label = QLabel(compare_dict.get(key))
                 font = QFont("黑体")
                 label.setFont(font)
+                label.setStyleSheet(f"font-size: {program_config_font_px}px;")
+                label.setMinimumHeight(program_config_label_min_height)
                 label.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
                 layout.addWidget(label)
                 # 添加编辑框 判断类型并设置能输入什么东西
                 line_edit = QLineEdit()
+                line_edit.setFont(QFont("黑体"))
+                line_edit.setStyleSheet(f"font-size: {program_config_font_px}px;")
+                line_edit.setMinimumHeight(program_config_control_min_height)
                 line_edit.setText(str(value))  # 添加文本
                 # 判断类型
                 if isinstance(value, float):
@@ -294,15 +309,6 @@ class SettingsPage(QWidget, Ui_settings):
                 self.program_config_show_area.layout().addWidget(widget)  # 加入widget
 
         add_widget(self.program_config_dict, None)  # 传入None 现在就是在遍历top key
-        # 自适应字体大小
-        for i in self.program_config_show_area.findChildren(QLabel):
-            adaptive_label_font_size(i, 50, 1)
-        for i in self.program_config_show_area.findChildren(QLineEdit):
-            adaptive_label_font_size(i, 50, 1)
-            # 字体变化的时候更新program_config这个dict
-        adaptive_label_font_size(preview_label, 50, 1)
-        adaptive_label_font_size(preview_enabled, 50, 1)
-        adaptive_label_font_size(preview_time, 50, 1)
         self.program_config_show_area.layout().addWidget(preview_widget)
 
     def update_preview_tomorrow_enabled(self, state):
