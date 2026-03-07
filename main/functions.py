@@ -355,33 +355,50 @@ def adaptive_label_font_size(label, max_size: int, min_size: int) -> None:
     """
     if min_size > max_size:
         max_size, min_size = min_size, max_size
+    max_size = max(1, int(max_size))
+    min_size = max(1, int(min_size))
+
     contents_rect = label.contentsRect()
-    label_width = contents_rect.width()
-    label_height = contents_rect.height()
-    text = label.text()
+    label_width = max(0, contents_rect.width(   ) - 2)
+    label_height = max(0, contents_rect.height() - 2)
+    if label_width == 0 or label_height == 0:
+        return
+
+    text = label.text() if hasattr(label, "text") else ""
     text = re.sub(r'<a\b[^>]*>(.*?)</a>', r'\1', text)
-    # 设置初始字体大小，根据初始标签大小和文本大小评估
-    initial_font_size = (max_size + min_size) // 2
+    lines = text.splitlines() if text else [""]
     font = label.font()
     font.setFamily("黑体")
-    font.setPointSize(initial_font_size)
 
-    # 使用二分法进行快速搜索
-    while max_size >= min_size:
-        current_font_size = (max_size + min_size) // 2
-        font.setPointSize(current_font_size)
-
-        # 测量文本的尺寸
+    def can_fit(point_size: int) -> bool:
+        font.setPointSize(point_size)
         fm = QFontMetricsF(font)
-        text_width = fm.boundingRect(text).width()
-        text_height = fm.lineSpacing()
-        # 根据文本尺寸调整搜索范围
-        if text_width > label_width or text_height > label_height:
-            max_size = current_font_size - 1
+        text_width = 0
+        for line in lines:
+            line_text = line if line else " "
+            line_width = max(fm.horizontalAdvance(line_text), fm.tightBoundingRect(line_text).width())
+            text_width = max(text_width, line_width)
+        text_height = fm.height() * len(lines)
+        return text_width <= label_width and text_height <= label_height
+
+    low = min_size
+    if not can_fit(low):
+        low = 1
+    high = max_size
+    best_size = low
+    # 二分搜
+    while low <= high:
+        current_font_size = (low + high) // 2
+        if can_fit(current_font_size):
+            best_size = current_font_size
+            low = current_font_size + 1
         else:
-            min_size = current_font_size + 1
-    # 使用最终确定的字体大小
-    font.setPointSize(max_size)
+            high = current_font_size - 1
+
+    while best_size > 1 and not can_fit(best_size):
+        best_size -= 1
+
+    font.setPointSize(best_size)
     label.setFont(font)
     return
 
